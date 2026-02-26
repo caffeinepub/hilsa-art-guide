@@ -1,0 +1,24 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-26T19:02:54.599Z",
+  "summary": "REQ-1 is implemented in the UploadInterface.tsx diff: job ID is validated before navigation and an error toast is shown if missing. REQ-2 is described in the file summary for Results.tsx but the actual diff of Results.tsx is not present — only a summary string mentions it. The defensive check for missing job ID in the Results page cannot be confirmed from the diff evidence alone.",
+  "missing_requirements": [
+    {
+      "id": "REQ-2",
+      "requirement": "Add a defensive check in the Results page component so that if the job ID route parameter is missing or empty, a clear user-facing error message is displayed with a link back to the Home page.",
+      "reason": "The diff does not include the actual modified content of frontend/src/pages/Results.tsx. Only a high-level file summary string describes it as 'Updated Results page', but there is no code evidence showing the defensive check, the 'No job ID provided' error message, or the 'Go Home' link. The acceptance criteria (error renders without crashing or making backend queries, navigating to /results/ shows the message) cannot be verified.",
+      "evidence": [
+        "frontend-file-summaries.txt",
+        "frontend/src/pages/Results.tsx"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.72,
+  "changed_files": [
+    "frontend-file-summaries.txt",
+    "frontend/src/components/UploadInterface.tsx",
+    "project_state.json"
+  ]
+}

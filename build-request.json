@@ -1,0 +1,57 @@
+{
+  "kind": "build_request",
+  "title": "Fix missing job ID in upload flow navigation to Results page",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Fix the UploadInterface component so that after a backend job is created and processed, the resulting job ID is correctly extracted and passed as a route parameter when navigating to the Results page. Ensure the job ID is never undefined, null, or empty before navigation is triggered.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "NO job id provided"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After a successful image upload and job creation, the browser navigates to /results/<jobId> where <jobId> is a valid non-empty string returned by the backend.",
+        "The Results page receives the job ID from the route parameter and fetches job status without showing a 'no job ID' error.",
+        "If job creation fails or returns no ID, an error toast is shown to the user and navigation does not proceed.",
+        "The fix is isolated to the upload flow; no other routes or components are affected."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add a defensive check in the Results page component so that if the job ID route parameter is missing or empty, a clear user-facing error message is displayed (e.g., 'No job ID provided. Please upload an image to get started.') with a link back to the Home page.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "NO job id provided"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Navigating to /results or /results/ without a job ID displays the error message and a 'Go Home' link.",
+        "The error state renders without crashing or making any backend queries.",
+        "The existing loading, failed, and success states for valid job IDs are unaffected."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "Do not change the backend job creation or processing API signatures."
+  ],
+  "nonGoals": [
+    "Redesigning the upload UI or results page layout.",
+    "Changing the backend job management logic.",
+    "Adding new job polling or retry mechanisms beyond what already exists."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

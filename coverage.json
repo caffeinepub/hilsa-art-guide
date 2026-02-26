@@ -1,0 +1,46 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-26T19:02:54.602Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 2,
+    "implemented": 1,
+    "items": [
+      {
+        "id": "REQ-1",
+        "summary": "Fix the UploadInterface component so that after a backend job is created and processed, the resulting job ID is correctly extracted and passed as a route parameter when navigating to the Results page. Ensure the job ID is never undefined, null, or empty before navigation is triggered.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/UploadInterface.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/UploadInterface.tsx"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Add a defensive check in the Results page component so that if the job ID route parameter is missing or empty, a clear user-facing error message is displayed (e.g., 'No job ID provided. Please upload an image to get started.') with a link back to the Home page.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/pages/Results.tsx"
+        ],
+        "matchedFiles": []
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/components/UploadInterface.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

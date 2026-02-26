@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "New project",
+  "architectural_notes": [],
+  "known_issues": [
+    "Job ID not being provided/passed correctly in the image upload flow"
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-fix-the-uploadinterface-component-so-that-after-a-backend-job-is-created-and-processed-the-resulting-job-id-is-correctly-extracted-and-passed-as-a-route-parameter-when-navigating-to-the-results-page-ensure-the-job-id-is-never-undefined-null-or-empty-before-navigation-is-triggered",
+      "title": "Fix the UploadInterface component so that after a backend job is created and processed, the resulting job ID is correctly extracted and passed as a route parameter when navigating to the Results page. Ensure the job ID is never undefined, null, or empty before navigation is triggered.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-2",
+      "summary": "Add a defensive check in the Results page component so that if the job ID route parameter is missing or empty, a clear user-facing error message is displayed (e.g., 'No job ID provided. Please upload an image to get started.') with a link back to the Home page.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Fix missing job ID in upload flow navigation to Results page",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
