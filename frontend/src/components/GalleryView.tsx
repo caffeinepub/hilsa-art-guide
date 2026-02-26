@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Download,
   ZoomIn,
@@ -11,6 +11,7 @@ import {
   ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   generatePencilSketchStages,
   SketchStage,
@@ -20,31 +21,29 @@ import { StageResult, JobStatus } from "@/backend";
 interface GalleryViewProps {
   uploadedImageSrc: string;
   jobId: string;
-  /** v3 stage results from the backend — used when resultImage is available */
   backendStages?: StageResult[];
 }
 
-// Stage display metadata aligned with the enhanced pencil sketch pipeline
 const STAGE_DEFINITIONS_DISPLAY = [
   {
-    label: "Stage 1 — Light Hatching",
-    description: "Initial light pencil strokes with fine hatching on cream paper",
+    label: "Stage 1 — Light Outline",
+    description: "Barely-visible ghost contours on clean cream paper",
   },
   {
-    label: "Stage 2 — Directional Strokes",
-    description: "Structured edge-following directional pencil lines",
+    label: "Stage 2 — Basic Structure",
+    description: "Light sketch with sparse directional hatching",
   },
   {
-    label: "Stage 3 — Cross-Hatching & Detail",
-    description: "Cross-hatched shadows with variable stroke thickness",
+    label: "Stage 3 — Defined Features",
+    description: "Medium cross-hatching with stronger facial detail",
   },
   {
-    label: "Stage 4 — Graphite Shading",
-    description: "Soft blended shading with graphite grain texture",
+    label: "Stage 4 — Hair & Shading",
+    description: "Dense hatching with hair strokes and tonal shading",
   },
   {
-    label: "Stage 5 — Final Pencil Artwork",
-    description: "Polished hand-drawn look with paper grain and vignette",
+    label: "Stage 5 — Final Artwork",
+    description: "Fully detailed portrait with graphite grain and vignette",
   },
 ];
 
@@ -55,44 +54,33 @@ export default function GalleryView({
   jobId,
   backendStages,
 }: GalleryViewProps) {
-  const [clientStages, setClientStages] = useState<(SketchStage | null)[]>(
-    Array(5).fill(null)
-  );
-  const [stageStatuses, setStageStatuses] = useState<StageGenStatus[]>(
-    Array(5).fill("pending")
-  );
+  const [clientStages, setClientStages] = useState<(SketchStage | null)[]>(Array(5).fill(null));
+  const [stageStatuses, setStageStatuses] = useState<StageGenStatus[]>(Array(5).fill("pending"));
   const [isGenerating, setIsGenerating] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const generatingRef = useRef(false);
 
-  // Check if backend has a completed image for a given stage (0-indexed)
   const getBackendImageUrl = (stageIndex: number): string | null => {
     if (!backendStages || backendStages.length === 0) return null;
     const stageNum = BigInt(stageIndex + 1);
     const match = backendStages.find((s) => s.stageNumber === stageNum);
-    if (
-      match &&
-      match.resultImage &&
-      match.status === JobStatus.completed
-    ) {
+    if (match && match.resultImage && match.status === JobStatus.completed) {
       return match.resultImage.getDirectURL();
     }
     return null;
   };
 
-  // Check if all 5 stages have backend images
   const allBackendImagesAvailable =
     backendStages &&
     backendStages.length >= 5 &&
-    backendStages.every(
-      (s) => !!s.resultImage && s.status === JobStatus.completed
-    );
+    backendStages.every((s) => !!s.resultImage && s.status === JobStatus.completed);
 
   const runClientGeneration = useCallback(async () => {
-    if (!uploadedImageSrc || isGenerating || allBackendImagesAvailable) return;
+    if (!uploadedImageSrc || generatingRef.current || allBackendImagesAvailable) return;
 
-    // Check cache first (updated cache key for v3 stages)
-    const cacheKey = `sketch_stages_v3_${jobId}`;
+    // Check session cache
+    const cacheKey = `sketch_stages_v4_${jobId}`;
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
       try {
@@ -107,33 +95,41 @@ export default function GalleryView({
       }
     }
 
+    generatingRef.current = true;
     setIsGenerating(true);
     setGenerationError(null);
-    // Mark all stages as generating
+    // Mark all as generating
     setStageStatuses(Array(5).fill("generating"));
 
+    const allStages: SketchStage[] = [];
+
     try {
-      // generatePencilSketchStages takes only the image src and returns all 5 stages
-      const stages = await generatePencilSketchStages(uploadedImageSrc);
+      await generatePencilSketchStages(uploadedImageSrc, (stageIndex, stage) => {
+        // Progressive update: set each stage as it completes
+        allStages.push(stage);
+        setClientStages((prev) => {
+          const next = [...prev];
+          next[stageIndex] = stage;
+          return next;
+        });
+        setStageStatuses((prev) => {
+          const next = [...prev];
+          next[stageIndex] = "complete";
+          return next;
+        });
+      });
 
-      // Set all stages at once and mark complete
-      setClientStages(stages);
-      setStageStatuses(Array(5).fill("complete"));
-
-      // Cache the results
+      // Cache the completed results
       try {
-        sessionStorage.setItem(cacheKey, JSON.stringify(stages));
+        sessionStorage.setItem(cacheKey, JSON.stringify(allStages));
       } catch {
-        // ignore storage errors (e.g. quota exceeded)
+        // ignore quota errors
       }
     } catch {
-      setGenerationError(
-        "Failed to generate sketch stages. Please try again."
-      );
-      setStageStatuses((prev) =>
-        prev.map((s) => (s === "generating" ? "error" : s))
-      );
+      setGenerationError("Failed to generate sketch stages. Please try again.");
+      setStageStatuses((prev) => prev.map((s) => (s === "generating" ? "error" : s)));
     } finally {
+      generatingRef.current = false;
       setIsGenerating(false);
     }
   }, [uploadedImageSrc, jobId, allBackendImagesAvailable]);
@@ -144,19 +140,14 @@ export default function GalleryView({
     }
   }, [uploadedImageSrc, runClientGeneration]);
 
-  // Get the best available image src for a stage
   const getStageImageSrc = (stageIndex: number): string | null => {
     const backendUrl = getBackendImageUrl(stageIndex);
     if (backendUrl) return backendUrl;
-    const clientStage = clientStages[stageIndex];
-    return clientStage ? clientStage.dataUrl : null;
+    return clientStages[stageIndex]?.dataUrl ?? null;
   };
 
-  const isStageReady = (stageIndex: number): boolean => {
-    return !!getStageImageSrc(stageIndex);
-  };
-
-  const isStageLoading = (stageIndex: number): boolean => {
+  const isStageReady = (stageIndex: number) => !!getStageImageSrc(stageIndex);
+  const isStageLoading = (stageIndex: number) => {
     if (isStageReady(stageIndex)) return false;
     return stageStatuses[stageIndex] === "generating" || isGenerating;
   };
@@ -170,7 +161,8 @@ export default function GalleryView({
     document.body.removeChild(a);
   };
 
-  // Lightbox items: original + 5 stages
+  const completedCount = Array.from({ length: 5 }, (_, i) => isStageReady(i)).filter(Boolean).length;
+
   const lightboxItems = [
     { label: "Original Portrait", src: uploadedImageSrc },
     ...STAGE_DEFINITIONS_DISPLAY.map((def, idx) => ({
@@ -181,12 +173,9 @@ export default function GalleryView({
 
   const openLightbox = (index: number) => setLightboxIndex(index);
   const closeLightbox = () => setLightboxIndex(null);
-  const prevLightbox = () =>
-    setLightboxIndex((i) => (i !== null ? Math.max(0, i - 1) : null));
+  const prevLightbox = () => setLightboxIndex((i) => (i !== null ? Math.max(0, i - 1) : null));
   const nextLightbox = () =>
-    setLightboxIndex((i) =>
-      i !== null ? Math.min(lightboxItems.length - 1, i + 1) : null
-    );
+    setLightboxIndex((i) => (i !== null ? Math.min(lightboxItems.length - 1, i + 1) : null));
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -199,28 +188,24 @@ export default function GalleryView({
     return () => window.removeEventListener("keydown", handler);
   }, [lightboxIndex]);
 
-  const completedCount = Array.from({ length: 5 }, (_, i) =>
-    isStageReady(i)
-  ).filter(Boolean).length;
-
   return (
     <div className="space-y-8">
-      {/* Generation progress bar */}
+      {/* Progress bar */}
       {isGenerating && (
         <div className="flex items-center gap-3 p-4 bg-card border border-border rounded-lg">
           <Loader2 className="w-5 h-5 text-gold animate-spin flex-shrink-0" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-foreground mb-1">
+            <p className="text-sm font-medium text-foreground mb-1.5">
               Rendering pencil sketch stages…
             </p>
-            <div className="w-full bg-border rounded-full h-1.5">
+            <div className="w-full bg-border rounded-full h-1.5 overflow-hidden">
               <div
-                className="bg-gold h-1.5 rounded-full transition-all duration-500"
+                className="bg-gold h-1.5 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${(completedCount / 5) * 100}%` }}
               />
             </div>
           </div>
-          <span className="text-sm text-muted-foreground font-mono">
+          <span className="text-sm text-muted-foreground font-mono tabular-nums">
             {completedCount}/5
           </span>
         </div>
@@ -230,162 +215,143 @@ export default function GalleryView({
         <div className="flex items-center gap-3 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
           <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
           <p className="text-sm text-destructive">{generationError}</p>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={runClientGeneration}
-            className="ml-auto"
-          >
+          <Button size="sm" variant="outline" onClick={runClientGeneration} className="ml-auto">
             Retry
           </Button>
         </div>
       )}
 
-      {/* Original + Stages grid */}
-      <div className="space-y-6">
-        {/* Original photo */}
-        <div className="group relative overflow-hidden rounded-lg border border-border bg-card shadow-art">
-          <div className="relative aspect-[4/3] overflow-hidden">
-            <img
-              src={uploadedImageSrc}
-              alt="Original Portrait"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
-              <button
-                onClick={() => openLightbox(0)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2 shadow-lg"
-                aria-label="View full size"
-              >
-                <ZoomIn className="w-5 h-5 text-ink" />
-              </button>
-            </div>
-          </div>
-          <div className="p-3 flex items-center justify-between">
-            <div>
-              <p className="font-serif text-sm font-semibold text-foreground">
-                Original Portrait
-              </p>
-              <p className="text-xs text-muted-foreground">Your uploaded photo</p>
-            </div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleDownload(uploadedImageSrc, "original_portrait")}
-              className="h-8 px-2"
+      {/* Original photo */}
+      <div className="group relative overflow-hidden rounded-lg border border-border bg-card shadow-art">
+        <div className="relative aspect-[4/3] overflow-hidden">
+          <img
+            src={uploadedImageSrc}
+            alt="Original Portrait"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
+            <button
+              onClick={() => openLightbox(0)}
+              className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2 shadow-lg"
+              aria-label="View full size"
             >
-              <Download className="w-3.5 h-3.5" />
-            </Button>
+              <ZoomIn className="w-5 h-5 text-ink" />
+            </button>
           </div>
         </div>
-
-        {/* 5 Stage cards in 2-column grid */}
-        <div className="grid grid-cols-2 gap-4">
-          {STAGE_DEFINITIONS_DISPLAY.map((def, idx) => {
-            const src = getStageImageSrc(idx);
-            const loading = isStageLoading(idx);
-            const ready = isStageReady(idx);
-            const hasError = stageStatuses[idx] === "error";
-
-            return (
-              <div
-                key={idx}
-                className="group relative overflow-hidden rounded-lg border border-border bg-card shadow-art"
-              >
-                {/* Image area */}
-                <div
-                  className="relative overflow-hidden"
-                  style={{ aspectRatio: "1 / 1" }}
-                >
-                  {ready && src ? (
-                    <>
-                      <img
-                        src={src}
-                        alt={def.label}
-                        className="w-full h-full object-cover"
-                        style={{ background: "#f0ece0" }}
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
-                        <button
-                          onClick={() => openLightbox(idx + 1)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2 shadow-lg"
-                          aria-label={`View ${def.label} full size`}
-                        >
-                          <ZoomIn className="w-4 h-4 text-ink" />
-                        </button>
-                      </div>
-                    </>
-                  ) : loading ? (
-                    <div
-                      className="w-full h-full flex flex-col items-center justify-center gap-2"
-                      style={{ background: "#f0ece0" }}
-                    >
-                      <Loader2 className="w-8 h-8 text-gold animate-spin" />
-                      <span className="text-xs text-muted-foreground font-sans">
-                        Rendering…
-                      </span>
-                    </div>
-                  ) : hasError ? (
-                    <div
-                      className="w-full h-full flex flex-col items-center justify-center gap-2"
-                      style={{ background: "#f0ece0" }}
-                    >
-                      <AlertCircle className="w-8 h-8 text-destructive" />
-                      <span className="text-xs text-destructive font-sans">
-                        Failed
-                      </span>
-                    </div>
-                  ) : (
-                    <div
-                      className="w-full h-full flex flex-col items-center justify-center gap-2"
-                      style={{ background: "#f0ece0" }}
-                    >
-                      <ImageIcon className="w-8 h-8 text-muted-foreground/40" />
-                      <span className="text-xs text-muted-foreground font-sans">
-                        Pending…
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Stage number badge */}
-                  <div className="absolute top-2 left-2 bg-ink/80 text-white text-xs font-mono px-1.5 py-0.5 rounded">
-                    {idx + 1}
-                  </div>
-
-                  {/* Completed checkmark */}
-                  {ready && (
-                    <div className="absolute top-2 right-2">
-                      <CheckCircle2 className="w-4 h-4 text-gold drop-shadow" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Card footer */}
-                <div className="p-2.5 flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-serif text-xs font-semibold text-foreground leading-tight truncate">
-                      {def.label}
-                    </p>
-                    <p className="text-xs text-muted-foreground leading-tight mt-0.5 line-clamp-2">
-                      {def.description}
-                    </p>
-                  </div>
-                  {ready && src && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDownload(src, def.label)}
-                      className="h-7 w-7 p-0 flex-shrink-0"
-                      title={`Download ${def.label}`}
-                    >
-                      <Download className="w-3 h-3" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="p-3 flex items-center justify-between">
+          <div>
+            <p className="font-serif text-sm font-semibold text-foreground">Original Portrait</p>
+            <p className="text-xs text-muted-foreground">Your uploaded photo</p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleDownload(uploadedImageSrc, "original_portrait")}
+            className="h-8 px-2"
+          >
+            <Download className="w-3.5 h-3.5" />
+          </Button>
         </div>
+      </div>
+
+      {/* 5 Stage cards — responsive grid: 1 col mobile → 2 col tablet → 5 col desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {STAGE_DEFINITIONS_DISPLAY.map((def, idx) => {
+          const src = getStageImageSrc(idx);
+          const loading = isStageLoading(idx);
+          const ready = isStageReady(idx);
+          const hasError = stageStatuses[idx] === "error";
+
+          return (
+            <div
+              key={idx}
+              className="group relative overflow-hidden rounded-lg border border-border bg-card shadow-art flex flex-col"
+            >
+              {/* Image area */}
+              <div className="relative overflow-hidden" style={{ aspectRatio: "1 / 1" }}>
+                {ready && src ? (
+                  <>
+                    <img
+                      src={src}
+                      alt={def.label}
+                      className="w-full h-full object-cover"
+                      style={{ background: "#f0ece0" }}
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
+                      <button
+                        onClick={() => openLightbox(idx + 1)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-2 shadow-lg"
+                        aria-label={`View ${def.label} full size`}
+                      >
+                        <ZoomIn className="w-4 h-4 text-ink" />
+                      </button>
+                    </div>
+                  </>
+                ) : loading ? (
+                  <div className="w-full h-full relative" style={{ background: "#f0ece0" }}>
+                    <Skeleton className="absolute inset-0 rounded-none" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                      <Loader2 className="w-7 h-7 text-gold animate-spin" />
+                      <span className="text-xs text-muted-foreground font-sans">Rendering…</span>
+                    </div>
+                  </div>
+                ) : hasError ? (
+                  <div
+                    className="w-full h-full flex flex-col items-center justify-center gap-2"
+                    style={{ background: "#f0ece0" }}
+                  >
+                    <AlertCircle className="w-7 h-7 text-destructive" />
+                    <span className="text-xs text-destructive font-sans">Failed</span>
+                  </div>
+                ) : (
+                  <div
+                    className="w-full h-full flex flex-col items-center justify-center gap-2"
+                    style={{ background: "#f0ece0" }}
+                  >
+                    <ImageIcon className="w-7 h-7 text-muted-foreground/40" />
+                    <span className="text-xs text-muted-foreground font-sans">Pending…</span>
+                  </div>
+                )}
+
+                {/* Stage number badge */}
+                <div className="absolute top-2 left-2 bg-ink/80 text-white text-xs font-mono px-1.5 py-0.5 rounded">
+                  {idx + 1}
+                </div>
+
+                {/* Completed checkmark */}
+                {ready && (
+                  <div className="absolute top-2 right-2">
+                    <CheckCircle2 className="w-4 h-4 text-gold drop-shadow" />
+                  </div>
+                )}
+              </div>
+
+              {/* Card footer */}
+              <div className="p-2.5 flex items-start justify-between gap-2 flex-1">
+                <div className="min-w-0 flex-1">
+                  <p className="font-serif text-xs font-semibold text-foreground leading-tight">
+                    {def.label}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-tight mt-0.5 line-clamp-2">
+                    {def.description}
+                  </p>
+                </div>
+                {ready && src && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleDownload(src, def.label)}
+                    className="h-7 w-7 p-0 flex-shrink-0"
+                    title={`Download ${def.label}`}
+                  >
+                    <Download className="w-3 h-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Lightbox */}
@@ -398,7 +364,6 @@ export default function GalleryView({
             className="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close */}
             <button
               onClick={closeLightbox}
               className="absolute -top-10 right-0 text-white/70 hover:text-white transition-colors"
@@ -407,7 +372,6 @@ export default function GalleryView({
               <X className="w-6 h-6" />
             </button>
 
-            {/* Image */}
             {lightboxItems[lightboxIndex]?.src ? (
               <img
                 src={lightboxItems[lightboxIndex].src}
@@ -421,12 +385,10 @@ export default function GalleryView({
               </div>
             )}
 
-            {/* Label */}
             <p className="mt-4 text-white/80 font-serif text-sm">
               {lightboxItems[lightboxIndex]?.label}
             </p>
 
-            {/* Navigation */}
             <div className="flex items-center gap-4 mt-4">
               <button
                 onClick={prevLightbox}
@@ -449,7 +411,6 @@ export default function GalleryView({
               </button>
             </div>
 
-            {/* Download current */}
             {lightboxItems[lightboxIndex]?.src && (
               <Button
                 size="sm"

@@ -1,29 +1,40 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T19:45:04.639Z",
+  "generatedAt": "2026-02-26T20:00:14.303Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Remove or suppress the 'NO JOB ID PROVIDED' error message from the Results page UI. This message should not be displayed to the user under any circumstance — if no job ID is present, redirect silently or show a neutral fallback state instead.",
+        "summary": "Optimize the client-side pencil sketch pipeline in pencilSketchUtils.ts to generate all 5 stages significantly faster. Reduce processing time by: (1) running stage computations in a single canvas pass where possible, (2) reusing intermediate canvas buffers between stages instead of re-running grayscale/Sobel from scratch for each stage, (3) reducing Gaussian blur kernel radius for earlier stages (light stages need less blur), and (4) skipping cross-hatching and graphite shading computations entirely for stages 1–2.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Results.tsx"
+          "frontend/src/lib/pencilSketchUtils.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Results.tsx"
+          "frontend/src/lib/pencilSketchUtils.ts"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Remove or suppress the 'EXPECTED V3 RESPONSE' error message from the UI. This internal error string must not be shown to users — replace any occurrence with a neutral fallback message or silent error handling.",
+        "summary": "Update the GalleryView component to display all 5 pencil sketch stages in a clean horizontal scrollable strip (on mobile) or a 5-column grid (on desktop), each labeled 'Stage 1' through 'Stage 5' with a subtitle describing that stage's detail level. Stages should appear progressively as they are computed — each stage card renders as soon as its canvas output is ready rather than waiting for all 5 to complete.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/GalleryView.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/GalleryView.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Fix the Results page (Results.tsx) to suppress and hide both the 'NO JOB ID PROVIDED' error and the 'EXPECTED V3 RESPONSE' error messages. Replace them with a neutral loading/fallback state that does not show raw error strings to the user.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/Results.tsx"
@@ -39,6 +50,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/components/GalleryView.tsx",
+    "frontend/src/lib/pencilSketchUtils.ts",
     "frontend/src/pages/Results.tsx",
     "project_state.json",
     "scratch/component-selection.json",

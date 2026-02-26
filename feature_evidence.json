@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-or-suppress-the-no-job-id-provided-error-message-from-the-results-page-ui-this-message-should-not-be-displayed-to-the-user-under-any-circumstance-if-no-job-id-is-present-redirect-silently-or-show-a-neutral-fallback-state-instead",
-      "featureTitle": "Remove or suppress the 'NO JOB ID PROVIDED' error message from the Results page UI. This message should not be displayed to the user under any circumstance — if no job ID is present, redirect silently or show a neutral fallback state instead.",
+      "featureId": "feature-optimize-the-client-side-pencil-sketch-pipeline-in-pencilsketchutils-ts-to-generate-all-5-stages-significantly-faster-reduce-processing-time-by-1-running-stage-computations-in-a-single-canvas-pass-where-possible-2-reusing-intermediate-canvas-buffers-between-stages-instead-of-re-running-grayscale-sobel-from-scratch-for-each-stage-3-reducing-gaussian-blur-kernel-radius-for-earlier-stages-light-stages-need-less-blur-and-4-skipping-cross-hatching-and-graphite-shading-computations-entirely-for-stages-1-2",
+      "featureTitle": "Optimize the client-side pencil sketch pipeline in pencilSketchUtils.ts to generate all 5 stages significantly faster. Reduce processing time by: (1) running stage computations in a single canvas pass where possible, (2) reusing intermediate canvas buffers between stages instead of re-running grayscale/Sobel from scratch for each stage, (3) reducing Gaussian blur kernel radius for earlier stages (light stages need less blur), and (4) skipping cross-hatching and graphite shading computations entirely for stages 1–2.",
       "files": [
-        "frontend/src/pages/Results.tsx"
+        "frontend/src/lib/pencilSketchUtils.ts"
       ],
       "components": [
         "blob-storage@4.0.0",
@@ -21,8 +21,27 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-remove-or-suppress-the-expected-v3-response-error-message-from-the-ui-this-internal-error-string-must-not-be-shown-to-users-replace-any-occurrence-with-a-neutral-fallback-message-or-silent-error-handling",
-      "featureTitle": "Remove or suppress the 'EXPECTED V3 RESPONSE' error message from the UI. This internal error string must not be shown to users — replace any occurrence with a neutral fallback message or silent error handling.",
+      "featureId": "feature-update-the-galleryview-component-to-display-all-5-pencil-sketch-stages-in-a-clean-horizontal-scrollable-strip-on-mobile-or-a-5-column-grid-on-desktop-each-labeled-stage-1-through-stage-5-with-a-subtitle-describing-that-stage-s-detail-level-stages-should-appear-progressively-as-they-are-computed-each-stage-card-renders-as-soon-as-its-canvas-output-is-ready-rather-than-waiting-for-all-5-to-complete",
+      "featureTitle": "Update the GalleryView component to display all 5 pencil sketch stages in a clean horizontal scrollable strip (on mobile) or a 5-column grid (on desktop), each labeled 'Stage 1' through 'Stage 5' with a subtitle describing that stage's detail level. Stages should appear progressively as they are computed — each stage card renders as soon as its canvas output is ready rather than waiting for all 5 to complete.",
+      "files": [
+        "frontend/src/components/GalleryView.tsx"
+      ],
+      "components": [
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fix-the-results-page-results-tsx-to-suppress-and-hide-both-the-no-job-id-provided-error-and-the-expected-v3-response-error-messages-replace-them-with-a-neutral-loading-fallback-state-that-does-not-show-raw-error-strings-to-the-user",
+      "featureTitle": "Fix the Results page (Results.tsx) to suppress and hide both the 'NO JOB ID PROVIDED' error and the 'EXPECTED V3 RESPONSE' error messages. Replace them with a neutral loading/fallback state that does not show raw error strings to the user.",
       "files": [
         "frontend/src/pages/Results.tsx"
       ],
@@ -35,7 +54,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-2"
+        "REQ-3"
       ],
       "confidence": "high"
     }

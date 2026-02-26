@@ -1,51 +1,82 @@
 {
   "kind": "build_request",
-  "title": "Clear 'NO JOB ID PROVIDED' and 'EXPECTED V3 RESPONSE' error messages from UI",
-  "projectName": "HILSA-ART Guide",
-  "priority": "normal",
+  "title": "Optimize 5-Stage Pencil Sketch Pipeline for Speed and Visual Fidelity",
+  "projectName": "HILSA-ART",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Remove or suppress the 'NO JOB ID PROVIDED' error message from the Results page UI. This message should not be displayed to the user under any circumstance — if no job ID is present, redirect silently or show a neutral fallback state instead.",
+      "text": "Optimize the client-side pencil sketch pipeline in pencilSketchUtils.ts to generate all 5 stages significantly faster. Reduce processing time by: (1) running stage computations in a single canvas pass where possible, (2) reusing intermediate canvas buffers between stages instead of re-running grayscale/Sobel from scratch for each stage, (3) reducing Gaussian blur kernel radius for earlier stages (light stages need less blur), and (4) skipping cross-hatching and graphite shading computations entirely for stages 1–2.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-latest"
         ],
         "quotes": [
-          "clear the NO JOB ID PROVIDED and EXPECTED V3 response"
+          "the same 5 stages from light sketch to detailed .BUILD it faster"
         ]
       },
       "acceptanceCriteria": [
-        "The text 'NO JOB ID PROVIDED' does not appear anywhere in the rendered UI",
-        "When no job ID is present in the route/URL, the user is redirected or shown a neutral fallback (e.g., back to home) without displaying the raw error string"
+        "All 5 sketch stages are generated and displayed noticeably faster than before (target: under 3 seconds total on a mid-range device)",
+        "Stage 1 shows only very faint basic outlines with minimal hatching — lightest pencil strokes, nearly white",
+        "Stage 2 shows cleaner, slightly darker outlines with basic facial structure — light sketch feel",
+        "Stage 3 adds defined facial features (eyes, nose, mouth) with medium line weight",
+        "Stage 4 introduces hair strokes and light shading/hatching",
+        "Stage 5 is the fully detailed portrait with deep cross-hatching, graphite shading, and paper texture — matching the bottom-right panel of the reference image",
+        "No stage re-runs grayscale conversion or Sobel edge detection more than once (share computed data across stages)",
+        "Processing does not block the UI — show a progress indicator while stages are being generated"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Remove or suppress the 'EXPECTED V3 RESPONSE' error message from the UI. This internal error string must not be shown to users — replace any occurrence with a neutral fallback message or silent error handling.",
+      "text": "Update the GalleryView component to display all 5 pencil sketch stages in a clean horizontal scrollable strip (on mobile) or a 5-column grid (on desktop), each labeled 'Stage 1' through 'Stage 5' with a subtitle describing that stage's detail level. Stages should appear progressively as they are computed — each stage card renders as soon as its canvas output is ready rather than waiting for all 5 to complete.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-latest"
         ],
         "quotes": [
-          "clear the NO JOB ID PROVIDED and EXPECTED V3 response"
+          "the same 5 stages from light sketch to detailed"
         ]
       },
       "acceptanceCriteria": [
-        "The text 'EXPECTED V3 RESPONSE' does not appear anywhere in the rendered UI",
-        "Any code path that previously surfaced this string either silently handles the condition or shows a user-friendly generic error message"
+        "5 stage cards are visible in a responsive grid (1 column mobile → 5 columns desktop)",
+        "Each card shows a skeleton/loading placeholder until its stage finishes computing",
+        "Stage label and subtitle (e.g., 'Stage 1 — Light Outline', 'Stage 5 — Final Artwork') are shown below each image",
+        "Each card has a download button that saves that stage as a PNG",
+        "Stages appear one-by-one as they complete, not all at once after a long wait"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Fix the Results page (Results.tsx) to suppress and hide both the 'NO JOB ID PROVIDED' error and the 'EXPECTED V3 RESPONSE' error messages. Replace them with a neutral loading/fallback state that does not show raw error strings to the user.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-earlier"
+        ],
+        "quotes": [
+          "expected v3 response"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The string 'NO JOB ID PROVIDED' never appears in the UI",
+        "The string 'EXPECTED V3 RESPONSE' never appears in the UI",
+        "When job ID is missing, a friendly message such as 'No sketch job found. Please upload a photo to get started.' is shown with a link back to the home page",
+        "When the backend returns an unexpected response format, a neutral fallback message is shown without exposing internal error strings"
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui"
+    "Do not change the backend Motoko actor or data schema",
+    "Do not modify files in frontend/src/hooks/ or frontend/src/components/ui/",
+    "All sketch generation must remain client-side using canvas APIs — no external image processing APIs"
   ],
   "nonGoals": [
-    "Changing backend job processing logic",
-    "Modifying the 5-stage pencil sketch pipeline",
-    "Adding new error types or error tracking"
+    "Adding new sketch styles beyond the 5-stage pencil portrait pipeline",
+    "Server-side image processing",
+    "User accounts or saving sketches to backend storage",
+    "AI/ML model integration for sketch generation"
   ],
   "imageRequirements": {
     "required": [],

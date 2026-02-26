@@ -1,33 +1,67 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "A pencil sketch progression app that applies 5-stage sketch effects to uploaded images. Currently fixing error message display issues.",
-  "architectural_notes": [],
-  "known_issues": [
-    "'NO JOB ID PROVIDED' and 'EXPECTED V3 RESPONSE' error messages appearing in UI need to be cleared/hidden"
+  "summary": "A photo-to-pencil-sketch converter app that takes a user's uploaded photo and generates 5 progressive pencil sketch stages — from a light basic outline to a fully detailed, shaded portrait — matching the style from a reference image.",
+  "architectural_notes": [
+    "Pencil sketch style should match reference image: fine linework, grayscale pencil texture, realistic portrait aesthetic",
+    "5 stages: (1) faint basic outline, (2) cleaner lines/facial structure, (3) features added, (4) hair and shading begins, (5) fully detailed with deep shading"
   ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-remove-or-suppress-the-no-job-id-provided-error-message-from-the-results-page-ui-this-message-should-not-be-displayed-to-the-user-under-any-circumstance-if-no-job-id-is-present-redirect-silently-or-show-a-neutral-fallback-state-instead",
-      "title": "Remove or suppress the 'NO JOB ID PROVIDED' error message from the Results page UI. This message should not be displayed to the user under any circumstance — if no job ID is present, redirect silently or show a neutral fallback state instead.",
+      "id": "feature-optimize-the-client-side-pencil-sketch-pipeline-in-pencilsketchutils-ts-to-generate-all-5-stages-significantly-faster-reduce-processing-time-by-1-running-stage-computations-in-a-single-canvas-pass-where-possible-2-reusing-intermediate-canvas-buffers-between-stages-instead-of-re-running-grayscale-sobel-from-scratch-for-each-stage-3-reducing-gaussian-blur-kernel-radius-for-earlier-stages-light-stages-need-less-blur-and-4-skipping-cross-hatching-and-graphite-shading-computations-entirely-for-stages-1-2",
+      "title": "Optimize the client-side pencil sketch pipeline in pencilSketchUtils.ts to generate all 5 stages significantly faster. Reduce processing time by: (1) running stage computations in a single canvas pass where possible, (2) reusing intermediate canvas buffers between stages instead of re-running grayscale/Sobel from scratch for each stage, (3) reducing Gaussian blur kernel radius for earlier stages (light stages need less blur), and (4) skipping cross-hatching and graphite shading computations entirely for stages 1–2.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-remove-or-suppress-the-expected-v3-response-error-message-from-the-ui-this-internal-error-string-must-not-be-shown-to-users-replace-any-occurrence-with-a-neutral-fallback-message-or-silent-error-handling",
-      "title": "Remove or suppress the 'EXPECTED V3 RESPONSE' error message from the UI. This internal error string must not be shown to users — replace any occurrence with a neutral fallback message or silent error handling.",
+      "id": "feature-update-the-galleryview-component-to-display-all-5-pencil-sketch-stages-in-a-clean-horizontal-scrollable-strip-on-mobile-or-a-5-column-grid-on-desktop-each-labeled-stage-1-through-stage-5-with-a-subtitle-describing-that-stage-s-detail-level-stages-should-appear-progressively-as-they-are-computed-each-stage-card-renders-as-soon-as-its-canvas-output-is-ready-rather-than-waiting-for-all-5-to-complete",
+      "title": "Update the GalleryView component to display all 5 pencil sketch stages in a clean horizontal scrollable strip (on mobile) or a 5-column grid (on desktop), each labeled 'Stage 1' through 'Stage 5' with a subtitle describing that stage's detail level. Stages should appear progressively as they are computed — each stage card renders as soon as its canvas output is ready rather than waiting for all 5 to complete.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-fix-the-results-page-results-tsx-to-suppress-and-hide-both-the-no-job-id-provided-error-and-the-expected-v3-response-error-messages-replace-them-with-a-neutral-loading-fallback-state-that-does-not-show-raw-error-strings-to-the-user",
+      "title": "Fix the Results page (Results.tsx) to suppress and hide both the 'NO JOB ID PROVIDED' error and the 'EXPECTED V3 RESPONSE' error messages. Replace them with a neutral loading/fallback state that does not show raw error strings to the user.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Photo upload input for user to submit their photo",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Generate 5 progressive pencil sketch stages from uploaded photo (light outline → fully detailed shaded portrait)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Display all 5 sketch stages side-by-side or in a step progression view",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Download option for each of the 5 sketch stages",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
   "gameProjectType": "none",
-  "projectName": "HILSA-ART Guide",
+  "projectName": "HILSA-ART",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
