@@ -1,61 +1,96 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Optimize 5-Stage Pencil Sketch Pipeline for Speed and Visual Fidelity",
+  "title": "Match HILSA-ART reference style with progressive deep-shading pencil sketch stages",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Optimize the client-side pencil sketch pipeline to generate all 5 stages significantly faster by reusing intermediate buffers, reducing blur kernels for early stages, and skipping heavy computations for stages 1-2",
+      "summary": "Update client-side pencil sketch pipeline to produce clean thin outlines in Stage 1 and progressively deeper shading with hatching/cross-hatching through Stage 5, matching the reference image style with near-black shadows and bright white highlights",
       "acceptanceCriteria": [
-        "All 5 sketch stages are generated and displayed noticeably faster than before (target: under 3 seconds total on a mid-range device)",
-        "Stage 1 shows only very faint basic outlines with minimal hatching — lightest pencil strokes, nearly white",
-        "Stage 2 shows cleaner, slightly darker outlines with basic facial structure — light sketch feel",
-        "Stage 3 adds defined facial features (eyes, nose, mouth) with medium line weight",
-        "Stage 4 introduces hair strokes and light shading/hatching",
-        "Stage 5 is the fully detailed portrait with deep cross-hatching, graphite shading, and paper texture — matching the bottom-right panel of the reference image",
-        "No stage re-runs grayscale conversion or Sobel edge detection more than once (share computed data across stages)",
-        "Processing does not block the UI — show a progress indicator while stages are being generated"
+        "Stage 1 output shows only thin, clean grey outlines on a white background, matching the reference screenshot (no fill, no shading).",
+        "Each successive stage (2–5) adds progressively deeper shading so the transition from outline to fully shaded drawing is clearly visible.",
+        "Stage 5 contains rich dark tones in shadow areas (close to near-black) with bright white preserved in highlight areas.",
+        "The shading style uses hatching/cross-hatching strokes consistent with traditional pencil technique rather than flat grey fills.",
+        "All 5 stages render correctly on a real portrait photo upload without visual glitches or fully black/white outputs."
       ],
       "file_operations": [
         {
           "path": "frontend/src/lib/pencilSketchUtils.ts",
           "operation": "modify",
-          "description": "Refactor the five-stage pencil sketch pipeline to compute grayscale and Sobel edge detection only once at the beginning, then reuse those intermediate ImageData buffers across all stages. Run stage computations in a single optimized pass where feasible. Reduce Gaussian blur kernel radius for stages 1-3 (lighter stages need less blur). Skip cross-hatching and graphite shading entirely for stages 1-2 to minimize processing time. Adjust intensity/opacity parameters so stage 1 produces very faint outlines (nearly white), stage 2 produces light sketch structure, stage 3 adds defined facial features, stage 4 introduces hair and light shading, and stage 5 delivers the fully detailed portrait with deep cross-hatching, graphite shading, and paper texture matching the reference image. Ensure the pipeline runs non-blocking and exposes progress callbacks for UI updates."
+          "description": "Refactor the 5-stage pencil sketch generation pipeline to match the reference style. Stage 1 must produce only thin, clean graphite-grey outlines (similar to Canny/Sobel edge detection at ~0.3 opacity) on pure white (#FFFFFF) background with no shading or fill. Stages 2-4 progressively introduce directional hatching strokes, cross-hatching patterns, and increasing density/darkness of shading layers. Stage 5 must deliver deep, high-contrast graphite/charcoal-level dark fills in shadow regions (approaching near-black #1a1a1a in darkest areas) while preserving bright white highlights, using composite blending modes that simulate traditional pencil layering. Adjust Sobel edge detection sensitivity, Gaussian blur sigma values, and hatching density parameters to achieve clean thin lines in early stages and rich tonal depth in final stages. Verify the pipeline produces the exact visual progression shown in the reference screenshot."
+        },
+        {
+          "path": "frontend/src/components/GalleryView.tsx",
+          "operation": "modify",
+          "description": "Update the sketch stage gallery display to reflect the improved progressive shading quality from the updated pencil sketch pipeline. Ensure stage preview cards properly display the refined Stage 1 outlines and the deepened Stage 5 shading. Verify lightbox navigation and download functionality work correctly with the updated canvas-generated images. No structural changes required, only visual verification that the component correctly renders the new sketch outputs."
+        },
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Replace the existing 5-stage progression preview images with the newly generated reference-matched sketch stage assets from frontend/public/assets/generated/sketch-stage-1.dim_600x600.png through sketch-stage-5.dim_600x600.png. These generated images demonstrate the updated progressive shading style (clean thin outlines in Stage 1, deep rich shading in Stage 5) and serve as visual examples for users before they upload their own photos. Update the image src paths and verify the stage descriptions accurately reflect the refined sketch characteristics."
+        },
+        {
+          "path": "frontend/src/pages/HowItWorks.tsx",
+          "operation": "modify",
+          "description": "Update the stage descriptions and technical details to accurately reflect the refined pencil sketch pipeline. Stage 1 description should emphasize 'clean thin graphite-grey outlines on pure white background with no shading'. Stages 2-4 descriptions should detail the progressive addition of directional hatching, cross-hatching, and increasing tonal density. Stage 5 description must highlight 'deep high-contrast shading with near-black shadow regions and preserved bright white highlights, simulating fully rendered traditional pencil drawing'. Replace stage icon images with the generated reference assets from frontend/public/assets/generated/stage-1-outline.dim_256x256.png through stage-5-polish.dim_256x256.png to visually demonstrate the updated progression."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Update GalleryView to display all 5 stages in a responsive grid with progressive rendering as each stage completes",
+      "summary": "Update UI theme across all pages to match HILSA-ART reference: deep near-black background (#1a1a1a), gold/amber accent for 'ART' branding and active nav links, light grey/white text, dark card containers with stage labels in gold above white titles",
       "acceptanceCriteria": [
-        "5 stage cards are visible in a responsive grid (1 column mobile → 5 columns desktop)",
-        "Each card shows a skeleton/loading placeholder until its stage finishes computing",
-        "Stage label and subtitle (e.g., 'Stage 1 — Light Outline', 'Stage 5 — Final Artwork') are shown below each image",
-        "Each card has a download button that saves that stage as a PNG",
-        "Stages appear one-by-one as they complete, not all at once after a long wait"
+        "App background is deep near-black across all pages.",
+        "Header shows 'HILSA-' in white and 'ART' in gold/amber, matching reference branding.",
+        "Active navigation links are styled in gold/amber to match the reference.",
+        "Sketch stage cards have a dark container background with the stage number in gold and stage title in white.",
+        "Footer matches the reference: dark background, centered HILSA-ART branding with gold accent, grey navigation links, copyright line."
       ],
       "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Update the global CSS custom properties to implement the HILSA-ART reference theme. Set --background to deep near-black (#1a1a1a or hsl(0 0% 10%)), --foreground to light grey/white (#e5e5e5 or hsl(0 0% 90%)), --card to slightly lighter black (#222222 or hsl(0 0% 13%)), --card-foreground to white, --primary to gold/amber (#d4af37 or hsl(43 74% 53%)), --primary-foreground to dark for contrast. Update --border to subtle grey (#333333). Remove or override the current cream/parchment editorial design tokens to match the dark theme shown in the reference screenshot. Ensure both light and dark theme blocks use these values for consistency."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Update the Tailwind theme extension to support the HILSA-ART reference color scheme. Add or update gold/amber accent colors in the extend.colors section (e.g., gold: '#d4af37', ink: '#1a1a1a'). Ensure the OKLCH-based color tokens reference the updated CSS custom properties from index.css. Verify custom shadows and typography plugins remain compatible with the dark theme. Remove any cream/parchment color references that conflict with the near-black background requirement."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Update the Header component to match the reference branding style. Split the HILSA-ART logo rendering so 'HILSA-' appears in white (text-foreground or text-white) and 'ART' appears in gold/amber (text-primary or text-gold). Update the active navigation link styling using TanStack Router's active state detection to apply the gold/amber color (text-primary) to the active link. Ensure the header background is dark (bg-background) and the CTA button uses gold/amber accent styling. Update the mobile menu to use the same color scheme."
+        },
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Update the Footer component to match the reference screenshot. Ensure the background is dark (bg-background or bg-card). Render the HILSA-ART branding with 'HILSA-' in white and 'ART' in gold/amber, centered. Style navigation links in grey (text-muted-foreground) with hover state in gold/amber. Ensure the copyright line and caffeine.ai attribution are in muted grey. Update social media icons (Instagram, X, Behance) to use grey/white fill with gold/amber hover states. Verify the layout is centered and matches the reference footer structure."
+        },
         {
           "path": "frontend/src/components/GalleryView.tsx",
           "operation": "modify",
-          "description": "Refactor the GalleryView component to display all 5 pencil sketch stages in a clean horizontal scrollable strip on mobile and a 5-column grid on desktop. Each stage card should render a skeleton/loading placeholder initially, then update progressively as its canvas output becomes ready (do not wait for all 5 to complete). Add a stage label ('Stage 1' through 'Stage 5') and a descriptive subtitle below each image (e.g., 'Stage 1 — Light Outline', 'Stage 2 — Basic Structure', 'Stage 3 — Defined Features', 'Stage 4 — Hair & Shading', 'Stage 5 — Final Artwork'). Include a download button on each card that saves that specific stage as a PNG. Leverage the optimized pencilSketchUtils pipeline's progress callbacks to render stages incrementally as they complete, ensuring a responsive user experience."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Fix Results page to suppress raw error messages ('NO JOB ID PROVIDED', 'EXPECTED V3 RESPONSE') and replace them with neutral fallback states",
-      "acceptanceCriteria": [
-        "The string 'NO JOB ID PROVIDED' never appears in the UI",
-        "The string 'EXPECTED V3 RESPONSE' never appears in the UI",
-        "When job ID is missing, a friendly message such as 'No sketch job found. Please upload a photo to get started.' is shown with a link back to the home page",
-        "When the backend returns an unexpected response format, a neutral fallback message is shown without exposing internal error strings"
-      ],
-      "file_operations": [
+          "description": "Update the sketch stage gallery cards to match the reference screenshot styling. Ensure stage cards have a dark background (bg-card), subtle border (border-border), and rounded corners. Render the stage number label (e.g., 'STAGE 1') in uppercase gold/amber text (text-primary) above the stage title. Display the stage title (e.g., 'Basic Outline') in white (text-card-foreground). Ensure the image thumbnails have proper contrast against the dark card background. Update lightbox overlay to use dark background with gold/amber accent for navigation controls."
+        },
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Update the Home page to use the dark theme throughout. Ensure the hero section background is deep near-black (bg-background). Update the scroll-to-upload CTA button to use gold/amber accent styling (bg-primary text-primary-foreground). Ensure the 5-stage progression section uses dark card backgrounds (bg-card) with gold/amber stage labels and white titles. Update any text colors to light grey/white (text-foreground). Replace the hero background image reference to use frontend/public/assets/generated/hero-bg.dim_1920x1080.png if a background image is needed, ensuring it composites well with the dark theme."
+        },
+        {
+          "path": "frontend/src/pages/HowItWorks.tsx",
+          "operation": "modify",
+          "description": "Update the HowItWorks page to use the dark theme. Ensure the page background is deep near-black (bg-background). Update stage description cards to use dark card backgrounds (bg-card) with subtle borders (border-border). Render stage numbers in gold/amber (text-primary) and stage titles in white (text-card-foreground). Ensure body text is light grey (text-muted-foreground) for readability. Update any headings to white (text-foreground) and accent elements to gold/amber."
+        },
         {
           "path": "frontend/src/pages/Results.tsx",
           "operation": "modify",
-          "description": "Update the Results page to suppress and hide the raw error messages 'NO JOB ID PROVIDED' and 'EXPECTED V3 RESPONSE'. When the job ID is missing from the URL, replace the error with a friendly fallback message: 'No sketch job found. Please upload a photo to get started.' Include a button or link navigating back to the home page. When the backend returns an unexpected response format or structure, display a neutral error state without exposing internal error strings. Ensure all error handling provides a user-friendly experience without leaking technical details."
+          "description": "Update the Results page to use the dark theme. Ensure the page background is deep near-black (bg-background). Update loading, error, and status message styling to use light text on dark background. Ensure the uploaded image preview and GalleryView component integration use dark card styling. Update any buttons or interactive elements to use gold/amber accent colors. Verify the page layout maintains readability and visual hierarchy with the dark theme."
+        },
+        {
+          "path": "frontend/src/pages/Contact.tsx",
+          "operation": "modify",
+          "description": "Update the Contact page to use the dark theme. Ensure the page background is deep near-black (bg-background) and the contact form uses dark card styling (bg-card). Update form input fields to have dark backgrounds with light text and gold/amber focus states (focus:ring-primary). Update the submit button to use gold/amber accent styling (bg-primary). Ensure contact info text and social media links use light grey/white with gold/amber hover states. Verify form validation messages are readable against the dark background."
         }
       ]
     }

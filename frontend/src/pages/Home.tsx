@@ -1,51 +1,38 @@
-import { useRef } from 'react';
-import { Link } from '@tanstack/react-router';
-import { ArrowDown, Sparkles } from 'lucide-react';
-import UploadInterface from '../components/UploadInterface';
+import { useRef } from "react";
+import { Link } from "@tanstack/react-router";
+import { ArrowDown, Pencil, Layers, Sparkles } from "lucide-react";
+import UploadInterface from "@/components/UploadInterface";
 
-const stages = [
-  { num: '01', name: 'Basic Outline' },
-  { num: '02', name: 'Clean Line Art' },
-  { num: '03', name: 'Refined Sketch' },
-  { num: '04', name: 'Detailed Shading' },
-  { num: '05', name: 'Finished Portrait' },
-];
-
-const stageDetails = [
+const STAGES = [
   {
-    num: '01',
-    name: 'Basic Outline',
-    desc: 'Faint contour lines emerge — the skeleton of your portrait',
-    img: '/assets/generated/sketch-stage-1.dim_600x600.png',
-    fallbackImg: '/assets/generated/stage1-basic-outline.dim_800x800.png',
+    number: 1,
+    name: "Basic Outline",
+    desc: "Clean thin graphite lines on pure white — the skeleton of the drawing.",
+    img: "/assets/generated/sketch-stage-1.dim_600x600.png",
   },
   {
-    num: '02',
-    name: 'Clean Line Art',
-    desc: 'Defined facial features with clean, confident pencil strokes',
-    img: '/assets/generated/sketch-stage-2.dim_600x600.png',
-    fallbackImg: '/assets/generated/stage2-reference-sketch.dim_800x800.png',
+    number: 2,
+    name: "Light Hatching",
+    desc: "Directional strokes begin to suggest form and light direction.",
+    img: "/assets/generated/sketch-stage-2.dim_600x600.png",
   },
   {
-    num: '03',
-    name: 'Refined Sketch',
-    desc: 'Hair outline and facial contours gain depth and dimension',
-    img: '/assets/generated/sketch-stage-3.dim_600x600.png',
-    fallbackImg: '/assets/generated/stage3-shading.dim_800x800.png',
+    number: 3,
+    name: "Cross-Hatching",
+    desc: "Intersecting lines build mid-tones and three-dimensional depth.",
+    img: "/assets/generated/sketch-stage-3.dim_600x600.png",
   },
   {
-    num: '04',
-    name: 'Detailed Shading',
-    desc: 'Directional pencil hatching brings hair and shadows to life',
-    img: '/assets/generated/sketch-stage-4.dim_600x600.png',
-    fallbackImg: '/assets/generated/stage4-render-detail.dim_800x800.png',
+    number: 4,
+    name: "Deep Shading",
+    desc: "Dense tonal layers push shadows darker, revealing volume and texture.",
+    img: "/assets/generated/sketch-stage-4.dim_600x600.png",
   },
   {
-    num: '05',
-    name: 'Finished Portrait',
-    desc: 'Rich dark hair, full facial shading, and sharp eye detail',
-    img: '/assets/generated/sketch-stage-5.dim_600x600.png',
-    fallbackImg: '/assets/generated/stage5-polish-final.dim_800x800.png',
+    number: 5,
+    name: "Finished Portrait",
+    desc: "Near-black shadows, bright white highlights — a fully rendered pencil drawing.",
+    img: "/assets/generated/sketch-stage-5.dim_600x600.png",
   },
 ];
 
@@ -53,159 +40,136 @@ export default function Home() {
   const uploadRef = useRef<HTMLDivElement>(null);
 
   const scrollToUpload = () => {
-    uploadRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    uploadRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <>
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
+    <main className="min-h-screen bg-background">
+      {/* Hero */}
+      <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Subtle background texture */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/assets/generated/hero-bg.dim_1920x1080.png')" }}
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `url('/assets/generated/hero-bg.dim_1920x1080.png')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
         />
-        {/* Overlay */}
-        <div className="hero-overlay absolute inset-0" />
-
-        {/* Content */}
-        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-          <div className="mb-6 flex items-center justify-center gap-2">
-            <div className="h-px w-12 bg-gold opacity-70" />
-            <span className="section-label text-gold opacity-90">AI-Powered Art Transformation</span>
-            <div className="h-px w-12 bg-gold opacity-70" />
+        <div className="relative max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 rounded-full px-4 py-1.5 mb-6">
+            <Sparkles size={14} className="text-primary" />
+            <span className="text-primary text-xs font-semibold tracking-widest uppercase">
+              AI Pencil Sketch
+            </span>
           </div>
 
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-tight mb-6">
-            Transform Your
-            <br />
-            <span className="italic text-gold">Photo into Art</span>
+          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6">
+            Transform Your Photo Into a{" "}
+            <span className="text-primary">Pencil Masterpiece</span>
           </h1>
 
-          <p className="font-cormorant text-xl md:text-2xl text-white/80 leading-relaxed mb-4 max-w-2xl mx-auto">
-            Watch your photograph evolve through five distinct artistic stages — from raw outline to polished masterpiece.
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+            Watch your portrait evolve through 5 progressive stages — from clean
+            outlines to richly shaded pencil art with deep shadows and bright
+            highlights.
           </p>
 
-          {/* Stage Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
-            {stages.map((s, i) => (
-              <span
-                key={s.num}
-                className="text-xs font-sans font-medium tracking-widest uppercase text-white/60 px-3 py-1 border border-white/20"
-              >
-                {s.num} {s.name}
-                {i < stages.length - 1 && <span className="ml-2 text-gold/60">→</span>}
-              </span>
-            ))}
-          </div>
-
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button onClick={scrollToUpload} className="btn-primary-art flex items-center gap-2">
-              <Sparkles size={14} />
-              Upload Your Photo
+            <button
+              onClick={scrollToUpload}
+              className="flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-3 rounded transition-all duration-200 hover:opacity-90 text-base"
+            >
+              <Pencil size={18} />
+              Start Creating
             </button>
-            <Link to="/how-it-works" className="btn-outline-art text-white border-white/40 hover:border-gold hover:text-gold">
+            <Link
+              to="/how-it-works"
+              className="flex items-center gap-2 border border-border text-muted-foreground hover:text-foreground hover:border-foreground px-8 py-3 rounded transition-all duration-200 text-base"
+            >
+              <Layers size={18} />
               How It Works
             </Link>
           </div>
-        </div>
 
-        {/* Scroll Indicator */}
-        <button
-          onClick={scrollToUpload}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/50 hover:text-gold transition-colors animate-bounce"
-          aria-label="Scroll down"
-        >
-          <ArrowDown size={20} />
-        </button>
+          <button
+            onClick={scrollToUpload}
+            className="mt-12 flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors mx-auto"
+          >
+            <span className="text-xs tracking-widest uppercase">Upload Photo</span>
+            <ArrowDown size={18} className="animate-bounce" />
+          </button>
+        </div>
+      </section>
+
+      {/* Stage Preview */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 border-t border-border">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-primary text-xs font-semibold tracking-widest uppercase mb-3">
+              THE PROCESS
+            </p>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-foreground mb-4">
+              5 Progressive Stages
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Each stage builds on the last — from a clean outline to a fully
+              rendered pencil drawing with deep, rich shading.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            {STAGES.map((stage) => (
+              <div key={stage.number} className="stage-card group">
+                <div className="relative aspect-square overflow-hidden bg-muted">
+                  <img
+                    src={stage.img}
+                    alt={`Stage ${stage.number}: ${stage.name}`}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      target.style.display = "none";
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `<div class="w-full h-full flex items-center justify-center text-muted-foreground text-4xl font-serif font-bold">${stage.number}</div>`;
+                      }
+                    }}
+                  />
+                </div>
+                <div className="p-3 bg-card">
+                  <p className="stage-label mb-1">STAGE {stage.number}</p>
+                  <p className="stage-title">{stage.name}</p>
+                  <p className="text-muted-foreground text-xs mt-1 leading-relaxed">
+                    {stage.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Upload Section */}
-      <section ref={uploadRef} className="py-20 px-6 bg-background">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="section-label mb-3">Begin Your Journey</p>
-            <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-4">
+      <section
+        ref={uploadRef}
+        className="py-20 px-4 sm:px-6 lg:px-8 border-t border-border"
+      >
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-primary text-xs font-semibold tracking-widest uppercase mb-3">
+              GET STARTED
+            </p>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-foreground mb-4">
               Upload Your Photo
             </h2>
-            <div className="ink-divider w-24 mx-auto mb-4" />
-            <p className="text-muted-foreground font-sans text-sm leading-relaxed max-w-md mx-auto">
-              Select any photograph and our pipeline will guide it through five progressive artistic stages, revealing the artwork within.
+            <p className="text-muted-foreground">
+              Upload a portrait photo and watch it transform into a beautiful
+              pencil sketch in seconds.
             </p>
           </div>
           <UploadInterface />
         </div>
       </section>
-
-      {/* Stage Preview Section */}
-      <section className="py-20 px-6 bg-secondary/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="section-label mb-3">The Process</p>
-            <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-4">
-              Five Stages of Artistic Evolution
-            </h2>
-            <div className="ink-divider w-24 mx-auto mb-4" />
-            <p className="text-muted-foreground font-sans text-sm max-w-lg mx-auto">
-              Every portrait passes through these five carefully crafted stages, each adding more depth, detail, and artistic character.
-            </p>
-          </div>
-
-          {/* Stage preview grid — 5 cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
-            {stageDetails.map((stage, i) => (
-              <div
-                key={stage.num}
-                className="flex flex-col items-center group stage-card-hover"
-              >
-                {/* Preview image card */}
-                <div
-                  className="relative w-full overflow-hidden rounded-lg border border-border shadow-art group-hover:border-gold transition-colors duration-300 mb-3"
-                  style={{ aspectRatio: '1 / 1', background: '#f0ece0' }}
-                >
-                  <img
-                    src={stage.img}
-                    alt={`Stage ${stage.num} — ${stage.name}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      // Try fallback image
-                      if (target.src !== stage.fallbackImg) {
-                        target.src = stage.fallbackImg;
-                      } else {
-                        target.style.display = 'none';
-                      }
-                    }}
-                  />
-                  {/* Stage number overlay */}
-                  <div className="absolute top-2 left-2 bg-ink/70 text-white text-xs font-mono px-1.5 py-0.5 rounded">
-                    {stage.num}
-                  </div>
-                  {/* Connector line (desktop only) */}
-                  {i < stageDetails.length - 1 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-3 w-6 h-px bg-border -translate-y-1/2 z-10" />
-                  )}
-                </div>
-
-                {/* Stage label */}
-                <p className="section-label text-center mb-1">{stage.num}</p>
-                <h3 className="font-serif text-sm font-semibold text-foreground text-center mb-1">
-                  {stage.name}
-                </h3>
-                <p className="text-xs text-muted-foreground font-sans leading-relaxed text-center">
-                  {stage.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link to="/how-it-works" className="btn-outline-art inline-block">
-              Explore the Full Process
-            </Link>
-          </div>
-        </div>
-      </section>
-    </>
+    </main>
   );
 }

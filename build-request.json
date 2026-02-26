@@ -1,82 +1,59 @@
 {
   "kind": "build_request",
-  "title": "Optimize 5-Stage Pencil Sketch Pipeline for Speed and Visual Fidelity",
-  "projectName": "HILSA-ART",
-  "priority": "high",
+  "title": "Match HILSA-ART reference style with progressive deep-shading pencil sketch stages",
+  "projectName": "HILSA-ART Guide",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Optimize the client-side pencil sketch pipeline in pencilSketchUtils.ts to generate all 5 stages significantly faster. Reduce processing time by: (1) running stage computations in a single canvas pass where possible, (2) reusing intermediate canvas buffers between stages instead of re-running grayscale/Sobel from scratch for each stage, (3) reducing Gaussian blur kernel radius for earlier stages (light stages need less blur), and (4) skipping cross-hatching and graphite shading computations entirely for stages 1–2.",
+      "text": "Update the client-side pencil sketch pipeline in `frontend/src/lib/pencilSketchUtils.ts` to produce output that closely matches the reference image style: clean, thin graphite-grey outlines on a pure white background for Stage 1 (Basic Outline), with each subsequent stage progressively adding deeper, denser shading — including directional hatching, cross-hatching, and rich graphite/charcoal-level dark fills by Stage 5. The final stage must have deep, high-contrast shadow regions (near-black in darkest areas) while preserving bright whites in highlights, giving the appearance of a fully shaded traditional pencil drawing.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "the same 5 stages from light sketch to detailed .BUILD it faster"
+          "I want this exact style and the progressive styles with deep shading"
         ]
       },
       "acceptanceCriteria": [
-        "All 5 sketch stages are generated and displayed noticeably faster than before (target: under 3 seconds total on a mid-range device)",
-        "Stage 1 shows only very faint basic outlines with minimal hatching — lightest pencil strokes, nearly white",
-        "Stage 2 shows cleaner, slightly darker outlines with basic facial structure — light sketch feel",
-        "Stage 3 adds defined facial features (eyes, nose, mouth) with medium line weight",
-        "Stage 4 introduces hair strokes and light shading/hatching",
-        "Stage 5 is the fully detailed portrait with deep cross-hatching, graphite shading, and paper texture — matching the bottom-right panel of the reference image",
-        "No stage re-runs grayscale conversion or Sobel edge detection more than once (share computed data across stages)",
-        "Processing does not block the UI — show a progress indicator while stages are being generated"
+        "Stage 1 output shows only thin, clean grey outlines on a white background, matching the reference screenshot (no fill, no shading).",
+        "Each successive stage (2–5) adds progressively deeper shading so the transition from outline to fully shaded drawing is clearly visible.",
+        "Stage 5 contains rich dark tones in shadow areas (close to near-black) with bright white preserved in highlight areas.",
+        "The shading style uses hatching/cross-hatching strokes consistent with traditional pencil technique rather than flat grey fills.",
+        "All 5 stages render correctly on a real portrait photo upload without visual glitches or fully black/white outputs."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Update the GalleryView component to display all 5 pencil sketch stages in a clean horizontal scrollable strip (on mobile) or a 5-column grid (on desktop), each labeled 'Stage 1' through 'Stage 5' with a subtitle describing that stage's detail level. Stages should appear progressively as they are computed — each stage card renders as soon as its canvas output is ready rather than waiting for all 5 to complete.",
+      "text": "Update the UI theme across the app (Header, Footer, GalleryView, Home, Results, HowItWorks pages) to exactly match the HILSA-ART reference UI: deep near-black background (`#1a1a1a` or similar), gold/amber accent color for the brand name 'ART' portion and active nav links, light grey/white body text, and dark card containers with subtle borders for sketch stage cards. Stage label (e.g. 'STAGE 1') should appear in the gold accent color above the stage title in white, exactly as shown in the reference screenshot.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "the same 5 stages from light sketch to detailed"
+          "I want this exact style"
         ]
       },
       "acceptanceCriteria": [
-        "5 stage cards are visible in a responsive grid (1 column mobile → 5 columns desktop)",
-        "Each card shows a skeleton/loading placeholder until its stage finishes computing",
-        "Stage label and subtitle (e.g., 'Stage 1 — Light Outline', 'Stage 5 — Final Artwork') are shown below each image",
-        "Each card has a download button that saves that stage as a PNG",
-        "Stages appear one-by-one as they complete, not all at once after a long wait"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Fix the Results page (Results.tsx) to suppress and hide both the 'NO JOB ID PROVIDED' error and the 'EXPECTED V3 RESPONSE' error messages. Replace them with a neutral loading/fallback state that does not show raw error strings to the user.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-earlier"
-        ],
-        "quotes": [
-          "expected v3 response"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The string 'NO JOB ID PROVIDED' never appears in the UI",
-        "The string 'EXPECTED V3 RESPONSE' never appears in the UI",
-        "When job ID is missing, a friendly message such as 'No sketch job found. Please upload a photo to get started.' is shown with a link back to the home page",
-        "When the backend returns an unexpected response format, a neutral fallback message is shown without exposing internal error strings"
+        "App background is deep near-black across all pages.",
+        "Header shows 'HILSA-' in white and 'ART' in gold/amber, matching reference branding.",
+        "Active navigation links are styled in gold/amber to match the reference.",
+        "Sketch stage cards have a dark container background with the stage number in gold and stage title in white.",
+        "Footer matches the reference: dark background, centered HILSA-ART branding with gold accent, grey navigation links, copyright line."
       ]
     }
   ],
   "constraints": [
-    "Do not change the backend Motoko actor or data schema",
-    "Do not modify files in frontend/src/hooks/ or frontend/src/components/ui/",
-    "All sketch generation must remain client-side using canvas APIs — no external image processing APIs"
+    "Do not modify files listed in frontend.immutablePaths (useInternetIdentity.ts, useActor.ts, main.tsx, frontend/src/components/ui).",
+    "All image processing must remain client-side in pencilSketchUtils.ts — do not route generated sketch images through the backend.",
+    "Keep all Motoko logic in backend/main.mo; do not alter backend schema unless required."
   ],
   "nonGoals": [
-    "Adding new sketch styles beyond the 5-stage pencil portrait pipeline",
-    "Server-side image processing",
-    "User accounts or saving sketches to backend storage",
-    "AI/ML model integration for sketch generation"
+    "Adding new sketch stages beyond the existing 5-stage pipeline.",
+    "Changing the backend job management logic.",
+    "Implementing any AI or server-side image processing."
   ],
   "imageRequirements": {
     "required": [],

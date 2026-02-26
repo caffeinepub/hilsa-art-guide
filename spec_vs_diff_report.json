@@ -1,16 +1,45 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T20:00:14.300Z",
-  "summary": "All three requirements (REQ-1, REQ-2, REQ-3) appear to be implemented in the diff. The pencilSketchUtils.ts has been optimized with shared grayscale/Sobel computation and per-stage blur radii. GalleryView.tsx has been updated with progressive stage rendering, skeleton placeholders, responsive grid, download buttons, and stage labels/subtitles. Results.tsx suppresses raw error strings and shows friendly fallback messages. No significant missing requirements or hallucinated features were identified.",
+  "generatedAt": "2026-02-26T20:15:13.270Z",
+  "summary": "Both REQ-1 and REQ-2 appear to be substantially implemented. The pencilSketchUtils.ts has been refactored with Sobel edge detection, hatching/cross-hatching pipeline across 5 stages. The UI theme has been updated with deep near-black backgrounds, gold/amber accents, dark card containers, and proper HILSA-ART branding across all required pages and components. No significant missing requirements are detected, though a few unrequested features were added.",
   "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.87,
+  "hallucinated_features": [
+    {
+      "description": "Social media links (Instagram, X/Twitter, Behance) added to Footer",
+      "reason": "The build request for REQ-2 described the footer as having dark background, centered HILSA-ART branding with gold accent, grey navigation links, and copyright line — no social media icons were mentioned in the spec.",
+      "evidence": [
+        "frontend/src/components/Footer.tsx"
+      ]
+    },
+    {
+      "description": "Contact page added with validated form and social media cards",
+      "reason": "A Contact page with a form and social media cards was implemented, but neither REQ-1 nor REQ-2 requested a Contact page. The build request only lists Header, Footer, GalleryView, Home, Results, and HowItWorks pages for REQ-2.",
+      "evidence": [
+        "frontend/src/pages/Contact.tsx"
+      ]
+    },
+    {
+      "description": "caffeine.ai attribution link added to Footer",
+      "reason": "The build request did not request any caffeine.ai branding or attribution in the footer. This appears to be an addition not covered by the spec.",
+      "evidence": [
+        "frontend/src/components/Footer.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.78,
   "changed_files": [
     "frontend-file-summaries.txt",
+    "frontend/src/components/Footer.tsx",
     "frontend/src/components/GalleryView.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/index.css",
     "frontend/src/lib/pencilSketchUtils.ts",
+    "frontend/src/pages/Contact.tsx",
+    "frontend/src/pages/Home.tsx",
+    "frontend/src/pages/HowItWorks.tsx",
     "frontend/src/pages/Results.tsx",
+    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

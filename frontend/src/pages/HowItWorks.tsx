@@ -1,213 +1,185 @@
-import { Link } from '@tanstack/react-router';
-import { ArrowRight } from 'lucide-react';
+import { Link } from "@tanstack/react-router";
+import { Pencil, Layers, Zap, Eye, Sparkles } from "lucide-react";
 
-const stages = [
+const STAGES = [
   {
-    num: '01',
-    name: 'Light Hatching',
-    icon: '/assets/generated/stage-1-outline.dim_256x256.png',
-    description:
-      'The first pass lays down the lightest possible pencil marks — fine diagonal hatching lines at low opacity that barely whisper across the cream paper surface.',
-    detail: 'Fine hatching lines at 45° angles are overlaid on detected contour edges, creating the initial skeletal impression of the subject with a feather-light touch that mimics an artist\'s first exploratory strokes.',
+    number: 1,
+    name: "Basic Outline",
+    icon: Pencil,
+    img: "/assets/generated/stage-1-outline.dim_256x256.png",
+    shortDesc: "Clean thin graphite-grey outlines on pure white background.",
+    longDesc:
+      "Sobel edge detection extracts the structural lines of your photo — thin, clean graphite-grey strokes on a pure white background. No shading, no fill. Just the essential contours that define the subject.",
   },
   {
-    num: '02',
-    name: 'Directional Strokes',
-    icon: '/assets/generated/stage-2-sketch.dim_256x256.png',
-    description:
-      'Pencil strokes begin to follow the natural contours of the subject. Lines align with detected edges, giving the sketch a structured, intentional quality.',
-    detail: 'Edge gradient analysis guides each stroke direction — lines flow along curves and boundaries rather than at fixed angles, producing the characteristic look of a skilled artist tracing form with confident, directional marks.',
+    number: 2,
+    name: "Light Hatching",
+    icon: Layers,
+    img: "/assets/generated/stage-2-sketch.dim_256x256.png",
+    shortDesc: "Directional hatching strokes suggest form and light.",
+    longDesc:
+      "Single-direction hatching lines are drawn at 45° in the darker regions of the image. These strokes begin to suggest the direction of light and the three-dimensional form of the subject.",
   },
   {
-    num: '03',
-    name: 'Cross-Hatching & Detail',
-    icon: '/assets/generated/stage-3-shading.dim_256x256.png',
-    description:
-      'Shadow regions receive a second layer of perpendicular hatching, building tonal depth. Stroke thickness varies with local contrast — darker areas get denser, heavier marks.',
-    detail: 'Cross-hatching (perpendicular stroke layers) is applied selectively to shadow zones, while stroke spacing and thickness are dynamically adjusted based on luminance values, creating convincing tonal gradation through mark density alone.',
+    number: 3,
+    name: "Cross-Hatching",
+    icon: Zap,
+    img: "/assets/generated/stage-3-shading.dim_256x256.png",
+    shortDesc: "Intersecting lines build mid-tones and depth.",
+    longDesc:
+      "A second layer of hatching crosses the first at a perpendicular angle. The intersection of these lines creates mid-tones and begins to give the drawing real tonal depth and three-dimensionality.",
   },
   {
-    num: '04',
-    name: 'Graphite Shading',
-    icon: '/assets/generated/stage-4-render.dim_256x256.png',
-    description:
-      'Soft blending simulates the smeared, velvety quality of graphite on paper. A granular texture overlay adds the characteristic grain of pencil pigment.',
-    detail: 'A Gaussian-blurred tonal base creates smooth shading transitions that mimic finger-blending or tortillon smearing. A graphite grain noise layer is composited over the hatching to reproduce the micro-texture of real pencil marks on textured paper.',
+    number: 4,
+    name: "Deep Shading",
+    icon: Eye,
+    img: "/assets/generated/stage-4-render.dim_256x256.png",
+    shortDesc: "Dense tonal layers push shadows into darkness.",
+    longDesc:
+      "Multiple dense hatching layers in different directions are combined with a tonal fill layer. Shadow regions become significantly darker, revealing the full volume and texture of the subject.",
   },
   {
-    num: '05',
-    name: 'Final Pencil Artwork',
-    icon: '/assets/generated/stage-5-polish.dim_256x256.png',
-    description:
-      'All techniques converge into a polished, gallery-ready pencil illustration. Paper grain, radial vignette, and tonal compression unify the composition.',
-    detail: 'Multi-frequency paper texture is composited over the full drawing, a radial vignette darkens the edges to draw focus inward, and an S-curve tonal compression ensures the full range from bright highlights to rich darks — the hallmarks of a finished hand-drawn pencil portrait.',
+    number: 5,
+    name: "Finished Portrait",
+    icon: Sparkles,
+    img: "/assets/generated/stage-5-polish.dim_256x256.png",
+    shortDesc: "Near-black shadows, bright white highlights — fully rendered.",
+    longDesc:
+      "The final stage applies aggressive tone mapping with near-black shadows (approaching #1a1a1a) and preserved bright white highlights. Four layers of hatching at varied angles create the rich, complex texture of a fully rendered traditional pencil drawing.",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <div className="pt-16">
-      {/* Page Header */}
-      <section className="py-20 px-6 bg-card border-b border-border">
+    <main className="min-h-screen bg-background">
+      {/* Hero */}
+      <section className="pt-32 pb-16 px-4 sm:px-6 lg:px-8 border-b border-border">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="section-label mb-4">The Method</p>
-          <h1 className="font-serif text-4xl md:text-6xl font-bold text-foreground mb-6">
-            How It <span className="italic text-gold">Works</span>
+          <p className="text-primary text-xs font-semibold tracking-widest uppercase mb-4">
+            THE TECHNIQUE
+          </p>
+          <h1 className="font-serif text-4xl sm:text-5xl font-bold text-foreground mb-6">
+            The Pencil Sketch Pipeline
           </h1>
-          <div className="ink-divider w-24 mx-auto mb-6" />
-          <p className="font-cormorant text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto">
-            A five-stage pencil sketch pipeline that transforms any photograph into a refined hand-drawn artwork — each stage building upon the last with authentic drawing techniques.
+          <p className="text-muted-foreground text-lg leading-relaxed">
+            Every photo goes through 5 carefully crafted stages — each one
+            building on the last to produce a progressively richer pencil
+            drawing, from clean outlines to deep, fully-rendered shading.
           </p>
         </div>
       </section>
 
-      {/* Stages — Vertical Timeline */}
-      <section className="py-20 px-6 bg-background">
-        <div className="max-w-4xl mx-auto">
-          <div className="space-y-0">
-            {stages.map((stage, index) => (
-              <div key={stage.num} className="relative">
-                {/* Connector line */}
-                {index < stages.length - 1 && (
-                  <div className="absolute left-8 md:left-1/2 top-full w-px h-12 bg-border -translate-x-1/2 z-0" />
-                )}
-
-                <div
-                  className={`relative z-10 flex flex-col md:flex-row items-start md:items-center gap-8 py-10 ${
-                    index % 2 === 1 ? 'md:flex-row-reverse' : ''
-                  }`}
-                >
-                  {/* Stage Icon & Number */}
-                  <div className="flex-shrink-0 flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 rounded-full bg-card border-2 border-border flex items-center justify-center overflow-hidden shadow-art hover:border-gold transition-colors duration-300 group">
-                      <img
-                        src={stage.icon}
-                        alt={stage.name}
-                        className="w-10 h-10 object-contain"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const parent = target.parentElement;
-                          if (parent) {
-                            parent.innerHTML = `<span class="font-serif text-xl font-bold text-gold">${stage.num}</span>`;
-                          }
-                        }}
-                      />
-                    </div>
-                    <span className="section-label">{stage.num}</span>
-                  </div>
-
-                  {/* Content Card */}
-                  <div className="flex-1 bg-card border border-border p-8 shadow-art hover:shadow-art-lg transition-shadow duration-300 stage-card-hover">
-                    <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground mb-3">
-                      {stage.name}
-                    </h2>
-                    <div className="ink-divider w-16 mb-4" />
-                    <p className="font-cormorant text-lg text-foreground/80 leading-relaxed mb-3">
-                      {stage.description}
-                    </p>
-                    <p className="text-sm text-muted-foreground font-sans leading-relaxed">
-                      {stage.detail}
-                    </p>
+      {/* Stages */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto space-y-8">
+          {STAGES.map((stage, idx) => {
+            const Icon = stage.icon;
+            const isEven = idx % 2 === 0;
+            return (
+              <div
+                key={stage.number}
+                className={`flex flex-col md:flex-row gap-8 items-center ${
+                  isEven ? "" : "md:flex-row-reverse"
+                }`}
+              >
+                {/* Image */}
+                <div className="w-full md:w-48 flex-shrink-0">
+                  <div className="stage-card overflow-hidden aspect-square">
+                    <img
+                      src={stage.img}
+                      alt={`Stage ${stage.number}: ${stage.name}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = "none";
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-card text-primary text-4xl font-serif font-bold">${stage.number}</div>`;
+                        }
+                      }}
+                    />
                   </div>
                 </div>
+
+                {/* Content */}
+                <div className="flex-1 bg-card border border-border rounded-lg p-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+                      <Icon size={16} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="stage-label">STAGE {stage.number}</p>
+                      <h3 className="text-card-foreground font-semibold text-lg font-serif">
+                        {stage.name}
+                      </h3>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground text-sm font-medium mb-2">
+                    {stage.shortDesc}
+                  </p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    {stage.longDesc}
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* Horizontal Flow (Desktop Visual) */}
-      <section className="py-16 px-6 bg-secondary/30 border-t border-border">
-        <div className="max-w-5xl mx-auto">
+      {/* At a Glance */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 border-t border-border">
+        <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
-            <p className="section-label mb-3">At a Glance</p>
-            <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground">
+            <p className="text-primary text-xs font-semibold tracking-widest uppercase mb-3">
+              AT A GLANCE
+            </p>
+            <h2 className="font-serif text-3xl font-bold text-foreground mb-4">
               The Pencil Sketch Pipeline
             </h2>
           </div>
 
-          {/* Horizontal flow — desktop */}
-          <div className="hidden md:flex items-center justify-between gap-2">
-            {stages.map((stage, i) => (
-              <div key={stage.num} className="flex items-center gap-2 flex-1">
-                <div className="flex-1 flex flex-col items-center text-center p-4 bg-card border border-border hover:border-gold transition-colors duration-200">
-                  <div className="w-12 h-12 rounded-full bg-background border border-border flex items-center justify-center mb-3 overflow-hidden">
-                    <img
-                      src={stage.icon}
-                      alt={stage.name}
-                      className="w-8 h-8 object-contain"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          parent.innerHTML = `<span class="font-serif text-sm font-bold text-gold">${stage.num}</span>`;
-                        }
-                      }}
-                    />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {STAGES.map((stage) => {
+              const Icon = stage.icon;
+              return (
+                <div
+                  key={stage.number}
+                  className="bg-card border border-border rounded-lg p-4 text-center"
+                >
+                  <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-3">
+                    <Icon size={18} className="text-primary" />
                   </div>
-                  <p className="section-label text-xs mb-1">{stage.num}</p>
-                  <p className="font-serif text-xs font-semibold text-foreground">{stage.name}</p>
+                  <p className="stage-label mb-1">STAGE {stage.number}</p>
+                  <p className="text-card-foreground font-semibold text-sm">
+                    {stage.name}
+                  </p>
                 </div>
-                {i < stages.length - 1 && (
-                  <ArrowRight size={16} className="text-gold flex-shrink-0" />
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Vertical flow — mobile */}
-          <div className="md:hidden flex flex-col gap-3">
-            {stages.map((stage, i) => (
-              <div key={stage.num} className="flex flex-col items-center">
-                <div className="w-full flex items-center gap-4 p-4 bg-card border border-border">
-                  <div className="w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center flex-shrink-0 overflow-hidden">
-                    <img
-                      src={stage.icon}
-                      alt={stage.name}
-                      className="w-7 h-7 object-contain"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          parent.innerHTML = `<span class="font-serif text-xs font-bold text-gold">${stage.num}</span>`;
-                        }
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <p className="section-label text-xs mb-0.5">{stage.num}</p>
-                    <p className="font-serif text-sm font-semibold text-foreground">{stage.name}</p>
-                  </div>
-                </div>
-                {i < stages.length - 1 && (
-                  <div className="w-px h-4 bg-border" />
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6 bg-background text-center">
-        <div className="max-w-xl mx-auto">
-          <p className="section-label mb-4">Ready to Begin?</p>
-          <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-4">
-            Transform Your First Photo
+      <section className="py-16 px-4 sm:px-6 lg:px-8 border-t border-border">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="font-serif text-3xl font-bold text-foreground mb-4">
+            Ready to Try It?
           </h2>
-          <div className="ink-divider w-24 mx-auto mb-6" />
-          <p className="text-muted-foreground font-sans text-sm mb-8 leading-relaxed">
-            Upload any photograph and watch it evolve through all five stages of pencil sketch transformation — from light hatching to a finished hand-drawn artwork.
+          <p className="text-muted-foreground mb-8">
+            Upload your photo and watch the pencil sketch transformation happen
+            in real time — all 5 stages, right in your browser.
           </p>
-          <Link to="/" className="btn-primary-art inline-flex items-center gap-2">
-            Upload a Photo
-            <ArrowRight size={14} />
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-3 rounded transition-all duration-200 hover:opacity-90"
+          >
+            <Pencil size={18} />
+            Start Your Pencil Sketch
           </Link>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

@@ -1,522 +1,391 @@
-export interface SketchStage {
-  label: string;
-  description: string;
-  dataUrl: string;
+export type StageProgressCallback = (stageIndex: number, dataUrl: string) => void;
+
+// Yield to browser between heavy operations
+function yieldToBrowser(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
-export type StageProgressCallback = (stageIndex: number, stage: SketchStage) => void;
+// Gaussian blur kernel
+function gaussianKernel(sigma: number): number[] {
+  const radius = Math.ceil(sigma * 3);
+  const size = 2 * radius + 1;
+  const kernel: number[] = [];
+  let sum = 0;
+  for (let i = 0; i < size; i++) {
+    const x = i - radius;
+    const val = Math.exp(-(x * x) / (2 * sigma * sigma));
+    kernel.push(val);
+    sum += val;
+  }
+  return kernel.map((v) => v / sum);
+}
 
-const STAGE_DEFINITIONS = [
-  {
-    label: "Stage 1 — Light Outline",
-    description: "Barely-visible ghost contours on clean cream paper",
-  },
-  {
-    label: "Stage 2 — Basic Structure",
-    description: "Light sketch with sparse directional hatching",
-  },
-  {
-    label: "Stage 3 — Defined Features",
-    description: "Medium cross-hatching with stronger facial detail",
-  },
-  {
-    label: "Stage 4 — Hair & Shading",
-    description: "Dense hatching with hair strokes and tonal shading",
-  },
-  {
-    label: "Stage 5 — Final Artwork",
-    description: "Fully detailed portrait with graphite grain and vignette",
-  },
-];
+// Apply 1D separable Gaussian blur
+function gaussianBlur(data: Float32Array, width: number, height: number, sigma: number): Float32Array {
+  const kernel = gaussianKernel(sigma);
+  const radius = Math.floor(kernel.length / 2);
+  const temp = new Float32Array(width * height);
+  const out = new Float32Array(width * height);
 
-// Cream/parchment paper background
-const PAPER_R = 242;
-const PAPER_G = 238;
-const PAPER_B = 226;
+  // Horizontal pass
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let sum = 0;
+      for (let k = -radius; k <= radius; k++) {
+        const xi = Math.min(Math.max(x + k, 0), width - 1);
+        sum += data[y * width + xi] * kernel[k + radius];
+      }
+      temp[y * width + x] = sum;
+    }
+  }
 
-function loadImage(src: string): Promise<HTMLImageElement> {
+  // Vertical pass
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let sum = 0;
+      for (let k = -radius; k <= radius; k++) {
+        const yi = Math.min(Math.max(y + k, 0), height - 1);
+        sum += temp[yi * width + x] * kernel[k + radius];
+      }
+      out[y * width + x] = sum;
+    }
+  }
+
+  return out;
+}
+
+// Compute Sobel edge magnitude (0-1)
+function sobelEdges(gray: Float32Array, width: number, height: number): Float32Array {
+  const edges = new Float32Array(width * height);
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      const tl = gray[(y - 1) * width + (x - 1)];
+      const tm = gray[(y - 1) * width + x];
+      const tr = gray[(y - 1) * width + (x + 1)];
+      const ml = gray[y * width + (x - 1)];
+      const mr = gray[y * width + (x + 1)];
+      const bl = gray[(y + 1) * width + (x - 1)];
+      const bm = gray[(y + 1) * width + x];
+      const br = gray[(y + 1) * width + (x + 1)];
+      const gx = -tl - 2 * ml - bl + tr + 2 * mr + br;
+      const gy = -tl - 2 * tm - tr + bl + 2 * bm + br;
+      edges[y * width + x] = Math.min(Math.sqrt(gx * gx + gy * gy) / 4, 1);
+    }
+  }
+  return edges;
+}
+
+// Draw hatching lines onto a canvas context
+function drawHatching(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  darkMap: Float32Array,
+  angle: number,
+  spacing: number,
+  threshold: number,
+  opacity: number,
+  strokeWidth: number
+) {
+  ctx.save();
+  ctx.strokeStyle = `rgba(20, 20, 20, ${opacity})`;
+  ctx.lineWidth = strokeWidth;
+  ctx.lineCap = "round";
+
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  const diag = Math.sqrt(width * width + height * height);
+
+  for (let d = -diag; d < diag; d += spacing) {
+    ctx.beginPath();
+    let started = false;
+    const steps = Math.ceil(diag * 2);
+    for (let t = 0; t < steps; t++) {
+      const px = Math.round(width / 2 + cos * t - sin * d);
+      const py = Math.round(height / 2 + sin * t + cos * d);
+      if (px < 0 || px >= width || py < 0 || py >= height) {
+        if (started) {
+          ctx.stroke();
+          ctx.beginPath();
+          started = false;
+        }
+        continue;
+      }
+      const darkness = darkMap[py * width + px];
+      if (darkness > threshold) {
+        if (!started) {
+          ctx.moveTo(px, py);
+          started = true;
+        } else {
+          ctx.lineTo(px, py);
+        }
+      } else {
+        if (started) {
+          ctx.stroke();
+          ctx.beginPath();
+          started = false;
+        }
+      }
+    }
+    if (started) ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Load image from URL into an HTMLImageElement
+function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
     img.onerror = reject;
-    img.src = src;
+    img.src = url;
   });
 }
 
-function toGrayscale(data: Uint8ClampedArray): Float32Array {
-  const len = data.length >> 2;
-  const gray = new Float32Array(len);
-  for (let i = 0; i < len; i++) {
-    gray[i] = 0.299 * data[i * 4] + 0.587 * data[i * 4 + 1] + 0.114 * data[i * 4 + 2];
-  }
-  return gray;
-}
-
-interface SobelResult {
-  magnitude: Float32Array;
-  angleX: Float32Array;
-  angleY: Float32Array;
-}
-
-function sobelEdges(gray: Float32Array, width: number, height: number): SobelResult {
-  const magnitude = new Float32Array(gray.length);
-  const angleX = new Float32Array(gray.length);
-  const angleY = new Float32Array(gray.length);
-
-  for (let y = 1; y < height - 1; y++) {
-    for (let x = 1; x < width - 1; x++) {
-      const idx = y * width + x;
-      const gx =
-        -gray[(y - 1) * width + (x - 1)] + gray[(y - 1) * width + (x + 1)] +
-        -2 * gray[y * width + (x - 1)] + 2 * gray[y * width + (x + 1)] +
-        -gray[(y + 1) * width + (x - 1)] + gray[(y + 1) * width + (x + 1)];
-      const gy =
-        -gray[(y - 1) * width + (x - 1)] - 2 * gray[(y - 1) * width + x] - gray[(y - 1) * width + (x + 1)] +
-        gray[(y + 1) * width + (x - 1)] + 2 * gray[(y + 1) * width + x] + gray[(y + 1) * width + (x + 1)];
-      magnitude[idx] = Math.min(255, Math.sqrt(gx * gx + gy * gy));
-      angleX[idx] = gx;
-      angleY[idx] = gy;
-    }
-  }
-  return { magnitude, angleX, angleY };
-}
-
-// Optimized 1D separable Gaussian blur
-function gaussianBlur(data: Float32Array, width: number, height: number, radius: number): Float32Array {
-  if (radius <= 0) return data.slice();
-  const sigma = Math.max(radius / 2, 0.5);
-  const kernel: number[] = [];
-  let sum = 0;
-  for (let i = -radius; i <= radius; i++) {
-    const val = Math.exp(-(i * i) / (2 * sigma * sigma));
-    kernel.push(val);
-    sum += val;
-  }
-  const norm = kernel.map((v) => v / sum);
-
-  const temp = new Float32Array(data.length);
-  // Horizontal pass
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      let acc = 0;
-      for (let k = -radius; k <= radius; k++) {
-        const nx = Math.max(0, Math.min(width - 1, x + k));
-        acc += data[y * width + nx] * norm[k + radius];
-      }
-      temp[y * width + x] = acc;
-    }
-  }
-  // Vertical pass
-  const result = new Float32Array(data.length);
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      let acc = 0;
-      for (let k = -radius; k <= radius; k++) {
-        const ny = Math.max(0, Math.min(height - 1, y + k));
-        acc += temp[ny * width + x] * norm[k + radius];
-      }
-      result[y * width + x] = acc;
-    }
-  }
-  return result;
-}
-
-function pseudoRandom(seed: number): number {
-  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
-  return x - Math.floor(x);
-}
-
-function paperGrain(seed: number, strength = 3): number {
-  return (pseudoRandom(seed) - 0.5) * strength;
-}
-
-function graphiteGrain(seed: number, strength = 12): number {
-  return (pseudoRandom(seed * 1.618 + 999.9) - 0.5) * strength;
-}
-
-function fillPaperBackground(output: ImageData): void {
-  const len = output.data.length >> 2;
-  for (let i = 0; i < len; i++) {
-    const grain = paperGrain(i, 3);
-    output.data[i * 4] = Math.max(0, Math.min(255, PAPER_R + grain));
-    output.data[i * 4 + 1] = Math.max(0, Math.min(255, PAPER_G + grain * 0.9));
-    output.data[i * 4 + 2] = Math.max(0, Math.min(255, PAPER_B + grain * 0.7));
-    output.data[i * 4 + 3] = 255;
-  }
-}
-
-function blendPencilStroke(
-  pr: number, pg: number, pb: number,
-  strokeDarkness: number, opacity: number
-): [number, number, number] {
-  const graphiteR = 35, graphiteG = 33, graphiteB = 40;
-  const blended = Math.min(1, opacity * strokeDarkness);
-  return [
-    Math.max(0, Math.min(255, Math.round(pr * (1 - blended) + graphiteR * blended))),
-    Math.max(0, Math.min(255, Math.round(pg * (1 - blended) + graphiteG * blended))),
-    Math.max(0, Math.min(255, Math.round(pb * (1 - blended) + graphiteB * blended))),
-  ];
-}
-
-function hatchingPattern(x: number, y: number, angle: number, spacing: number, lineWidth: number): number {
-  const proj = x * Math.cos(angle) + y * Math.sin(angle);
-  const mod = ((proj % spacing) + spacing) % spacing;
-  const distFromLine = Math.abs(mod - spacing / 2) - (spacing / 2 - lineWidth);
-  if (distFromLine < 0) return 1;
-  return Math.max(0, 1 - distFromLine / 0.8);
-}
-
-function applyVignette(output: ImageData, width: number, height: number, strength: number): void {
-  const cx = width / 2, cy = height / 2;
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = y * width + x;
-      const dx = (x - cx) / cx, dy = (y - cy) / cy;
-      const vignette = Math.pow(Math.min(1, Math.sqrt(dx * dx + dy * dy)), 2.5) * strength;
-      output.data[i * 4] = Math.max(0, output.data[i * 4] - vignette * 60);
-      output.data[i * 4 + 1] = Math.max(0, output.data[i * 4 + 1] - vignette * 58);
-      output.data[i * 4 + 2] = Math.max(0, output.data[i * 4 + 2] - vignette * 55);
-    }
-  }
-}
-
-function applyPaperTexture(output: ImageData, width: number, height: number, strength: number): void {
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = y * width + x;
-      const n1 = pseudoRandom(x * 0.1 + y * 0.13 + 1) - 0.5;
-      const n2 = pseudoRandom(x * 0.3 + y * 0.37 + 2) - 0.5;
-      const n3 = pseudoRandom(x * 0.7 + y * 0.71 + 3) - 0.5;
-      const noise = (n1 * 0.5 + n2 * 0.3 + n3 * 0.2) * strength;
-      output.data[i * 4] = Math.max(0, Math.min(255, output.data[i * 4] + noise));
-      output.data[i * 4 + 1] = Math.max(0, Math.min(255, output.data[i * 4 + 1] + noise * 0.9));
-      output.data[i * 4 + 2] = Math.max(0, Math.min(255, output.data[i * 4 + 2] + noise * 0.7));
-    }
-  }
-}
-
-function imageDataToDataUrl(imageData: ImageData, width: number, height: number): string {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d")!;
-  ctx.putImageData(imageData, 0, 0);
-  return canvas.toDataURL("image/png");
-}
-
-// ─── STAGE 1: Ghost outlines only — no hatching ───────────────────────────────
-function applyStage1(
-  gray: Float32Array,
-  smoothEdges: Float32Array, // pre-blurred with radius 3
-  width: number,
-  height: number
-): ImageData {
-  const output = new ImageData(width, height);
-  fillPaperBackground(output);
-
-  const edgeThreshold = 210;
-  const maxEdgeOpacity = 0.12;
-
-  for (let i = 0, len = width * height; i < len; i++) {
-    const e = smoothEdges[i];
-    if (e > edgeThreshold) {
-      const t = Math.min(1, (e - edgeThreshold) / 45);
-      const opacity = t * maxEdgeOpacity;
-      const pr = output.data[i * 4], pg = output.data[i * 4 + 1], pb = output.data[i * 4 + 2];
-      const [r, gv, b] = blendPencilStroke(pr, pg, pb, 1, opacity);
-      output.data[i * 4] = r; output.data[i * 4 + 1] = gv; output.data[i * 4 + 2] = b;
-    }
-  }
-  return output;
-}
-
-// ─── STAGE 2: Light directional hatching + clearer outlines ──────────────────
-function applyStage2(
-  gray: Float32Array,
-  smoothEdges: Float32Array, // pre-blurred with radius 2
-  width: number,
-  height: number
-): ImageData {
-  const output = new ImageData(width, height);
-  fillPaperBackground(output);
-
-  const edgeThreshold = 155;
-  const maxEdgeOpacity = 0.32;
-  const hatchAngle = Math.PI / 4;
-  const hatchSpacing = 10;
-  const hatchLineWidth = 0.7;
-  const hatchMaxOpacity = 0.28;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = y * width + x;
-      const e = smoothEdges[i];
-      const g = gray[i];
-
-      let edgeOpacity = 0;
-      if (e > edgeThreshold) {
-        edgeOpacity = Math.min(1, (e - edgeThreshold) / 60) * maxEdgeOpacity;
-      }
-
-      let hatchOpacity = 0;
-      if (g < 190) {
-        const tonalWeight = (190 - g) / 190;
-        hatchOpacity = hatchingPattern(x, y, hatchAngle, hatchSpacing, hatchLineWidth) * tonalWeight * hatchMaxOpacity;
-      }
-
-      const combinedOpacity = Math.max(edgeOpacity, hatchOpacity);
-      if (combinedOpacity > 0.005) {
-        const pr = output.data[i * 4], pg = output.data[i * 4 + 1], pb = output.data[i * 4 + 2];
-        const [r, gv, b] = blendPencilStroke(pr, pg, pb, 1, combinedOpacity);
-        output.data[i * 4] = r; output.data[i * 4 + 1] = gv; output.data[i * 4 + 2] = b;
-      }
-    }
-  }
-  return output;
-}
-
-// ─── STAGE 3: Medium cross-hatching + stronger edges ─────────────────────────
-function applyStage3(
-  gray: Float32Array,
-  smoothEdges: Float32Array, // pre-blurred with radius 1
-  width: number,
-  height: number
-): ImageData {
-  const output = new ImageData(width, height);
-  fillPaperBackground(output);
-
-  const edgeThreshold = 125;
-  const maxEdgeOpacity = 0.52;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = y * width + x;
-      const e = smoothEdges[i];
-      const g = gray[i];
-      const tonalDarkness = Math.max(0, (200 - g) / 200);
-
-      let edgeOpacity = 0;
-      if (e > edgeThreshold) {
-        edgeOpacity = Math.min(1, (e - edgeThreshold) / 55) * maxEdgeOpacity;
-      }
-
-      const strokeSpacing = Math.max(5, 11 - tonalDarkness * 5);
-      const strokeThickness = 0.6 + tonalDarkness * 1.2;
-      const hatch1 = g < 185
-        ? hatchingPattern(x, y, Math.PI / 4, strokeSpacing, strokeThickness) * tonalDarkness * 0.42
-        : 0;
-      const hatch2 = g < 120
-        ? hatchingPattern(x, y, -Math.PI / 4, strokeSpacing * 1.3, strokeThickness * 0.85) * tonalDarkness * 0.30
-        : 0;
-
-      const combinedOpacity = Math.max(edgeOpacity, hatch1, hatch2);
-      if (combinedOpacity > 0.01) {
-        const grain = paperGrain(i + 2000, 2) * 0.005;
-        const pr = output.data[i * 4], pg = output.data[i * 4 + 1], pb = output.data[i * 4 + 2];
-        const [r, gv, b] = blendPencilStroke(pr, pg, pb, 1, Math.min(1, combinedOpacity + grain));
-        output.data[i * 4] = r; output.data[i * 4 + 1] = gv; output.data[i * 4 + 2] = b;
-      }
-    }
-  }
-  return output;
-}
-
-// ─── STAGE 4: Dense cross-hatching + hair strokes ────────────────────────────
-function applyStage4(
-  gray: Float32Array,
-  smoothEdges: Float32Array, // pre-blurred with radius 1
-  blurredGray: Float32Array, // pre-blurred with radius 2
-  width: number,
-  height: number
-): ImageData {
-  const output = new ImageData(width, height);
-  fillPaperBackground(output);
-
-  const edgeThreshold = 88;
-  const maxEdgeOpacity = 0.72;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = y * width + x;
-      const e = smoothEdges[i];
-      const g = gray[i];
-      const bg = blurredGray[i];
-      const tonalDarkness = Math.max(0, (210 - g) / 210);
-      const softTone = Math.max(0, (210 - bg) / 210);
-
-      let edgeOpacity = 0;
-      if (e > edgeThreshold) {
-        edgeOpacity = Math.min(1, (e - edgeThreshold) / 45) * maxEdgeOpacity;
-      }
-
-      const strokeSpacing = Math.max(3, 8 - tonalDarkness * 4);
-      const strokeThickness = 0.7 + tonalDarkness * 1.6;
-      const hatch1 = g < 200
-        ? hatchingPattern(x, y, Math.PI / 4, strokeSpacing, strokeThickness) * tonalDarkness * 0.58
-        : 0;
-      const hatch2 = g < 160
-        ? hatchingPattern(x, y, -Math.PI / 4, strokeSpacing * 1.1, strokeThickness * 0.9) * tonalDarkness * 0.48
-        : 0;
-      const hatch3 = g < 90
-        ? hatchingPattern(x, y, 0, strokeSpacing * 1.4, strokeThickness * 0.75) * tonalDarkness * 0.38
-        : 0;
-      const blendedShade = softTone * 0.28;
-      const gGrain = graphiteGrain(i + 3000, 12);
-      const grainContrib = tonalDarkness > 0.1 ? gGrain * tonalDarkness * 0.012 : 0;
-
-      const combinedOpacity = Math.max(edgeOpacity, blendedShade, hatch1, hatch2, hatch3) + grainContrib;
-      if (combinedOpacity > 0.01) {
-        const pr = output.data[i * 4], pg = output.data[i * 4 + 1], pb = output.data[i * 4 + 2];
-        const [r, gv, b] = blendPencilStroke(pr, pg, pb, 1, Math.min(1, combinedOpacity));
-        output.data[i * 4] = r; output.data[i * 4 + 1] = gv; output.data[i * 4 + 2] = b;
-      }
-    }
-  }
-  return output;
-}
-
-// ─── STAGE 5: Full detailed artwork with paper texture + vignette ─────────────
-function applyStage5(
-  gray: Float32Array,
-  smoothEdges: Float32Array, // pre-blurred with radius 1
-  blurredGray: Float32Array, // pre-blurred with radius 3
-  blurredGray2: Float32Array, // pre-blurred with radius 1
-  width: number,
-  height: number
-): ImageData {
-  const output = new ImageData(width, height);
-  fillPaperBackground(output);
-
-  const edgeThreshold = 58;
-  const maxEdgeOpacity = 0.90;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = y * width + x;
-      const e = smoothEdges[i];
-      const g = gray[i];
-      const bg = blurredGray[i];
-      const bg2 = blurredGray2[i];
-
-      // Unsharp mask
-      const sharpened = Math.max(0, Math.min(255, g + (g - bg2) * 1.0));
-      // S-curve tonal compression
-      const normalized = sharpened / 255;
-      const sCurve = normalized < 0.5
-        ? 2 * normalized * normalized
-        : 1 - Math.pow(-2 * normalized + 2, 2) / 2;
-      const tonalDarkness = Math.max(0, 1 - sCurve);
-      const softTone = Math.max(0, (220 - bg) / 220);
-
-      let edgeOpacity = 0;
-      if (e > edgeThreshold) {
-        edgeOpacity = Math.min(1, (e - edgeThreshold) / 40) * maxEdgeOpacity;
-      }
-
-      const strokeSpacing = Math.max(2, 7 - tonalDarkness * 4);
-      const strokeThickness = 0.8 + tonalDarkness * 2.0;
-      const hatch1 = hatchingPattern(x, y, Math.PI / 4, strokeSpacing, strokeThickness) * tonalDarkness * 0.70;
-      const hatch2 = tonalDarkness > 0.25
-        ? hatchingPattern(x, y, -Math.PI / 4, strokeSpacing * 1.1, strokeThickness * 0.9) * tonalDarkness * 0.60
-        : 0;
-      const hatch3 = tonalDarkness > 0.45
-        ? hatchingPattern(x, y, 0, strokeSpacing * 1.3, strokeThickness * 0.8) * tonalDarkness * 0.50
-        : 0;
-      const hatch4 = tonalDarkness > 0.60
-        ? hatchingPattern(x, y, Math.PI / 6, strokeSpacing * 1.5, strokeThickness * 0.7) * tonalDarkness * 0.40
-        : 0;
-      const hatch5 = tonalDarkness > 0.75
-        ? hatchingPattern(x, y, -Math.PI / 6, strokeSpacing * 1.7, strokeThickness * 0.65) * tonalDarkness * 0.35
-        : 0;
-      const blendedShade = softTone * 0.45;
-      const gGrain = graphiteGrain(i + 5000, 14);
-      const grainContrib = tonalDarkness > 0.05 ? gGrain * tonalDarkness * 0.018 : 0;
-
-      const combinedOpacity = Math.max(edgeOpacity, blendedShade, hatch1, hatch2, hatch3, hatch4, hatch5) + grainContrib;
-      if (combinedOpacity > 0.005) {
-        const pr = output.data[i * 4], pg = output.data[i * 4 + 1], pb = output.data[i * 4 + 2];
-        const [r, gv, b] = blendPencilStroke(pr, pg, pb, 1, Math.min(1, combinedOpacity));
-        output.data[i * 4] = r; output.data[i * 4 + 1] = gv; output.data[i * 4 + 2] = b;
-      }
-    }
-  }
-
-  applyPaperTexture(output, width, height, 18);
-  applyVignette(output, width, height, 0.55);
-  return output;
-}
-
-// ─── Yield to browser between heavy stages ────────────────────────────────────
-function yieldToMain(): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, 0));
-}
-
-// ─── Main export: generates all 5 stages with progressive callbacks ───────────
 export async function generatePencilSketchStages(
-  imageSrc: string,
-  onStageComplete?: StageProgressCallback
-): Promise<SketchStage[]> {
-  const img = await loadImage(imageSrc);
+  imageUrl: string,
+  onProgress?: StageProgressCallback
+): Promise<string[]> {
+  const img = await loadImage(imageUrl);
 
-  // Downscale for speed: max 600px on longest side
-  const MAX_DIM = 600;
-  const scale = Math.min(1, MAX_DIM / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height));
-  const width = Math.round((img.naturalWidth || img.width) * scale);
-  const height = Math.round((img.naturalHeight || img.height) * scale);
+  // Downscale to max 700px for performance
+  const MAX = 700;
+  let w = img.naturalWidth || img.width;
+  let h = img.naturalHeight || img.height;
+  if (w > MAX || h > MAX) {
+    const scale = MAX / Math.max(w, h);
+    w = Math.round(w * scale);
+    h = Math.round(h * scale);
+  }
 
-  // Draw source image once
+  // Source canvas
   const srcCanvas = document.createElement("canvas");
-  srcCanvas.width = width;
-  srcCanvas.height = height;
+  srcCanvas.width = w;
+  srcCanvas.height = h;
   const srcCtx = srcCanvas.getContext("2d")!;
-  srcCtx.drawImage(img, 0, 0, width, height);
-  const srcData = srcCtx.getImageData(0, 0, width, height);
+  srcCtx.drawImage(img, 0, 0, w, h);
+  const srcData = srcCtx.getImageData(0, 0, w, h);
 
-  // ── Shared pre-computations (run ONCE) ──────────────────────────────────────
-  const gray = toGrayscale(srcData.data);
-  await yieldToMain();
+  // Grayscale
+  const gray = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) {
+    const r = srcData.data[i * 4] / 255;
+    const g = srcData.data[i * 4 + 1] / 255;
+    const b = srcData.data[i * 4 + 2] / 255;
+    gray[i] = 0.299 * r + 0.587 * g + 0.114 * b;
+  }
 
-  const { magnitude: rawEdges } = sobelEdges(gray, width, height);
-  await yieldToMain();
+  // Pre-compute blurs
+  const blurLight = gaussianBlur(gray, w, h, 1.0);
+  const blurMed = gaussianBlur(gray, w, h, 2.5);
+  const blurHeavy = gaussianBlur(gray, w, h, 5.0);
 
-  // Pre-blur at different radii — reused across stages
-  const edges_r3 = gaussianBlur(rawEdges, width, height, 3); // Stage 1
-  await yieldToMain();
-  const edges_r2 = gaussianBlur(rawEdges, width, height, 2); // Stage 2
-  await yieldToMain();
-  const edges_r1 = gaussianBlur(rawEdges, width, height, 1); // Stages 3, 4, 5
-  await yieldToMain();
-  const blurGray_r2 = gaussianBlur(gray, width, height, 2);  // Stage 4
-  await yieldToMain();
-  const blurGray_r3 = gaussianBlur(gray, width, height, 3);  // Stage 5
-  await yieldToMain();
-  // blurGray_r1 reuses edges_r1 concept but on gray
-  const blurGray_r1 = gaussianBlur(gray, width, height, 1);  // Stage 5 unsharp
-  await yieldToMain();
+  // Edges from lightly blurred source (cleaner lines)
+  const edges = sobelEdges(blurLight, w, h);
 
-  // ── Generate each stage, yield between them ──────────────────────────────────
-  const results: SketchStage[] = [];
+  // Darkness map: inverted grayscale (how dark each pixel is)
+  const darkMap = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) {
+    darkMap[i] = 1 - gray[i];
+  }
 
-  const stageProcessors = [
-    () => applyStage1(gray, edges_r3, width, height),
-    () => applyStage2(gray, edges_r2, width, height),
-    () => applyStage3(gray, edges_r1, width, height),
-    () => applyStage4(gray, edges_r1, blurGray_r2, width, height),
-    () => applyStage5(gray, edges_r1, blurGray_r3, blurGray_r1, width, height),
-  ];
+  // Smoothed darkness for shading regions
+  const darkMapSmooth = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) {
+    darkMapSmooth[i] = 1 - blurMed[i];
+  }
 
-  for (let i = 0; i < 5; i++) {
-    const imageData = stageProcessors[i]();
-    const dataUrl = imageDataToDataUrl(imageData, width, height);
-    const stage: SketchStage = {
-      label: STAGE_DEFINITIONS[i].label,
-      description: STAGE_DEFINITIONS[i].description,
-      dataUrl,
-    };
-    results.push(stage);
-    if (onStageComplete) onStageComplete(i, stage);
-    await yieldToMain(); // yield between stages so UI can update
+  const results: string[] = [];
+
+  // Helper: create a white canvas
+  const makeCanvas = () => {
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext("2d")!;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, w, h);
+    return { c, ctx };
+  };
+
+  // ─── STAGE 1: Basic Outline ───────────────────────────────────────────────
+  // Clean thin grey lines on pure white background — no shading
+  await yieldToBrowser();
+  {
+    const { c, ctx } = makeCanvas();
+    const imgData = ctx.getImageData(0, 0, w, h);
+    for (let i = 0; i < w * h; i++) {
+      const e = edges[i];
+      // Only draw edges above a low threshold — thin, clean lines
+      if (e > 0.06) {
+        // Map edge strength to a grey value (stronger edge = darker line)
+        const lineStrength = Math.min(e * 3.5, 1);
+        const grey = Math.round(255 - lineStrength * 180); // range ~75-255
+        imgData.data[i * 4] = grey;
+        imgData.data[i * 4 + 1] = grey;
+        imgData.data[i * 4 + 2] = grey;
+        imgData.data[i * 4 + 3] = 255;
+      }
+      // else stays white
+    }
+    ctx.putImageData(imgData, 0, 0);
+    const dataUrl = c.toDataURL("image/png");
+    results.push(dataUrl);
+    onProgress?.(0, dataUrl);
+  }
+
+  // ─── STAGE 2: Light Hatching ──────────────────────────────────────────────
+  // Outline + light directional hatching in shadow areas
+  await yieldToBrowser();
+  {
+    const { c, ctx } = makeCanvas();
+
+    // Draw base outlines
+    const imgData = ctx.getImageData(0, 0, w, h);
+    for (let i = 0; i < w * h; i++) {
+      const e = edges[i];
+      if (e > 0.06) {
+        const lineStrength = Math.min(e * 3.5, 1);
+        const grey = Math.round(255 - lineStrength * 180);
+        imgData.data[i * 4] = grey;
+        imgData.data[i * 4 + 1] = grey;
+        imgData.data[i * 4 + 2] = grey;
+        imgData.data[i * 4 + 3] = 255;
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    // Light hatching at 45°
+    drawHatching(ctx, w, h, darkMapSmooth, Math.PI / 4, 5, 0.25, 0.18, 0.6);
+
+    const dataUrl = c.toDataURL("image/png");
+    results.push(dataUrl);
+    onProgress?.(1, dataUrl);
+  }
+
+  // ─── STAGE 3: Cross-Hatching ──────────────────────────────────────────────
+  // Outline + two-direction hatching for mid-tones
+  await yieldToBrowser();
+  {
+    const { c, ctx } = makeCanvas();
+
+    // Base outlines
+    const imgData = ctx.getImageData(0, 0, w, h);
+    for (let i = 0; i < w * h; i++) {
+      const e = edges[i];
+      if (e > 0.06) {
+        const lineStrength = Math.min(e * 3.5, 1);
+        const grey = Math.round(255 - lineStrength * 200);
+        imgData.data[i * 4] = grey;
+        imgData.data[i * 4 + 1] = grey;
+        imgData.data[i * 4 + 2] = grey;
+        imgData.data[i * 4 + 3] = 255;
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    // Two-direction hatching
+    drawHatching(ctx, w, h, darkMapSmooth, Math.PI / 4, 5, 0.20, 0.22, 0.7);
+    drawHatching(ctx, w, h, darkMapSmooth, -Math.PI / 4, 5, 0.35, 0.18, 0.6);
+
+    const dataUrl = c.toDataURL("image/png");
+    results.push(dataUrl);
+    onProgress?.(2, dataUrl);
+  }
+
+  // ─── STAGE 4: Deep Shading ────────────────────────────────────────────────
+  // Dense cross-hatching + tonal fill for dark regions
+  await yieldToBrowser();
+  {
+    const { c, ctx } = makeCanvas();
+
+    // Tonal base: blend grayscale into the white canvas for mid-tones
+    const imgData = ctx.getImageData(0, 0, w, h);
+    for (let i = 0; i < w * h; i++) {
+      const dark = darkMapSmooth[i];
+      if (dark > 0.15) {
+        // Soft tonal fill — lighter than final
+        const tone = Math.round(255 - dark * 160);
+        imgData.data[i * 4] = tone;
+        imgData.data[i * 4 + 1] = tone;
+        imgData.data[i * 4 + 2] = tone;
+        imgData.data[i * 4 + 3] = 255;
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    // Dense hatching in multiple directions
+    drawHatching(ctx, w, h, darkMapSmooth, Math.PI / 4, 4, 0.15, 0.28, 0.7);
+    drawHatching(ctx, w, h, darkMapSmooth, -Math.PI / 4, 4, 0.25, 0.24, 0.65);
+    drawHatching(ctx, w, h, darkMapSmooth, 0, 5, 0.40, 0.18, 0.55);
+
+    // Strong outlines on top
+    const outlineData = ctx.getImageData(0, 0, w, h);
+    for (let i = 0; i < w * h; i++) {
+      const e = edges[i];
+      if (e > 0.05) {
+        const lineStrength = Math.min(e * 4, 1);
+        const grey = Math.round(255 - lineStrength * 220);
+        const cur = outlineData.data[i * 4];
+        outlineData.data[i * 4] = Math.min(cur, grey);
+        outlineData.data[i * 4 + 1] = Math.min(cur, grey);
+        outlineData.data[i * 4 + 2] = Math.min(cur, grey);
+        outlineData.data[i * 4 + 3] = 255;
+      }
+    }
+    ctx.putImageData(outlineData, 0, 0);
+
+    const dataUrl = c.toDataURL("image/png");
+    results.push(dataUrl);
+    onProgress?.(3, dataUrl);
+  }
+
+  // ─── STAGE 5: Finished Portrait ───────────────────────────────────────────
+  // Full tonal rendering: near-black shadows, bright white highlights
+  await yieldToBrowser();
+  {
+    const { c, ctx } = makeCanvas();
+
+    // Full tonal fill — deep shadows approaching near-black
+    const imgData = ctx.getImageData(0, 0, w, h);
+    for (let i = 0; i < w * h; i++) {
+      const dark = darkMapSmooth[i];
+      // Aggressive tone mapping: shadows go very dark
+      const tone = Math.round(255 - Math.pow(dark, 0.75) * 230);
+      const clamped = Math.max(10, Math.min(255, tone));
+      imgData.data[i * 4] = clamped;
+      imgData.data[i * 4 + 1] = clamped;
+      imgData.data[i * 4 + 2] = clamped;
+      imgData.data[i * 4 + 3] = 255;
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    // Very dense hatching layers
+    drawHatching(ctx, w, h, darkMapSmooth, Math.PI / 4, 3, 0.10, 0.30, 0.7);
+    drawHatching(ctx, w, h, darkMapSmooth, -Math.PI / 4, 3, 0.20, 0.28, 0.65);
+    drawHatching(ctx, w, h, darkMapSmooth, 0, 4, 0.30, 0.22, 0.6);
+    drawHatching(ctx, w, h, darkMapSmooth, Math.PI / 6, 4, 0.45, 0.20, 0.55);
+
+    // Final strong outlines
+    const outlineData = ctx.getImageData(0, 0, w, h);
+    for (let i = 0; i < w * h; i++) {
+      const e = edges[i];
+      if (e > 0.04) {
+        const lineStrength = Math.min(e * 5, 1);
+        const grey = Math.round(255 - lineStrength * 240);
+        const cur = outlineData.data[i * 4];
+        outlineData.data[i * 4] = Math.min(cur, grey);
+        outlineData.data[i * 4 + 1] = Math.min(cur, grey);
+        outlineData.data[i * 4 + 2] = Math.min(cur, grey);
+        outlineData.data[i * 4 + 3] = 255;
+      }
+    }
+    ctx.putImageData(outlineData, 0, 0);
+
+    const dataUrl = c.toDataURL("image/png");
+    results.push(dataUrl);
+    onProgress?.(4, dataUrl);
   }
 
   return results;

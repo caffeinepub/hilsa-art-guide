@@ -1,46 +1,57 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T20:00:14.303Z",
+  "generatedAt": "2026-02-26T20:15:13.273Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Optimize the client-side pencil sketch pipeline in pencilSketchUtils.ts to generate all 5 stages significantly faster. Reduce processing time by: (1) running stage computations in a single canvas pass where possible, (2) reusing intermediate canvas buffers between stages instead of re-running grayscale/Sobel from scratch for each stage, (3) reducing Gaussian blur kernel radius for earlier stages (light stages need less blur), and (4) skipping cross-hatching and graphite shading computations entirely for stages 1–2.",
+        "summary": "Update the client-side pencil sketch pipeline in `frontend/src/lib/pencilSketchUtils.ts` to produce output that closely matches the reference image style: clean, thin graphite-grey outlines on a pure white background for Stage 1 (Basic Outline), with each subsequent stage progressively adding deeper, denser shading — including directional hatching, cross-hatching, and rich graphite/charcoal-level dark fills by Stage 5. The final stage must have deep, high-contrast shadow regions (near-black in darkest areas) while preserving bright whites in highlights, giving the appearance of a fully shaded traditional pencil drawing.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/lib/pencilSketchUtils.ts"
+          "frontend/src/lib/pencilSketchUtils.ts",
+          "frontend/src/components/GalleryView.tsx",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/pages/HowItWorks.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/lib/pencilSketchUtils.ts"
+          "frontend/src/lib/pencilSketchUtils.ts",
+          "frontend/src/components/GalleryView.tsx",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/pages/HowItWorks.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Update the GalleryView component to display all 5 pencil sketch stages in a clean horizontal scrollable strip (on mobile) or a 5-column grid (on desktop), each labeled 'Stage 1' through 'Stage 5' with a subtitle describing that stage's detail level. Stages should appear progressively as they are computed — each stage card renders as soon as its canvas output is ready rather than waiting for all 5 to complete.",
+        "summary": "Update the UI theme across the app (Header, Footer, GalleryView, Home, Results, HowItWorks pages) to exactly match the HILSA-ART reference UI: deep near-black background (`#1a1a1a` or similar), gold/amber accent color for the brand name 'ART' portion and active nav links, light grey/white body text, and dark card containers with subtle borders for sketch stage cards. Stage label (e.g. 'STAGE 1') should appear in the gold accent color above the stage title in white, exactly as shown in the reference screenshot.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/GalleryView.tsx"
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js",
+          "frontend/src/components/Header.tsx",
+          "frontend/src/components/Footer.tsx",
+          "frontend/src/components/GalleryView.tsx",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/pages/HowItWorks.tsx",
+          "frontend/src/pages/Results.tsx",
+          "frontend/src/pages/Contact.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/GalleryView.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Fix the Results page (Results.tsx) to suppress and hide both the 'NO JOB ID PROVIDED' error and the 'EXPECTED V3 RESPONSE' error messages. Replace them with a neutral loading/fallback state that does not show raw error strings to the user.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Results.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Results.tsx"
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js",
+          "frontend/src/components/Header.tsx",
+          "frontend/src/components/Footer.tsx",
+          "frontend/src/components/GalleryView.tsx",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/pages/HowItWorks.tsx",
+          "frontend/src/pages/Results.tsx",
+          "frontend/src/pages/Contact.tsx"
         ]
       }
     ]
@@ -50,9 +61,16 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/components/Footer.tsx",
     "frontend/src/components/GalleryView.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/index.css",
     "frontend/src/lib/pencilSketchUtils.ts",
+    "frontend/src/pages/Contact.tsx",
+    "frontend/src/pages/Home.tsx",
+    "frontend/src/pages/HowItWorks.tsx",
     "frontend/src/pages/Results.tsx",
+    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
