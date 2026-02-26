@@ -1,62 +1,106 @@
 {
   "kind": "build_request",
-  "title": "Match HILSA-ART reference style with progressive deep-shading pencil sketch stages",
-  "projectName": "HILSA-ART Guide",
+  "title": "Step-by-step processed image drawing guide with stage-by-stage progression",
+  "projectName": "HILSA Art Guide",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the client-side pencil sketch pipeline in `frontend/src/lib/pencilSketchUtils.ts` to produce output that closely matches the reference image style: clean, thin graphite-grey outlines on a pure white background for Stage 1 (Basic Outline), with each subsequent stage progressively adding deeper, denser shading — including directional hatching, cross-hatching, and rich graphite/charcoal-level dark fills by Stage 5. The final stage must have deep, high-contrast shadow regions (near-black in darkest areas) while preserving bright whites in highlights, giving the appearance of a fully shaded traditional pencil drawing.",
+      "text": "Enhance the five-stage pencil sketch pipeline in pencilSketchUtils.ts so that each stage produces a clearly distinct, progressive visual output: Stage 1 shows only the basic skull/proportion construction lines (very faint, structural), Stage 2 adds rough contour outlines, Stage 3 layers in mid-tone shading, Stage 4 refines details and adds darker values, and Stage 5 delivers the fully rendered portrait with complete tonal range and paper grain texture.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-4"
         ],
         "quotes": [
-          "I want this exact style and the progressive styles with deep shading"
+          "create step by step processed image which guides to draw stage by stage"
         ]
       },
       "acceptanceCriteria": [
-        "Stage 1 output shows only thin, clean grey outlines on a white background, matching the reference screenshot (no fill, no shading).",
-        "Each successive stage (2–5) adds progressively deeper shading so the transition from outline to fully shaded drawing is clearly visible.",
-        "Stage 5 contains rich dark tones in shadow areas (close to near-black) with bright white preserved in highlight areas.",
-        "The shading style uses hatching/cross-hatching strokes consistent with traditional pencil technique rather than flat grey fills.",
-        "All 5 stages render correctly on a real portrait photo upload without visual glitches or fully black/white outputs."
+        "Each of the 5 stages produces a visually distinct canvas output that is clearly more complete than the previous stage",
+        "Stage 1 output is the most minimal/sparse, Stage 5 is the most detailed/complete",
+        "Transitions between stages are smooth and progressive, not abrupt",
+        "All stages still derive from the original uploaded image"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Update the UI theme across the app (Header, Footer, GalleryView, Home, Results, HowItWorks pages) to exactly match the HILSA-ART reference UI: deep near-black background (`#1a1a1a` or similar), gold/amber accent color for the brand name 'ART' portion and active nav links, light grey/white body text, and dark card containers with subtle borders for sketch stage cards. Stage label (e.g. 'STAGE 1') should appear in the gold accent color above the stage title in white, exactly as shown in the reference screenshot.",
+      "text": "Update the GalleryView component to display each stage with a step label (e.g. 'Step 1: Construction Lines', 'Step 2: Contour Outline', etc.), an instructional caption below each image explaining what the artist should focus on or practice at that stage, and a clear visual indicator showing which step the user is currently viewing (e.g. a numbered progress indicator or breadcrumb).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-4"
         ],
         "quotes": [
-          "I want this exact style"
+          "create step by step processed image which guides to draw stage by stage"
         ]
       },
       "acceptanceCriteria": [
-        "App background is deep near-black across all pages.",
-        "Header shows 'HILSA-' in white and 'ART' in gold/amber, matching reference branding.",
-        "Active navigation links are styled in gold/amber to match the reference.",
-        "Sketch stage cards have a dark container background with the stage number in gold and stage title in white.",
-        "Footer matches the reference: dark background, centered HILSA-ART branding with gold accent, grey navigation links, copyright line."
+        "Each stage panel shows a numbered step label and a descriptive title",
+        "A short instructional caption (1–2 sentences) is displayed beneath each stage image",
+        "A progress indicator (e.g. '2 of 5') is visible when navigating between stages in the lightbox",
+        "Step titles and captions match the actual visual content of that stage"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Add a dedicated 'Drawing Guide' view or mode on the Results page that presents stages sequentially in a step-by-step walkthrough layout: one stage visible at a time, with 'Previous Step' and 'Next Step' navigation buttons, the instructional caption, and a thumbnail strip at the bottom showing all 5 stages so the user can jump to any step directly.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "guides to draw stage by stage"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A 'Drawing Guide' button or tab is available on the Results page for completed jobs",
+        "The guide view shows one stage at a time with Previous/Next controls",
+        "A thumbnail strip with all 5 stages is visible at the bottom; clicking a thumbnail jumps to that step",
+        "The current step number and total step count are always visible",
+        "The guide view can be exited to return to the standard gallery view"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Update the HowItWorks page timeline to include a small representative preview image alongside each of the five stage entries, visually demonstrating what the output looks like at that stage of the drawing process.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "step by step processed image which guides to draw stage by stage"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each of the five timeline entries on the HowItWorks page includes a small illustrative image or icon representing that drawing stage",
+        "The preview images are consistent in size and style across all five stages",
+        "The page layout remains clean and readable with the added visual elements"
       ]
     }
   ],
   "constraints": [
-    "Do not modify files listed in frontend.immutablePaths (useInternetIdentity.ts, useActor.ts, main.tsx, frontend/src/components/ui).",
-    "All image processing must remain client-side in pencilSketchUtils.ts — do not route generated sketch images through the backend.",
-    "Keep all Motoko logic in backend/main.mo; do not alter backend schema unless required."
+    "Do not modify files under frontend/src/hooks/ (useActor.ts, useInternetIdentity.ts) or frontend/src/main.tsx",
+    "Do not modify files under frontend/src/components/ui/",
+    "All Motoko logic must remain in backend/main.mo as a single actor",
+    "Stage processing must continue to be canvas-based and client-side via pencilSketchUtils.ts"
   ],
   "nonGoals": [
-    "Adding new sketch stages beyond the existing 5-stage pipeline.",
-    "Changing the backend job management logic.",
-    "Implementing any AI or server-side image processing."
+    "Adding new backend endpoints or changing the job data model",
+    "Supporting drawing media other than pencil sketch",
+    "Adding video or animation-based tutorials",
+    "Allowing users to edit or annotate the stage images"
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Minimal pencil construction lines illustration showing skull proportions and basic head structure, white background (stage1-construction.dim_400x400.png)",
+      "Pencil contour outline illustration of a face with no shading, white background (stage2-contour.dim_400x400.png)",
+      "Pencil sketch with light mid-tone shading on a face, white background (stage3-shading.dim_400x400.png)",
+      "Detailed pencil portrait with refined features and darker values, white background (stage4-details.dim_400x400.png)",
+      "Fully rendered pencil portrait with complete tonal range and paper grain texture, white background (stage5-complete.dim_400x400.png)"
+    ],
     "edits": []
   }
 }

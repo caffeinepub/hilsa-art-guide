@@ -1,97 +1,83 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
-import { Menu, X, Pencil } from "lucide-react";
+import { useState } from 'react';
+import { Link, useRouter } from '@tanstack/react-router';
+import { Menu, X } from 'lucide-react';
+
+const navLinks = [
+  { label: 'Home', path: '/' },
+  { label: 'How It Works', path: '/how-it-works' },
+  { label: 'Contact', path: '/contact' },
+];
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const routerState = useRouterState();
-  const currentPath = routerState.location.pathname;
-
-  const navLinks = [
-    { label: "Home", to: "/" },
-    { label: "How It Works", to: "/how-it-works" },
-    { label: "Contact", to: "/contact" },
-  ];
-
-  const isActive = (path: string) => {
-    if (path === "/") return currentPath === "/";
-    return currentPath.startsWith(path);
-  };
+  const router = useRouter();
+  const currentPath = router.state.location.pathname;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold tracking-widest font-serif">
-              <span className="text-foreground">HILSA-</span>
-              <span className="text-primary">ART</span>
-            </span>
-          </Link>
-
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`text-sm font-medium tracking-wide transition-colors duration-200 ${
-                  isActive(link.to)
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* CTA */}
-          <div className="hidden md:flex items-center gap-4">
-            <Link
-              to="/"
-              className="flex items-center gap-2 bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 rounded transition-all duration-200 hover:opacity-90"
-            >
-              <Pencil size={14} />
-              Start Creating
-            </Link>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-7 h-7 flex items-center justify-center">
+            <svg viewBox="0 0 28 28" fill="none" className="w-full h-full">
+              <rect x="2" y="2" width="24" height="24" rx="1" stroke="currentColor" strokeWidth="1.5" className="text-gold" />
+              <path d="M7 21 L14 7 L21 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-foreground" />
+              <path d="M9.5 16 H18.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-gold" />
+            </svg>
           </div>
+          <span className="font-serif text-base font-semibold tracking-wide text-foreground group-hover:text-gold transition-colors duration-200">
+            HILSA<span className="text-gold">·</span>ART
+          </span>
+        </Link>
 
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden text-foreground p-2"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`nav-link ${currentPath === link.path ? 'active' : ''}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Desktop CTA */}
+        <div className="hidden md:flex items-center">
+          <Link to="/" className="btn-primary-art text-xs">
+            Start Creating
+          </Link>
         </div>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden p-2 text-foreground hover:text-gold transition-colors"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle menu"
+        >
+          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-card border-t border-border px-4 py-4 space-y-3">
+        <div className="md:hidden bg-background border-t border-border px-6 py-4 flex flex-col gap-4">
           {navLinks.map((link) => (
             <Link
-              key={link.to}
-              to={link.to}
+              key={link.path}
+              to={link.path}
+              className={`nav-link text-sm py-1 ${currentPath === link.path ? 'active' : ''}`}
               onClick={() => setMobileOpen(false)}
-              className={`block text-sm font-medium py-2 transition-colors duration-200 ${
-                isActive(link.to)
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
             >
               {link.label}
             </Link>
           ))}
           <Link
             to="/"
+            className="btn-primary-art text-xs text-center mt-2"
             onClick={() => setMobileOpen(false)}
-            className="flex items-center gap-2 bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 rounded w-full justify-center mt-2"
           >
-            <Pencil size={14} />
             Start Creating
           </Link>
         </div>

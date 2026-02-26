@@ -1,96 +1,83 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Match HILSA-ART reference style with progressive deep-shading pencil sketch stages",
+  "title": "Step-by-step processed image drawing guide with stage-by-stage progression",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Update client-side pencil sketch pipeline to produce clean thin outlines in Stage 1 and progressively deeper shading with hatching/cross-hatching through Stage 5, matching the reference image style with near-black shadows and bright white highlights",
+      "summary": "Enhance the five-stage pencil sketch pipeline so each stage produces clearly distinct, progressive visual output",
       "acceptanceCriteria": [
-        "Stage 1 output shows only thin, clean grey outlines on a white background, matching the reference screenshot (no fill, no shading).",
-        "Each successive stage (2–5) adds progressively deeper shading so the transition from outline to fully shaded drawing is clearly visible.",
-        "Stage 5 contains rich dark tones in shadow areas (close to near-black) with bright white preserved in highlight areas.",
-        "The shading style uses hatching/cross-hatching strokes consistent with traditional pencil technique rather than flat grey fills.",
-        "All 5 stages render correctly on a real portrait photo upload without visual glitches or fully black/white outputs."
+        "Each of the 5 stages produces a visually distinct canvas output that is clearly more complete than the previous stage",
+        "Stage 1 output is the most minimal/sparse, Stage 5 is the most detailed/complete",
+        "Transitions between stages are smooth and progressive, not abrupt",
+        "All stages still derive from the original uploaded image"
       ],
       "file_operations": [
         {
           "path": "frontend/src/lib/pencilSketchUtils.ts",
           "operation": "modify",
-          "description": "Refactor the 5-stage pencil sketch generation pipeline to match the reference style. Stage 1 must produce only thin, clean graphite-grey outlines (similar to Canny/Sobel edge detection at ~0.3 opacity) on pure white (#FFFFFF) background with no shading or fill. Stages 2-4 progressively introduce directional hatching strokes, cross-hatching patterns, and increasing density/darkness of shading layers. Stage 5 must deliver deep, high-contrast graphite/charcoal-level dark fills in shadow regions (approaching near-black #1a1a1a in darkest areas) while preserving bright white highlights, using composite blending modes that simulate traditional pencil layering. Adjust Sobel edge detection sensitivity, Gaussian blur sigma values, and hatching density parameters to achieve clean thin lines in early stages and rich tonal depth in final stages. Verify the pipeline produces the exact visual progression shown in the reference screenshot."
-        },
-        {
-          "path": "frontend/src/components/GalleryView.tsx",
-          "operation": "modify",
-          "description": "Update the sketch stage gallery display to reflect the improved progressive shading quality from the updated pencil sketch pipeline. Ensure stage preview cards properly display the refined Stage 1 outlines and the deepened Stage 5 shading. Verify lightbox navigation and download functionality work correctly with the updated canvas-generated images. No structural changes required, only visual verification that the component correctly renders the new sketch outputs."
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Replace the existing 5-stage progression preview images with the newly generated reference-matched sketch stage assets from frontend/public/assets/generated/sketch-stage-1.dim_600x600.png through sketch-stage-5.dim_600x600.png. These generated images demonstrate the updated progressive shading style (clean thin outlines in Stage 1, deep rich shading in Stage 5) and serve as visual examples for users before they upload their own photos. Update the image src paths and verify the stage descriptions accurately reflect the refined sketch characteristics."
-        },
-        {
-          "path": "frontend/src/pages/HowItWorks.tsx",
-          "operation": "modify",
-          "description": "Update the stage descriptions and technical details to accurately reflect the refined pencil sketch pipeline. Stage 1 description should emphasize 'clean thin graphite-grey outlines on pure white background with no shading'. Stages 2-4 descriptions should detail the progressive addition of directional hatching, cross-hatching, and increasing tonal density. Stage 5 description must highlight 'deep high-contrast shading with near-black shadow regions and preserved bright white highlights, simulating fully rendered traditional pencil drawing'. Replace stage icon images with the generated reference assets from frontend/public/assets/generated/stage-1-outline.dim_256x256.png through stage-5-polish.dim_256x256.png to visually demonstrate the updated progression."
+          "description": "Refactor the generateSketchStage function to produce five clearly distinct progressive outputs: Stage 1 (Construction Lines) should show only faint structural/proportion lines using very light edge detection and minimal processing; Stage 2 (Contour Outline) should add rough contour outlines with stronger edge detection but no shading; Stage 3 (Mid-tone Shading) should layer in grayscale mid-tones with moderate blur and initial paper grain; Stage 4 (Refined Details) should add darker values, increased contrast, and refined edge details; Stage 5 (Complete Portrait) should deliver the fully rendered result with complete tonal range, maximum contrast, and full paper grain texture. Adjust Sobel thresholds, blur radii, contrast factors, and grain opacity progressively across stages to ensure each stage is visibly more complete than the previous."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Update UI theme across all pages to match HILSA-ART reference: deep near-black background (#1a1a1a), gold/amber accent for 'ART' branding and active nav links, light grey/white text, dark card containers with stage labels in gold above white titles",
+      "summary": "Update GalleryView to display each stage with step labels, instructional captions, and progress indicators",
       "acceptanceCriteria": [
-        "App background is deep near-black across all pages.",
-        "Header shows 'HILSA-' in white and 'ART' in gold/amber, matching reference branding.",
-        "Active navigation links are styled in gold/amber to match the reference.",
-        "Sketch stage cards have a dark container background with the stage number in gold and stage title in white.",
-        "Footer matches the reference: dark background, centered HILSA-ART branding with gold accent, grey navigation links, copyright line."
+        "Each stage panel shows a numbered step label and a descriptive title",
+        "A short instructional caption (1–2 sentences) is displayed beneath each stage image",
+        "A progress indicator (e.g. '2 of 5') is visible when navigating between stages in the lightbox",
+        "Step titles and captions match the actual visual content of that stage"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/index.css",
+          "path": "frontend/src/lib/pencilSketchUtils.ts",
           "operation": "modify",
-          "description": "Update the global CSS custom properties to implement the HILSA-ART reference theme. Set --background to deep near-black (#1a1a1a or hsl(0 0% 10%)), --foreground to light grey/white (#e5e5e5 or hsl(0 0% 90%)), --card to slightly lighter black (#222222 or hsl(0 0% 13%)), --card-foreground to white, --primary to gold/amber (#d4af37 or hsl(43 74% 53%)), --primary-foreground to dark for contrast. Update --border to subtle grey (#333333). Remove or override the current cream/parchment editorial design tokens to match the dark theme shown in the reference screenshot. Ensure both light and dark theme blocks use these values for consistency."
-        },
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Update the Tailwind theme extension to support the HILSA-ART reference color scheme. Add or update gold/amber accent colors in the extend.colors section (e.g., gold: '#d4af37', ink: '#1a1a1a'). Ensure the OKLCH-based color tokens reference the updated CSS custom properties from index.css. Verify custom shadows and typography plugins remain compatible with the dark theme. Remove any cream/parchment color references that conflict with the near-black background requirement."
-        },
-        {
-          "path": "frontend/src/components/Header.tsx",
-          "operation": "modify",
-          "description": "Update the Header component to match the reference branding style. Split the HILSA-ART logo rendering so 'HILSA-' appears in white (text-foreground or text-white) and 'ART' appears in gold/amber (text-primary or text-gold). Update the active navigation link styling using TanStack Router's active state detection to apply the gold/amber color (text-primary) to the active link. Ensure the header background is dark (bg-background) and the CTA button uses gold/amber accent styling. Update the mobile menu to use the same color scheme."
-        },
-        {
-          "path": "frontend/src/components/Footer.tsx",
-          "operation": "modify",
-          "description": "Update the Footer component to match the reference screenshot. Ensure the background is dark (bg-background or bg-card). Render the HILSA-ART branding with 'HILSA-' in white and 'ART' in gold/amber, centered. Style navigation links in grey (text-muted-foreground) with hover state in gold/amber. Ensure the copyright line and caffeine.ai attribution are in muted grey. Update social media icons (Instagram, X, Behance) to use grey/white fill with gold/amber hover states. Verify the layout is centered and matches the reference footer structure."
+          "description": "Add an instructionalCaption field to each stage definition in the SKETCH_STAGES array. Stage 1 caption should guide the artist to focus on basic skull proportions and construction lines. Stage 2 should emphasize capturing the overall contour and main shapes. Stage 3 should explain mid-tone shading and form building. Stage 4 should focus on refining features and adding darker accents. Stage 5 should describe final polish, tonal range completion, and texture finishing."
         },
         {
           "path": "frontend/src/components/GalleryView.tsx",
           "operation": "modify",
-          "description": "Update the sketch stage gallery cards to match the reference screenshot styling. Ensure stage cards have a dark background (bg-card), subtle border (border-border), and rounded corners. Render the stage number label (e.g., 'STAGE 1') in uppercase gold/amber text (text-primary) above the stage title. Display the stage title (e.g., 'Basic Outline') in white (text-card-foreground). Ensure the image thumbnails have proper contrast against the dark card background. Update lightbox overlay to use dark background with gold/amber accent for navigation controls."
-        },
+          "description": "Update the gallery grid and lightbox to display step labels in the format 'Step X: [Stage Name]' above each image. Add the instructional caption text below each stage image in both grid and lightbox views. In the lightbox navigation, add a progress indicator showing 'Step X of 5' near the navigation controls. Ensure captions are styled for readability and positioned consistently beneath each stage preview."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add a dedicated Drawing Guide view with sequential step-by-step walkthrough layout",
+      "acceptanceCriteria": [
+        "A 'Drawing Guide' button or tab is available on the Results page for completed jobs",
+        "The guide view shows one stage at a time with Previous/Next controls",
+        "A thumbnail strip with all 5 stages is visible at the bottom; clicking a thumbnail jumps to that step",
+        "The current step number and total step count are always visible",
+        "The guide view can be exited to return to the standard gallery view"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Update the Home page to use the dark theme throughout. Ensure the hero section background is deep near-black (bg-background). Update the scroll-to-upload CTA button to use gold/amber accent styling (bg-primary text-primary-foreground). Ensure the 5-stage progression section uses dark card backgrounds (bg-card) with gold/amber stage labels and white titles. Update any text colors to light grey/white (text-foreground). Replace the hero background image reference to use frontend/public/assets/generated/hero-bg.dim_1920x1080.png if a background image is needed, ensuring it composites well with the dark theme."
-        },
-        {
-          "path": "frontend/src/pages/HowItWorks.tsx",
-          "operation": "modify",
-          "description": "Update the HowItWorks page to use the dark theme. Ensure the page background is deep near-black (bg-background). Update stage description cards to use dark card backgrounds (bg-card) with subtle borders (border-border). Render stage numbers in gold/amber (text-primary) and stage titles in white (text-card-foreground). Ensure body text is light grey (text-muted-foreground) for readability. Update any headings to white (text-foreground) and accent elements to gold/amber."
+          "path": "frontend/src/components/DrawingGuideView.tsx",
+          "operation": "create",
+          "description": "Create a new DrawingGuideView component that accepts a Job prop and displays a sequential step-by-step walkthrough. The component should maintain current step state (1-5), show one large stage image at a time with its step label and instructional caption prominently displayed. Add Previous and Next navigation buttons (disable Previous on step 1, Next on step 5). Display a step counter (e.g. 'Step 2 of 5') at the top. Include a horizontal thumbnail strip at the bottom showing all 5 stage thumbnails; highlight the current step thumbnail and allow click-to-jump navigation. Add a Close/Exit button to return to standard gallery mode. Use the same stage data source logic as GalleryView (backend stages or fallback to client-side generation)."
         },
         {
           "path": "frontend/src/pages/Results.tsx",
           "operation": "modify",
-          "description": "Update the Results page to use the dark theme. Ensure the page background is deep near-black (bg-background). Update loading, error, and status message styling to use light text on dark background. Ensure the uploaded image preview and GalleryView component integration use dark card styling. Update any buttons or interactive elements to use gold/amber accent colors. Verify the page layout maintains readability and visual hierarchy with the dark theme."
-        },
+          "description": "Add a view mode state (gallery or guide) and a 'Drawing Guide' button that appears when a job is completed. When clicked, switch to guide mode and render the DrawingGuideView component instead of GalleryView. The DrawingGuideView should receive a callback to switch back to gallery mode. Position the mode toggle button prominently near the job title or action area."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Update HowItWorks timeline to include representative preview images for each stage",
+      "acceptanceCriteria": [
+        "Each of the five timeline entries on the HowItWorks page includes a small illustrative image or icon representing that drawing stage",
+        "The preview images are consistent in size and style across all five stages",
+        "The page layout remains clean and readable with the added visual elements"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/pages/Contact.tsx",
+          "path": "frontend/src/pages/HowItWorks.tsx",
           "operation": "modify",
-          "description": "Update the Contact page to use the dark theme. Ensure the page background is deep near-black (bg-background) and the contact form uses dark card styling (bg-card). Update form input fields to have dark backgrounds with light text and gold/amber focus states (focus:ring-primary). Update the submit button to use gold/amber accent styling (bg-primary). Ensure contact info text and social media links use light grey/white with gold/amber hover states. Verify form validation messages are readable against the dark background."
+          "description": "Update each of the five timeline step entries to include a small preview image demonstrating that stage's visual output. Use the generated stage preview images at frontend/public/assets/generated/stage1-construction.dim_400x400.png, frontend/public/assets/generated/stage2-contour.dim_400x400.png, frontend/public/assets/generated/stage3-shading.dim_400x400.png, frontend/public/assets/generated/stage4-details.dim_400x400.png, and frontend/public/assets/generated/stage5-complete.dim_400x400.png. Position each image alongside or above its corresponding timeline entry. Size images consistently (e.g. 200x200px or 150x150px) and apply consistent styling (border, shadow, or rounded corners) to maintain visual harmony. Ensure the layout remains clean and the text descriptions are still easily readable."
         }
       ]
     }

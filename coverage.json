@@ -1,76 +1,64 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T20:15:13.273Z",
+  "generatedAt": "2026-02-26T20:52:52.452Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 4,
+    "implemented": 0,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the client-side pencil sketch pipeline in `frontend/src/lib/pencilSketchUtils.ts` to produce output that closely matches the reference image style: clean, thin graphite-grey outlines on a pure white background for Stage 1 (Basic Outline), with each subsequent stage progressively adding deeper, denser shading — including directional hatching, cross-hatching, and rich graphite/charcoal-level dark fills by Stage 5. The final stage must have deep, high-contrast shadow regions (near-black in darkest areas) while preserving bright whites in highlights, giving the appearance of a fully shaded traditional pencil drawing.",
-        "status": "implemented",
+        "summary": "Enhance the five-stage pencil sketch pipeline in pencilSketchUtils.ts so that each stage produces a clearly distinct, progressive visual output: Stage 1 shows only the basic skull/proportion construction lines (very faint, structural), Stage 2 adds rough contour outlines, Stage 3 layers in mid-tone shading, Stage 4 refines details and adds darker values, and Stage 5 delivers the fully rendered portrait with complete tonal range and paper grain texture.",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/src/lib/pencilSketchUtils.ts",
-          "frontend/src/components/GalleryView.tsx",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/pages/HowItWorks.tsx"
+          "frontend/src/lib/pencilSketchUtils.ts"
         ],
-        "matchedFiles": [
-          "frontend/src/lib/pencilSketchUtils.ts",
-          "frontend/src/components/GalleryView.tsx",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/pages/HowItWorks.tsx"
-        ]
+        "matchedFiles": []
       },
       {
         "id": "REQ-2",
-        "summary": "Update the UI theme across the app (Header, Footer, GalleryView, Home, Results, HowItWorks pages) to exactly match the HILSA-ART reference UI: deep near-black background (`#1a1a1a` or similar), gold/amber accent color for the brand name 'ART' portion and active nav links, light grey/white body text, and dark card containers with subtle borders for sketch stage cards. Stage label (e.g. 'STAGE 1') should appear in the gold accent color above the stage title in white, exactly as shown in the reference screenshot.",
-        "status": "implemented",
+        "summary": "Update the GalleryView component to display each stage with a step label (e.g. 'Step 1: Construction Lines', 'Step 2: Contour Outline', etc.), an instructional caption below each image explaining what the artist should focus on or practice at that stage, and a clear visual indicator showing which step the user is currently viewing (e.g. a numbered progress indicator or breadcrumb).",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/components/Footer.tsx",
-          "frontend/src/components/GalleryView.tsx",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/pages/HowItWorks.tsx",
-          "frontend/src/pages/Results.tsx",
-          "frontend/src/pages/Contact.tsx"
+          "frontend/src/lib/pencilSketchUtils.ts",
+          "frontend/src/components/GalleryView.tsx"
         ],
-        "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/components/Footer.tsx",
-          "frontend/src/components/GalleryView.tsx",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/pages/HowItWorks.tsx",
-          "frontend/src/pages/Results.tsx",
-          "frontend/src/pages/Contact.tsx"
-        ]
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Add a dedicated 'Drawing Guide' view or mode on the Results page that presents stages sequentially in a step-by-step walkthrough layout: one stage visible at a time, with 'Previous Step' and 'Next Step' navigation buttons, the instructional caption, and a thumbnail strip at the bottom showing all 5 stages so the user can jump to any step directly.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/components/DrawingGuideView.tsx",
+          "frontend/src/pages/Results.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Update the HowItWorks page timeline to include a small representative preview image alongside each of the five stage entries, visually demonstrating what the output looks like at that stage of the drawing process.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/pages/HowItWorks.tsx"
+        ],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
     "build-request.json",
     "feature_evidence.json",
-    "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/Footer.tsx",
-    "frontend/src/components/GalleryView.tsx",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/index.css",
-    "frontend/src/lib/pencilSketchUtils.ts",
-    "frontend/src/pages/Contact.tsx",
-    "frontend/src/pages/Home.tsx",
-    "frontend/src/pages/HowItWorks.tsx",
-    "frontend/src/pages/Results.tsx",
-    "frontend/tailwind.config.js",
+    "frontend/public/assets/generated/stage1-construction.dim_400x400.png",
+    "frontend/public/assets/generated/stage2-contour.dim_400x400.png",
+    "frontend/public/assets/generated/stage3-shading.dim_400x400.png",
+    "frontend/public/assets/generated/stage4-details.dim_400x400.png",
+    "frontend/public/assets/generated/stage5-complete.dim_400x400.png",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

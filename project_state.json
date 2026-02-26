@@ -1,40 +1,54 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "An art/photo-to-sketch conversion app (HILSA-ART style) that converts user photos into progressive pencil sketch stages with deep shading, matching the clean line-drawing style shown in the reference screenshot.",
-  "architectural_notes": [
-    "App converts user photos into progressive pencil sketch stages (e.g., Stage 1: Basic Outline → deeper shading stages), referencing HILSA-ART style"
-  ],
+  "summary": "A drawing tutorial app that guides users through step-by-step processed images to learn how to draw stage by stage.",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
-  "existing_features": [
-    {
-      "id": "feature-update-the-client-side-pencil-sketch-pipeline-in-frontend-src-lib-pencilsketchutils-ts-to-produce-output-that-closely-matches-the-reference-image-style-clean-thin-graphite-grey-outlines-on-a-pure-white-background-for-stage-1-basic-outline-with-each-subsequent-stage-progressively-adding-deeper-denser-shading-including-directional-hatching-cross-hatching-and-rich-graphite-charcoal-level-dark-fills-by-stage-5-the-final-stage-must-have-deep-high-contrast-shadow-regions-near-black-in-darkest-areas-while-preserving-bright-whites-in-highlights-giving-the-appearance-of-a-fully-shaded-traditional-pencil-drawing",
-      "title": "Update the client-side pencil sketch pipeline in `frontend/src/lib/pencilSketchUtils.ts` to produce output that closely matches the reference image style: clean, thin graphite-grey outlines on a pure white background for Stage 1 (Basic Outline), with each subsequent stage progressively adding deeper, denser shading — including directional hatching, cross-hatching, and rich graphite/charcoal-level dark fills by Stage 5. The final stage must have deep, high-contrast shadow regions (near-black in darkest areas) while preserving bright whites in highlights, giving the appearance of a fully shaded traditional pencil drawing.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-ui-theme-across-the-app-header-footer-galleryview-home-results-howitworks-pages-to-exactly-match-the-hilsa-art-reference-ui-deep-near-black-background-1a1a1a-or-similar-gold-amber-accent-color-for-the-brand-name-art-portion-and-active-nav-links-light-grey-white-body-text-and-dark-card-containers-with-subtle-borders-for-sketch-stage-cards-stage-label-e-g-stage-1-should-appear-in-the-gold-accent-color-above-the-stage-title-in-white-exactly-as-shown-in-the-reference-screenshot",
-      "title": "Update the UI theme across the app (Header, Footer, GalleryView, Home, Results, HowItWorks pages) to exactly match the HILSA-ART reference UI: deep near-black background (`#1a1a1a` or similar), gold/amber accent color for the brand name 'ART' portion and active nav links, light grey/white body text, and dark card containers with subtle borders for sketch stage cards. Stage label (e.g. 'STAGE 1') should appear in the gold accent color above the stage title in white, exactly as shown in the reference screenshot.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    }
-  ],
+  "imageRequirements": "## Required Images\n- Minimal pencil construction lines illustration showing skull proportions and basic head structure, white background (stage1-construction.dim_400x400.png)\n- Pencil contour outline illustration of a face with no shading, white background (stage2-contour.dim_400x400.png)\n- Pencil sketch with light mid-tone shading on a face, white background (stage3-shading.dim_400x400.png)\n- Detailed pencil portrait with refined features and darker values, white background (stage4-details.dim_400x400.png)\n- Fully rendered pencil portrait with complete tonal range and paper grain texture, white background (stage5-complete.dim_400x400.png)",
+  "existing_features": [],
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Progressive pencil sketch stages with deep shading, matching HILSA-ART clean line-drawing style",
+      "summary": "Step-by-step processed image guide that shows how to draw something stage by stage",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Enhance the five-stage pencil sketch pipeline in pencilSketchUtils.ts so that each stage produces a clearly distinct, progressive visual output: Stage 1 shows only the basic skull/proportion construction lines (very faint, structural), Stage 2 adds rough contour outlines, Stage 3 layers in mid-tone shading, Stage 4 refines details and adds darker values, and Stage 5 delivers the fully rendered portrait with complete tonal range and paper grain texture.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Update the GalleryView component to display each stage with a step label (e.g. 'Step 1: Construction Lines', 'Step 2: Contour Outline', etc.), an instructional caption below each image explaining what the artist should focus on or practice at that stage, and a clear visual indicator showing which step the user is currently viewing (e.g. a numbered progress indicator or breadcrumb).",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add a dedicated 'Drawing Guide' view or mode on the Results page that presents stages sequentially in a step-by-step walkthrough layout: one stage visible at a time, with 'Previous Step' and 'Next Step' navigation buttons, the instructional caption, and a thumbnail strip at the bottom showing all 5 stages so the user can jump to any step directly.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Update the HowItWorks page timeline to include a small representative preview image alongside each of the five stage entries, visually demonstrating what the output looks like at that stage of the drawing process.",
+      "reqIds": [
+        "REQ-4"
+      ],
       "status": "pending"
     }
   ],
   "gameProjectType": "none",
-  "projectName": "HILSA-ART",
+  "projectName": "HILSA Art Guide",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
