@@ -1,16 +1,15 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T19:02:54.599Z",
-  "summary": "REQ-1 is implemented in the UploadInterface.tsx diff: job ID is validated before navigation and an error toast is shown if missing. REQ-2 is described in the file summary for Results.tsx but the actual diff of Results.tsx is not present — only a summary string mentions it. The defensive check for missing job ID in the Results page cannot be confirmed from the diff evidence alone.",
+  "generatedAt": "2026-02-26T19:45:04.636Z",
+  "summary": "The diff addresses both REQ-1 and REQ-2. REQ-1 is fully implemented: Results.tsx now silently redirects to home when no job ID is present and renders null during redirect, with no 'NO JOB ID PROVIDED' string anywhere. REQ-2 is partially addressed: no 'EXPECTED V3 RESPONSE' string appears in Results.tsx, and the file-summaries mention useQueries.ts was updated to properly unwrap JobResponse variants. However, the diff does not show the actual content of useQueries.ts to confirm 'EXPECTED V3 RESPONSE' was removed from that file.",
   "missing_requirements": [
     {
       "id": "REQ-2",
-      "requirement": "Add a defensive check in the Results page component so that if the job ID route parameter is missing or empty, a clear user-facing error message is displayed with a link back to the Home page.",
-      "reason": "The diff does not include the actual modified content of frontend/src/pages/Results.tsx. Only a high-level file summary string describes it as 'Updated Results page', but there is no code evidence showing the defensive check, the 'No job ID provided' error message, or the 'Go Home' link. The acceptance criteria (error renders without crashing or making backend queries, navigating to /results/ shows the message) cannot be verified.",
+      "requirement": "Remove or suppress the 'EXPECTED V3 RESPONSE' error message from the UI — replace any occurrence with a neutral fallback message or silent error handling.",
+      "reason": "The diff does not include the actual content of frontend/src/hooks/useQueries.ts, only a summary describing it was fixed. There is no direct evidence in the diff that the 'EXPECTED V3 RESPONSE' string was removed or replaced from useQueries.ts or any other file. The file-summary mentions 'fixes useJob to return Job | null' and 'properly unwrap the JobResponse variant', which is consistent with the fix, but no code-level proof is visible.",
       "evidence": [
-        "frontend-file-summaries.txt",
-        "frontend/src/pages/Results.tsx"
+        "frontend/src/hooks/useQueries.ts"
       ]
     }
   ],
@@ -18,7 +17,7 @@
   "confidence": 0.72,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/UploadInterface.tsx",
+    "frontend/src/pages/Results.tsx",
     "project_state.json"
   ]
 }

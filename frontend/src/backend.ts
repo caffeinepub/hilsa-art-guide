@@ -89,6 +89,17 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface Job {
+    id: bigint;
+    stages: Array<StageResult>;
+    status: JobStatus;
+    owner: string;
+    createdAt: Time;
+    errorMessage?: string;
+    expiryReason?: ExpiryReason;
+    lastUpdated: Time;
+    uploadedImage: ExternalBlob;
+}
 export type Time = bigint;
 export type RetryJobResponse = {
     __kind__: "error";
@@ -129,17 +140,13 @@ export interface StageResult {
     resultImage?: ExternalBlob;
     stageName: string;
 }
-export interface JobResponse {
-    id: bigint;
-    stages: Array<StageResult>;
-    status: JobStatus;
-    owner: string;
-    createdAt: Time;
-    errorMessage?: string;
-    expiryReason?: ExpiryReason;
-    lastUpdated: Time;
-    uploadedImage: ExternalBlob;
-}
+export type JobResponse = {
+    __kind__: "error";
+    error: JobError;
+} | {
+    __kind__: "success";
+    success: Job;
+};
 export interface _CaffeineStorageCreateCertificateResult {
     method: string;
     blob_hash: string;
@@ -175,14 +182,14 @@ export interface backendInterface {
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     cancelJob(jobId: bigint): Promise<void>;
     createJob(uploadedImage: ExternalBlob): Promise<CreateJobResponse>;
-    getJob(jobId: bigint): Promise<JobResponse | null>;
-    getJobsByStatus(status: JobStatus, limit: bigint): Promise<Array<JobResponse>>;
-    getJobsSortedAsc(limit: bigint): Promise<Array<JobResponse>>;
-    getMyJobs(): Promise<Array<JobResponse>>;
+    getJob(jobId: bigint): Promise<Job | null>;
+    getJobsByStatus(status: JobStatus, limit: bigint): Promise<Array<Job>>;
+    getJobsSortedAsc(limit: bigint): Promise<Array<Job>>;
+    getMyJobs(): Promise<Array<Job>>;
     processJob(jobId: bigint): Promise<JobResponse>;
     retryFailedJob(jobId: bigint): Promise<RetryJobResponse>;
 }
-import type { CreateJobResponse as _CreateJobResponse, ExpiryReason as _ExpiryReason, ExternalBlob as _ExternalBlob, JobError as _JobError, JobResponse as _JobResponse, JobStatus as _JobStatus, RetryJobResponse as _RetryJobResponse, StageResult as _StageResult, Time as _Time, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { CreateJobResponse as _CreateJobResponse, ExpiryReason as _ExpiryReason, ExternalBlob as _ExternalBlob, Job as _Job, JobError as _JobError, JobResponse as _JobResponse, JobStatus as _JobStatus, RetryJobResponse as _RetryJobResponse, StageResult as _StageResult, Time as _Time, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -297,7 +304,7 @@ export class Backend implements backendInterface {
             return from_candid_CreateJobResponse_n9(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getJob(arg0: bigint): Promise<JobResponse | null> {
+    async getJob(arg0: bigint): Promise<Job | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getJob(arg0);
@@ -311,7 +318,7 @@ export class Backend implements backendInterface {
             return from_candid_opt_n13(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getJobsByStatus(arg0: JobStatus, arg1: bigint): Promise<Array<JobResponse>> {
+    async getJobsByStatus(arg0: JobStatus, arg1: bigint): Promise<Array<Job>> {
         if (this.processError) {
             try {
                 const result = await this.actor.getJobsByStatus(to_candid_JobStatus_n27(this._uploadFile, this._downloadFile, arg0), arg1);
@@ -325,7 +332,7 @@ export class Backend implements backendInterface {
             return from_candid_vec_n29(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getJobsSortedAsc(arg0: bigint): Promise<Array<JobResponse>> {
+    async getJobsSortedAsc(arg0: bigint): Promise<Array<Job>> {
         if (this.processError) {
             try {
                 const result = await this.actor.getJobsSortedAsc(arg0);
@@ -339,7 +346,7 @@ export class Backend implements backendInterface {
             return from_candid_vec_n29(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getMyJobs(): Promise<Array<JobResponse>> {
+    async getMyJobs(): Promise<Array<Job>> {
         if (this.processError) {
             try {
                 const result = await this.actor.getMyJobs();
@@ -357,28 +364,28 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.processJob(arg0);
-                return from_candid_JobResponse_n14(this._uploadFile, this._downloadFile, result);
+                return from_candid_JobResponse_n30(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.processJob(arg0);
-            return from_candid_JobResponse_n14(this._uploadFile, this._downloadFile, result);
+            return from_candid_JobResponse_n30(this._uploadFile, this._downloadFile, result);
         }
     }
     async retryFailedJob(arg0: bigint): Promise<RetryJobResponse> {
         if (this.processError) {
             try {
                 const result = await this.actor.retryFailedJob(arg0);
-                return from_candid_RetryJobResponse_n30(this._uploadFile, this._downloadFile, result);
+                return from_candid_RetryJobResponse_n32(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.retryFailedJob(arg0);
-            return from_candid_RetryJobResponse_n30(this._uploadFile, this._downloadFile, result);
+            return from_candid_RetryJobResponse_n32(this._uploadFile, this._downloadFile, result);
         }
     }
 }
@@ -394,13 +401,16 @@ async function from_candid_ExternalBlob_n22(_uploadFile: (file: ExternalBlob) =>
 function from_candid_JobError_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _JobError): JobError {
     return from_candid_variant_n12(_uploadFile, _downloadFile, value);
 }
-async function from_candid_JobResponse_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _JobResponse): Promise<JobResponse> {
-    return await from_candid_record_n15(_uploadFile, _downloadFile, value);
+async function from_candid_JobResponse_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _JobResponse): Promise<JobResponse> {
+    return await from_candid_variant_n31(_uploadFile, _downloadFile, value);
 }
 function from_candid_JobStatus_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _JobStatus): JobStatus {
     return from_candid_variant_n20(_uploadFile, _downloadFile, value);
 }
-function from_candid_RetryJobResponse_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _RetryJobResponse): RetryJobResponse {
+async function from_candid_Job_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Job): Promise<Job> {
+    return await from_candid_record_n15(_uploadFile, _downloadFile, value);
+}
+function from_candid_RetryJobResponse_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _RetryJobResponse): RetryJobResponse {
     return from_candid_variant_n10(_uploadFile, _downloadFile, value);
 }
 async function from_candid_StageResult_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _StageResult): Promise<StageResult> {
@@ -409,8 +419,8 @@ async function from_candid_StageResult_n17(_uploadFile: (file: ExternalBlob) => 
 function from_candid__CaffeineStorageRefillResult_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: __CaffeineStorageRefillResult): _CaffeineStorageRefillResult {
     return from_candid_record_n5(_uploadFile, _downloadFile, value);
 }
-async function from_candid_opt_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_JobResponse]): Promise<JobResponse | null> {
-    return value.length === 0 ? null : await from_candid_JobResponse_n14(_uploadFile, _downloadFile, value[0]);
+async function from_candid_opt_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Job]): Promise<Job | null> {
+    return value.length === 0 ? null : await from_candid_Job_n14(_uploadFile, _downloadFile, value[0]);
 }
 async function from_candid_opt_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ExternalBlob]): Promise<ExternalBlob | null> {
     return value.length === 0 ? null : await from_candid_ExternalBlob_n22(_uploadFile, _downloadFile, value[0]);
@@ -580,11 +590,30 @@ function from_candid_variant_n26(_uploadFile: (file: ExternalBlob) => Promise<Ui
 }): ExpiryReason {
     return "timeout" in value ? ExpiryReason.timeout : value;
 }
+async function from_candid_variant_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    error: _JobError;
+} | {
+    success: _Job;
+}): Promise<{
+    __kind__: "error";
+    error: JobError;
+} | {
+    __kind__: "success";
+    success: Job;
+}> {
+    return "error" in value ? {
+        __kind__: "error",
+        error: from_candid_JobError_n11(_uploadFile, _downloadFile, value.error)
+    } : "success" in value ? {
+        __kind__: "success",
+        success: await from_candid_Job_n14(_uploadFile, _downloadFile, value.success)
+    } : value;
+}
 async function from_candid_vec_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_StageResult>): Promise<Array<StageResult>> {
     return await Promise.all(value.map(async (x)=>await from_candid_StageResult_n17(_uploadFile, _downloadFile, x)));
 }
-async function from_candid_vec_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_JobResponse>): Promise<Array<JobResponse>> {
-    return await Promise.all(value.map(async (x)=>await from_candid_JobResponse_n14(_uploadFile, _downloadFile, x)));
+async function from_candid_vec_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Job>): Promise<Array<Job>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_Job_n14(_uploadFile, _downloadFile, x)));
 }
 async function to_candid_ExternalBlob_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
     return await _uploadFile(value);

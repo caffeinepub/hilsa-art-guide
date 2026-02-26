@@ -14,6 +14,17 @@ export class ExternalBlob {
     static fromBytes(blob: Uint8Array<ArrayBuffer>): ExternalBlob;
     withUploadProgress(onProgress: (percentage: number) => void): ExternalBlob;
 }
+export interface Job {
+    id: bigint;
+    stages: Array<StageResult>;
+    status: JobStatus;
+    owner: string;
+    createdAt: Time;
+    errorMessage?: string;
+    expiryReason?: ExpiryReason;
+    lastUpdated: Time;
+    uploadedImage: ExternalBlob;
+}
 export type Time = bigint;
 export type RetryJobResponse = {
     __kind__: "error";
@@ -51,17 +62,13 @@ export interface StageResult {
     resultImage?: ExternalBlob;
     stageName: string;
 }
-export interface JobResponse {
-    id: bigint;
-    stages: Array<StageResult>;
-    status: JobStatus;
-    owner: string;
-    createdAt: Time;
-    errorMessage?: string;
-    expiryReason?: ExpiryReason;
-    lastUpdated: Time;
-    uploadedImage: ExternalBlob;
-}
+export type JobResponse = {
+    __kind__: "error";
+    error: JobError;
+} | {
+    __kind__: "success";
+    success: Job;
+};
 export type CreateJobResponse = {
     __kind__: "error";
     error: JobError;
@@ -83,10 +90,10 @@ export enum JobStatus {
 export interface backendInterface {
     cancelJob(jobId: bigint): Promise<void>;
     createJob(uploadedImage: ExternalBlob): Promise<CreateJobResponse>;
-    getJob(jobId: bigint): Promise<JobResponse | null>;
-    getJobsByStatus(status: JobStatus, limit: bigint): Promise<Array<JobResponse>>;
-    getJobsSortedAsc(limit: bigint): Promise<Array<JobResponse>>;
-    getMyJobs(): Promise<Array<JobResponse>>;
+    getJob(jobId: bigint): Promise<Job | null>;
+    getJobsByStatus(status: JobStatus, limit: bigint): Promise<Array<Job>>;
+    getJobsSortedAsc(limit: bigint): Promise<Array<Job>>;
+    getMyJobs(): Promise<Array<Job>>;
     processJob(jobId: bigint): Promise<JobResponse>;
     retryFailedJob(jobId: bigint): Promise<RetryJobResponse>;
 }

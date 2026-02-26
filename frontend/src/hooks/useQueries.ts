@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useActor } from "./useActor";
 import {
+  Job,
   JobResponse,
   JobStatus,
   CreateJobResponse,
@@ -26,13 +27,14 @@ function extractJobErrorMessage(error: JobError): string {
 }
 
 // Hook to get a single job by ID, with polling while pending/inProgress
+// getJob returns Job | null directly (not wrapped in a variant)
 export function useJob(jobId: bigint | null) {
   const { actor, isFetching } = useActor();
 
   // Guard: only enable when jobId is a valid non-null bigint
   const isValidJobId = jobId !== null && jobId !== undefined;
 
-  return useQuery<JobResponse | null>({
+  return useQuery<Job | null>({
     queryKey: ["job", jobId?.toString()],
     queryFn: async () => {
       if (!actor || !isValidJobId) return null;
@@ -55,10 +57,11 @@ export function useJob(jobId: bigint | null) {
 }
 
 // Hook to get all jobs for the current user
+// getMyJobs returns Job[] directly
 export function useMyJobs() {
   const { actor, isFetching } = useActor();
 
-  return useQuery<JobResponse[]>({
+  return useQuery<Job[]>({
     queryKey: ["myJobs"],
     queryFn: async () => {
       if (!actor) return [];
@@ -94,17 +97,22 @@ export function useCreateJob() {
 }
 
 // Hook to process a job
+// processJob returns JobResponse (variant), unwrap it properly
 export function useProcessJob() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
-  return useMutation<JobResponse, Error, bigint>({
+  return useMutation<Job, Error, bigint>({
     mutationFn: async (jobId: bigint) => {
       if (!actor) throw new Error("Actor not initialized");
-      return actor.processJob(jobId);
+      const response: JobResponse = await actor.processJob(jobId);
+      if (response.__kind__ === "error") {
+        throw new Error(extractJobErrorMessage(response.error));
+      }
+      return response.success;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["job", data.id.toString()] });
+    onSuccess: (job) => {
+      queryClient.invalidateQueries({ queryKey: ["job", job.id.toString()] });
       queryClient.invalidateQueries({ queryKey: ["myJobs"] });
     },
   });

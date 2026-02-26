@@ -44,7 +44,7 @@ export const StageResult = IDL.Record({
 });
 export const Time = IDL.Int;
 export const ExpiryReason = IDL.Variant({ 'timeout' : IDL.Null });
-export const JobResponse = IDL.Record({
+export const Job = IDL.Record({
   'id' : IDL.Nat,
   'stages' : IDL.Vec(StageResult),
   'status' : JobStatus,
@@ -55,6 +55,7 @@ export const JobResponse = IDL.Record({
   'lastUpdated' : Time,
   'uploadedImage' : ExternalBlob,
 });
+export const JobResponse = IDL.Variant({ 'error' : JobError, 'success' : Job });
 export const RetryJobResponse = IDL.Variant({
   'error' : JobError,
   'success' : IDL.Record({ 'jobId' : IDL.Nat }),
@@ -89,14 +90,10 @@ export const idlService = IDL.Service({
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   'cancelJob' : IDL.Func([IDL.Nat], [], []),
   'createJob' : IDL.Func([ExternalBlob], [CreateJobResponse], []),
-  'getJob' : IDL.Func([IDL.Nat], [IDL.Opt(JobResponse)], ['query']),
-  'getJobsByStatus' : IDL.Func(
-      [JobStatus, IDL.Nat],
-      [IDL.Vec(JobResponse)],
-      ['query'],
-    ),
-  'getJobsSortedAsc' : IDL.Func([IDL.Nat], [IDL.Vec(JobResponse)], ['query']),
-  'getMyJobs' : IDL.Func([], [IDL.Vec(JobResponse)], ['query']),
+  'getJob' : IDL.Func([IDL.Nat], [IDL.Opt(Job)], ['query']),
+  'getJobsByStatus' : IDL.Func([JobStatus, IDL.Nat], [IDL.Vec(Job)], ['query']),
+  'getJobsSortedAsc' : IDL.Func([IDL.Nat], [IDL.Vec(Job)], ['query']),
+  'getMyJobs' : IDL.Func([], [IDL.Vec(Job)], ['query']),
   'processJob' : IDL.Func([IDL.Nat], [JobResponse], []),
   'retryFailedJob' : IDL.Func([IDL.Nat], [RetryJobResponse], []),
 });
@@ -140,7 +137,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const Time = IDL.Int;
   const ExpiryReason = IDL.Variant({ 'timeout' : IDL.Null });
-  const JobResponse = IDL.Record({
+  const Job = IDL.Record({
     'id' : IDL.Nat,
     'stages' : IDL.Vec(StageResult),
     'status' : JobStatus,
@@ -151,6 +148,7 @@ export const idlFactory = ({ IDL }) => {
     'lastUpdated' : Time,
     'uploadedImage' : ExternalBlob,
   });
+  const JobResponse = IDL.Variant({ 'error' : JobError, 'success' : Job });
   const RetryJobResponse = IDL.Variant({
     'error' : JobError,
     'success' : IDL.Record({ 'jobId' : IDL.Nat }),
@@ -185,14 +183,14 @@ export const idlFactory = ({ IDL }) => {
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     'cancelJob' : IDL.Func([IDL.Nat], [], []),
     'createJob' : IDL.Func([ExternalBlob], [CreateJobResponse], []),
-    'getJob' : IDL.Func([IDL.Nat], [IDL.Opt(JobResponse)], ['query']),
+    'getJob' : IDL.Func([IDL.Nat], [IDL.Opt(Job)], ['query']),
     'getJobsByStatus' : IDL.Func(
         [JobStatus, IDL.Nat],
-        [IDL.Vec(JobResponse)],
+        [IDL.Vec(Job)],
         ['query'],
       ),
-    'getJobsSortedAsc' : IDL.Func([IDL.Nat], [IDL.Vec(JobResponse)], ['query']),
-    'getMyJobs' : IDL.Func([], [IDL.Vec(JobResponse)], ['query']),
+    'getJobsSortedAsc' : IDL.Func([IDL.Nat], [IDL.Vec(Job)], ['query']),
+    'getMyJobs' : IDL.Func([], [IDL.Vec(Job)], ['query']),
     'processJob' : IDL.Func([IDL.Nat], [JobResponse], []),
     'retryFailedJob' : IDL.Func([IDL.Nat], [RetryJobResponse], []),
   });

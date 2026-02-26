@@ -24,27 +24,27 @@ interface GalleryViewProps {
   backendStages?: StageResult[];
 }
 
-// Stage display metadata aligned with the new pipeline
+// Stage display metadata aligned with the enhanced pencil sketch pipeline
 const STAGE_DEFINITIONS_DISPLAY = [
   {
-    label: "Stage 1 — Basic Outline",
-    description: "Faint head and face contour lines on cream paper",
+    label: "Stage 1 — Light Hatching",
+    description: "Initial light pencil strokes with fine hatching on cream paper",
   },
   {
-    label: "Stage 2 — Clean Line Art",
-    description: "Defined facial features with clean pencil strokes",
+    label: "Stage 2 — Directional Strokes",
+    description: "Structured edge-following directional pencil lines",
   },
   {
-    label: "Stage 3 — Refined Sketch",
-    description: "Hair outline and facial contour shading begins",
+    label: "Stage 3 — Cross-Hatching & Detail",
+    description: "Cross-hatched shadows with variable stroke thickness",
   },
   {
-    label: "Stage 4 — Detailed Shading",
-    description: "Directional hair strokes and facial plane shading",
+    label: "Stage 4 — Graphite Shading",
+    description: "Soft blended shading with graphite grain texture",
   },
   {
-    label: "Stage 5 — Finished Portrait",
-    description: "Rich dark hair, full shading, sharp eye detail",
+    label: "Stage 5 — Final Pencil Artwork",
+    description: "Polished hand-drawn look with paper grain and vignette",
   },
 ];
 
@@ -91,8 +91,8 @@ export default function GalleryView({
   const runClientGeneration = useCallback(async () => {
     if (!uploadedImageSrc || isGenerating || allBackendImagesAvailable) return;
 
-    // Check cache first
-    const cacheKey = `sketch_stages_v2_${jobId}`;
+    // Check cache first (updated cache key for v3 stages)
+    const cacheKey = `sketch_stages_v3_${jobId}`;
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
       try {
@@ -113,22 +113,19 @@ export default function GalleryView({
     setStageStatuses(Array(5).fill("generating"));
 
     try {
-      await generatePencilSketchStages(
-        uploadedImageSrc,
-        jobId,
-        (stageIndex, stage) => {
-          setClientStages((prev) => {
-            const next = [...prev];
-            next[stageIndex] = stage;
-            return next;
-          });
-          setStageStatuses((prev) => {
-            const next = [...prev];
-            next[stageIndex] = "complete";
-            return next;
-          });
-        }
-      );
+      // generatePencilSketchStages takes only the image src and returns all 5 stages
+      const stages = await generatePencilSketchStages(uploadedImageSrc);
+
+      // Set all stages at once and mark complete
+      setClientStages(stages);
+      setStageStatuses(Array(5).fill("complete"));
+
+      // Cache the results
+      try {
+        sessionStorage.setItem(cacheKey, JSON.stringify(stages));
+      } catch {
+        // ignore storage errors (e.g. quota exceeded)
+      }
     } catch {
       setGenerationError(
         "Failed to generate sketch stages. Please try again."
@@ -214,7 +211,7 @@ export default function GalleryView({
           <Loader2 className="w-5 h-5 text-gold animate-spin flex-shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-medium text-foreground mb-1">
-              Generating pencil sketch stages…
+              Rendering pencil sketch stages…
             </p>
             <div className="w-full bg-border rounded-full h-1.5">
               <div
@@ -325,7 +322,7 @@ export default function GalleryView({
                     >
                       <Loader2 className="w-8 h-8 text-gold animate-spin" />
                       <span className="text-xs text-muted-foreground font-sans">
-                        Generating…
+                        Rendering…
                       </span>
                     </div>
                   ) : hasError ? (

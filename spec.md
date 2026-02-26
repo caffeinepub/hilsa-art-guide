@@ -1,11 +1,10 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the upload flow so that the job ID is correctly passed to the Results page after a successful image upload, and add a defensive error state to the Results page when no job ID is present.
+**Goal:** Remove internal error strings "NO JOB ID PROVIDED" and "EXPECTED V3 RESPONSE" from the UI so users never see raw error messages.
 
 **Planned changes:**
-- Fix the `UploadInterface` component to correctly extract the job ID from the backend response and navigate to `/results/<jobId>` with a valid, non-empty job ID.
-- Show an error toast in the upload flow if job creation fails or returns no ID, and prevent navigation in that case.
-- Add a defensive check in the Results page component so that if the job ID route parameter is missing or empty, a clear error message is displayed with a link back to the Home page.
+- Suppress the "NO JOB ID PROVIDED" error message on the Results page; when no job ID is present in the route/URL, silently redirect to home or show a neutral fallback state
+- Suppress the "EXPECTED V3 RESPONSE" error message; replace any code path that surfaces this string with silent error handling or a generic user-friendly message
 
-**User-visible outcome:** After uploading an image, the user is correctly taken to the Results page for their job. If no job ID is available, the Results page shows a friendly error message with a link home instead of crashing or silently failing.
+**User-visible outcome:** Users will no longer see raw internal error strings in the UI; missing or invalid job states are handled gracefully with a neutral fallback.

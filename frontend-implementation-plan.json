@@ -1,38 +1,35 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix missing job ID in upload flow navigation to Results page",
+  "title": "Clear 'NO JOB ID PROVIDED' and 'EXPECTED V3 RESPONSE' error messages from UI",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Fix the UploadInterface component to correctly extract and pass the job ID when navigating to the Results page after backend job creation and processing",
+      "summary": "Remove or suppress the 'NO JOB ID PROVIDED' error message from the Results page UI, redirecting silently or showing a neutral fallback state when no job ID is present",
       "acceptanceCriteria": [
-        "After a successful image upload and job creation, the browser navigates to /results/<jobId> where <jobId> is a valid non-empty string returned by the backend.",
-        "The Results page receives the job ID from the route parameter and fetches job status without showing a 'no job ID' error.",
-        "If job creation fails or returns no ID, an error toast is shown to the user and navigation does not proceed.",
-        "The fix is isolated to the upload flow; no other routes or components are affected."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/UploadInterface.tsx",
-          "operation": "modify",
-          "description": "Fix the handleUpload function to properly extract the jobId from the CreateJobResponse success variant. After processJob completes successfully, verify the job response contains a valid id field before calling navigate. Extract the jobId as a string (converting from bigint if necessary) and pass it to navigate(`/results/${jobId}`). Add error handling: if createJob returns an error variant or processJob fails, display an error toast using the Sonner toast component and do not proceed with navigation. Ensure jobId is never undefined, null, or empty before triggering navigation."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Add a defensive check in the Results page component to display a clear error message with a link to Home when the job ID route parameter is missing or empty",
-      "acceptanceCriteria": [
-        "Navigating to /results or /results/ without a job ID displays the error message and a 'Go Home' link.",
-        "The error state renders without crashing or making any backend queries.",
-        "The existing loading, failed, and success states for valid job IDs are unaffected."
+        "The text 'NO JOB ID PROVIDED' does not appear anywhere in the rendered UI",
+        "When no job ID is present in the route/URL, the user is redirected or shown a neutral fallback (e.g., back to home) without displaying the raw error string"
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/Results.tsx",
           "operation": "modify",
-          "description": "Add a guard at the top of the component (before any hooks or queries) to check if the jobId route parameter is missing, undefined, null, or an empty string. If the check fails, render an error state with a card displaying the message 'No job ID provided. Please upload an image to get started.' and a Link or button component styled as a call-to-action that navigates to the Home page (route: '/'). Do not call useJobQuery or any backend hooks when the jobId is invalid. Ensure the existing loading, failed job, and success states remain unchanged for valid job IDs."
+          "description": "Replace the 'NO JOB ID PROVIDED' error display with silent redirect to home page or a neutral fallback message. Add early validation for missing job ID in the URL params and handle it gracefully without showing the raw error string to users."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Remove or suppress the 'EXPECTED V3 RESPONSE' error message from the UI, replacing any occurrence with neutral fallback handling",
+      "acceptanceCriteria": [
+        "The text 'EXPECTED V3 RESPONSE' does not appear anywhere in the rendered UI",
+        "Any code path that previously surfaced this string either silently handles the condition or shows a user-friendly generic error message"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Results.tsx",
+          "operation": "modify",
+          "description": "Find and replace any display of 'EXPECTED V3 RESPONSE' error string with either silent error handling or a user-friendly generic error message (e.g., 'Unable to load results'). Ensure the internal error string is never surfaced to the user interface."
         }
       ]
     }

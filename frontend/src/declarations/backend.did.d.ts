@@ -14,11 +14,7 @@ export type CreateJobResponse = { 'error' : JobError } |
   { 'success' : { 'jobId' : bigint } };
 export type ExpiryReason = { 'timeout' : null };
 export type ExternalBlob = Uint8Array;
-export type JobError = { 'rateLimitExceeded' : { 'message' : string } } |
-  { 'invalidState' : { 'message' : string } } |
-  { 'unauthorized' : { 'message' : string } } |
-  { 'jobNotFound' : { 'message' : string } };
-export interface JobResponse {
+export interface Job {
   'id' : bigint,
   'stages' : Array<StageResult>,
   'status' : JobStatus,
@@ -29,6 +25,12 @@ export interface JobResponse {
   'lastUpdated' : Time,
   'uploadedImage' : ExternalBlob,
 }
+export type JobError = { 'rateLimitExceeded' : { 'message' : string } } |
+  { 'invalidState' : { 'message' : string } } |
+  { 'unauthorized' : { 'message' : string } } |
+  { 'jobNotFound' : { 'message' : string } };
+export type JobResponse = { 'error' : JobError } |
+  { 'success' : Job };
 export type JobStatus = { 'pending' : null } |
   { 'completed' : null } |
   { 'inProgress' : null } |
@@ -71,10 +73,10 @@ export interface _SERVICE {
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   'cancelJob' : ActorMethod<[bigint], undefined>,
   'createJob' : ActorMethod<[ExternalBlob], CreateJobResponse>,
-  'getJob' : ActorMethod<[bigint], [] | [JobResponse]>,
-  'getJobsByStatus' : ActorMethod<[JobStatus, bigint], Array<JobResponse>>,
-  'getJobsSortedAsc' : ActorMethod<[bigint], Array<JobResponse>>,
-  'getMyJobs' : ActorMethod<[], Array<JobResponse>>,
+  'getJob' : ActorMethod<[bigint], [] | [Job]>,
+  'getJobsByStatus' : ActorMethod<[JobStatus, bigint], Array<Job>>,
+  'getJobsSortedAsc' : ActorMethod<[bigint], Array<Job>>,
+  'getMyJobs' : ActorMethod<[], Array<Job>>,
   'processJob' : ActorMethod<[bigint], JobResponse>,
   'retryFailedJob' : ActorMethod<[bigint], RetryJobResponse>,
 }

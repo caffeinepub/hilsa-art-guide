@@ -4,43 +4,43 @@ import { ArrowRight } from 'lucide-react';
 const stages = [
   {
     num: '01',
-    name: 'Basic Outline',
+    name: 'Light Hatching',
     icon: '/assets/generated/stage-1-outline.dim_256x256.png',
     description:
-      'The AI analyzes your photograph and extracts the fundamental contour lines. Every subject is reduced to its essential silhouette — clean, precise, and full of potential.',
-    detail: 'Edge detection algorithms identify the primary shapes and boundaries within your image, creating a crisp line drawing that forms the foundation of your artwork.',
+      'The first pass lays down the lightest possible pencil marks — fine diagonal hatching lines at low opacity that barely whisper across the cream paper surface.',
+    detail: 'Fine hatching lines at 45° angles are overlaid on detected contour edges, creating the initial skeletal impression of the subject with a feather-light touch that mimics an artist\'s first exploratory strokes.',
   },
   {
     num: '02',
-    name: 'Reference Sketch',
+    name: 'Directional Strokes',
     icon: '/assets/generated/stage-2-sketch.dim_256x256.png',
     description:
-      'Loose, expressive pencil strokes are layered over the outline. The sketch breathes life into the composition, capturing gesture, movement, and the artist\'s hand.',
-    detail: 'Hatching patterns and gestural marks are applied to suggest form and texture, mimicking the exploratory quality of a traditional artist\'s reference drawing.',
+      'Pencil strokes begin to follow the natural contours of the subject. Lines align with detected edges, giving the sketch a structured, intentional quality.',
+    detail: 'Edge gradient analysis guides each stroke direction — lines flow along curves and boundaries rather than at fixed angles, producing the characteristic look of a skilled artist tracing form with confident, directional marks.',
   },
   {
     num: '03',
-    name: 'Shading',
+    name: 'Cross-Hatching & Detail',
     icon: '/assets/generated/stage-3-shading.dim_256x256.png',
     description:
-      'Graduated tones and soft shadows are introduced, transforming flat lines into three-dimensional forms. Light and dark dance across the surface.',
-    detail: 'Tonal mapping derived from the original photograph guides the placement of shadows and highlights, creating convincing depth and volume.',
+      'Shadow regions receive a second layer of perpendicular hatching, building tonal depth. Stroke thickness varies with local contrast — darker areas get denser, heavier marks.',
+    detail: 'Cross-hatching (perpendicular stroke layers) is applied selectively to shadow zones, while stroke spacing and thickness are dynamically adjusted based on luminance values, creating convincing tonal gradation through mark density alone.',
   },
   {
     num: '04',
-    name: 'Render & Detail',
+    name: 'Graphite Shading',
     icon: '/assets/generated/stage-4-render.dim_256x256.png',
     description:
-      'Fine details emerge — textures, micro-expressions, intricate patterns. The artwork gains its unique character and visual complexity.',
-    detail: 'High-frequency detail passes add texture, refine edges, and introduce the subtle nuances that distinguish a polished illustration from a rough sketch.',
+      'Soft blending simulates the smeared, velvety quality of graphite on paper. A granular texture overlay adds the characteristic grain of pencil pigment.',
+    detail: 'A Gaussian-blurred tonal base creates smooth shading transitions that mimic finger-blending or tortillon smearing. A graphite grain noise layer is composited over the hatching to reproduce the micro-texture of real pencil marks on textured paper.',
   },
   {
     num: '05',
-    name: 'Polish & Final Touches',
+    name: 'Final Pencil Artwork',
     icon: '/assets/generated/stage-5-polish.dim_256x256.png',
     description:
-      'The final stage unifies all elements. Color harmonics, tonal balance, and subtle luminosity adjustments bring the artwork to its completed, gallery-ready state.',
-    detail: 'Global adjustments to contrast, saturation, and edge clarity ensure the final piece is cohesive, vibrant, and ready to be shared or printed.',
+      'All techniques converge into a polished, gallery-ready pencil illustration. Paper grain, radial vignette, and tonal compression unify the composition.',
+    detail: 'Multi-frequency paper texture is composited over the full drawing, a radial vignette darkens the edges to draw focus inward, and an S-curve tonal compression ensures the full range from bright highlights to rich darks — the hallmarks of a finished hand-drawn pencil portrait.',
   },
 ];
 
@@ -56,7 +56,7 @@ export default function HowItWorks() {
           </h1>
           <div className="ink-divider w-24 mx-auto mb-6" />
           <p className="font-cormorant text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto">
-            A five-stage artistic pipeline that transforms any photograph into a refined work of art — each stage building upon the last.
+            A five-stage pencil sketch pipeline that transforms any photograph into a refined hand-drawn artwork — each stage building upon the last with authentic drawing techniques.
           </p>
         </div>
       </section>
@@ -123,7 +123,7 @@ export default function HowItWorks() {
           <div className="text-center mb-10">
             <p className="section-label mb-3">At a Glance</p>
             <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground">
-              The Transformation Flow
+              The Pencil Sketch Pipeline
             </h2>
           </div>
 
@@ -200,7 +200,7 @@ export default function HowItWorks() {
           </h2>
           <div className="ink-divider w-24 mx-auto mb-6" />
           <p className="text-muted-foreground font-sans text-sm mb-8 leading-relaxed">
-            Upload any photograph and watch it evolve through all five stages of artistic transformation.
+            Upload any photograph and watch it evolve through all five stages of pencil sketch transformation — from light hatching to a finished hand-drawn artwork.
           </p>
           <Link to="/" className="btn-primary-art inline-flex items-center gap-2">
             Upload a Photo

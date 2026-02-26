@@ -122,8 +122,7 @@ export default function UploadInterface() {
       setUploadProgress(100);
       toast.success("Portrait uploaded! Generating your sketch…");
 
-      // Navigate immediately to results — the Results page polls for status.
-      // Fire processJob in the background without blocking navigation.
+      // Navigate to results using the correct route param name ($id)
       navigate({ to: `/results/${jobIdStr}` });
 
       // Kick off processing after navigation (fire-and-forget)

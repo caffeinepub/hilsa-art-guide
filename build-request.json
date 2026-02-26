@@ -1,54 +1,51 @@
 {
   "kind": "build_request",
-  "title": "Fix missing job ID in upload flow navigation to Results page",
-  "priority": "high",
+  "title": "Clear 'NO JOB ID PROVIDED' and 'EXPECTED V3 RESPONSE' error messages from UI",
+  "projectName": "HILSA-ART Guide",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the UploadInterface component so that after a backend job is created and processed, the resulting job ID is correctly extracted and passed as a route parameter when navigating to the Results page. Ensure the job ID is never undefined, null, or empty before navigation is triggered.",
+      "text": "Remove or suppress the 'NO JOB ID PROVIDED' error message from the Results page UI. This message should not be displayed to the user under any circumstance — if no job ID is present, redirect silently or show a neutral fallback state instead.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "NO job id provided"
+          "clear the NO JOB ID PROVIDED and EXPECTED V3 response"
         ]
       },
       "acceptanceCriteria": [
-        "After a successful image upload and job creation, the browser navigates to /results/<jobId> where <jobId> is a valid non-empty string returned by the backend.",
-        "The Results page receives the job ID from the route parameter and fetches job status without showing a 'no job ID' error.",
-        "If job creation fails or returns no ID, an error toast is shown to the user and navigation does not proceed.",
-        "The fix is isolated to the upload flow; no other routes or components are affected."
+        "The text 'NO JOB ID PROVIDED' does not appear anywhere in the rendered UI",
+        "When no job ID is present in the route/URL, the user is redirected or shown a neutral fallback (e.g., back to home) without displaying the raw error string"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add a defensive check in the Results page component so that if the job ID route parameter is missing or empty, a clear user-facing error message is displayed (e.g., 'No job ID provided. Please upload an image to get started.') with a link back to the Home page.",
+      "text": "Remove or suppress the 'EXPECTED V3 RESPONSE' error message from the UI. This internal error string must not be shown to users — replace any occurrence with a neutral fallback message or silent error handling.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "NO job id provided"
+          "clear the NO JOB ID PROVIDED and EXPECTED V3 response"
         ]
       },
       "acceptanceCriteria": [
-        "Navigating to /results or /results/ without a job ID displays the error message and a 'Go Home' link.",
-        "The error state renders without crashing or making any backend queries.",
-        "The existing loading, failed, and success states for valid job IDs are unaffected."
+        "The text 'EXPECTED V3 RESPONSE' does not appear anywhere in the rendered UI",
+        "Any code path that previously surfaced this string either silently handles the condition or shows a user-friendly generic error message"
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "Do not change the backend job creation or processing API signatures."
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui"
   ],
   "nonGoals": [
-    "Redesigning the upload UI or results page layout.",
-    "Changing the backend job management logic.",
-    "Adding new job polling or retry mechanisms beyond what already exists."
+    "Changing backend job processing logic",
+    "Modifying the 5-stage pencil sketch pipeline",
+    "Adding new error types or error tracking"
   ],
   "imageRequirements": {
     "required": [],

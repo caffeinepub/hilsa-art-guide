@@ -57,6 +57,11 @@ actor {
     };
 
     public type JobResponse = {
+      #success : Job;
+      #error : JobError;
+    };
+
+    public type Job = {
       id : Nat;
       status : JobStatus;
       uploadedImage : Storage.ExternalBlob;
@@ -117,10 +122,10 @@ actor {
 
   public shared ({ caller }) func processJob(jobId : Nat) : async V3.JobResponse {
     switch (jobs.get(jobId)) {
-      case (null) { Runtime.trap("Job not found") };
+      case (null) { #error(#jobNotFound({ message = "Job not found" })) };
       case (?job) {
         if (job.owner != caller) {
-          Runtime.trap("Caller not authorized to process this job.");
+          return #error(#unauthorized({ message = "Caller not authorized to process this job." }));
         };
 
         let updatedJob = {
@@ -155,15 +160,15 @@ actor {
         };
         jobs.add(jobId, finalJob);
 
-        {
+        #success({
           job with
-          owner = job.owner.toText()
-        };
+          owner = job.owner.toText();
+        });
       };
     };
   };
 
-  public query ({ caller }) func getJob(jobId : Nat) : async ?V3.JobResponse {
+  public query ({ caller }) func getJob(jobId : Nat) : async ?V3.Job {
     jobs.get(jobId).map(
       func(job) {
         { job with owner = job.owner.toText() };
@@ -171,7 +176,7 @@ actor {
     );
   };
 
-  public query ({ caller }) func getMyJobs() : async [V3.JobResponse] {
+  public query ({ caller }) func getMyJobs() : async [V3.Job] {
     jobs.values().toArray().filter(
       func(job) { job.owner == caller }
     ).map(
@@ -179,14 +184,14 @@ actor {
     );
   };
 
-  public query ({ caller }) func getJobsSortedAsc(limit : Nat) : async [V3.JobResponse] {
+  public query ({ caller }) func getJobsSortedAsc(limit : Nat) : async [V3.Job] {
     let sorted = jobs.values().toArray().reverse();
     sorted.sliceToArray(0, Nat.min(limit, sorted.size())).map(
       func(job) { { job with owner = job.owner.toText() } }
     );
   };
 
-  public query ({ caller }) func getJobsByStatus(status : JobStatus, limit : Nat) : async [V3.JobResponse] {
+  public query ({ caller }) func getJobsByStatus(status : JobStatus, limit : Nat) : async [V3.Job] {
     let filtered = jobs.values().toArray().filter(func(job) { job.status == status });
     filtered.sliceToArray(0, Nat.min(limit, filtered.size())).map(
       func(job) { { job with owner = job.owner.toText() } }
