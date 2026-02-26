@@ -71,7 +71,6 @@ export interface _SERVICE {
     _CaffeineStorageRefillResult
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
-  'cancelJob' : ActorMethod<[bigint], undefined>,
   'createJob' : ActorMethod<[ExternalBlob], CreateJobResponse>,
   'getJob' : ActorMethod<[bigint], [] | [Job]>,
   'getJobsByStatus' : ActorMethod<[JobStatus, bigint], Array<Job>>,

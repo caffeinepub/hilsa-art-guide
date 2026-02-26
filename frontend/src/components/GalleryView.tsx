@@ -24,27 +24,27 @@ interface GalleryViewProps {
   backendStages?: StageResult[];
 }
 
-// Stage display metadata aligned with the new pipeline
+// Stage display metadata aligned with the new portrait drawing stages
 const STAGE_DEFINITIONS_DISPLAY = [
   {
-    label: "Stage 1 — Basic Outline",
-    description: "Faint head and face contour lines on cream paper",
+    label: "Stage 1 — Trace the outlines",
+    description: "Faint traced contour lines capturing the overall portrait silhouette",
   },
   {
-    label: "Stage 2 — Clean Line Art",
-    description: "Defined facial features with clean pencil strokes",
+    label: "Stage 2 — Basic elements",
+    description: "Clean structural line work establishing basic facial elements",
   },
   {
-    label: "Stage 3 — Refined Sketch",
-    description: "Hair outline and facial contour shading begins",
+    label: "Stage 3 — Slight shading",
+    description: "Light tonal shading layered over the basic elements for form",
   },
   {
-    label: "Stage 4 — Detailed Shading",
-    description: "Directional hair strokes and facial plane shading",
+    label: "Stage 4 — Render and detail",
+    description: "Detailed rendering with texture, tonal depth, and refined features",
   },
   {
-    label: "Stage 5 — Finished Portrait",
-    description: "Rich dark hair, full shading, sharp eye detail",
+    label: "Stage 5 — Polish",
+    description: "Polished final illustration with full tonal range and crisp detail",
   },
 ];
 
@@ -92,7 +92,7 @@ export default function GalleryView({
     if (!uploadedImageSrc || isGenerating || allBackendImagesAvailable) return;
 
     // Check cache first
-    const cacheKey = `sketch_stages_v2_${jobId}`;
+    const cacheKey = `sketch_stages_v4_${jobId}`;
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
       try {
@@ -131,7 +131,7 @@ export default function GalleryView({
       );
     } catch {
       setGenerationError(
-        "Failed to generate sketch stages. Please try again."
+        "Failed to generate portrait drawing stages. Please try again."
       );
       setStageStatuses((prev) =>
         prev.map((s) => (s === "generating" ? "error" : s))
@@ -214,7 +214,7 @@ export default function GalleryView({
           <Loader2 className="w-5 h-5 text-gold animate-spin flex-shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-medium text-foreground mb-1">
-              Generating pencil sketch stages…
+              Generating portrait drawing stages…
             </p>
             <div className="w-full bg-border rounded-full h-1.5">
               <div

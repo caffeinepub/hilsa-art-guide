@@ -4,47 +4,47 @@ import { ArrowDown, Sparkles } from 'lucide-react';
 import UploadInterface from '../components/UploadInterface';
 
 const stages = [
-  { num: '01', name: 'Skull Construction' },
-  { num: '02', name: 'Head Structure' },
-  { num: '03', name: 'Feature Blocking' },
-  { num: '04', name: 'Light Detail' },
-  { num: '05', name: 'Completed Portrait' },
+  { num: '01', name: 'Trace Outlines' },
+  { num: '02', name: 'Basic Elements' },
+  { num: '03', name: 'Slight Shading' },
+  { num: '04', name: 'Render & Detail' },
+  { num: '05', name: 'Polish' },
 ];
 
 const stageDetails = [
   {
     num: '01',
-    name: 'Skull Construction',
-    desc: 'Draw a circle with 1/3 proportion guide lines and a centre cross to map the skull',
-    img: '/assets/generated/sketch-stage-1.dim_600x600.png',
+    name: 'Trace the outlines',
+    desc: 'Lightly trace the overall silhouette and major contours of the portrait as your foundational roadmap',
+    img: '/assets/generated/stage1-trace-outlines.dim_600x600.png',
     fallbackImg: '/assets/generated/stage1-basic-outline.dim_800x800.png',
   },
   {
     num: '02',
-    name: 'Head Structure',
-    desc: 'Add the oval face shape, jawline, and chin over the skull construction circle',
-    img: '/assets/generated/sketch-stage-2.dim_600x600.png',
+    name: 'Draw the basic elements',
+    desc: 'Draw in the basic facial elements with clean structural line work establishing correct placement and proportions',
+    img: '/assets/generated/stage2-basic-elements.dim_600x600.png',
     fallbackImg: '/assets/generated/stage2-reference-sketch.dim_800x800.png',
   },
   {
     num: '03',
-    name: 'Feature Blocking',
-    desc: 'Block in rough eyes, nose, lips, ear, and the hair mass silhouette with loose strokes',
-    img: '/assets/generated/sketch-stage-3.dim_600x600.png',
+    name: 'Have a slight shading',
+    desc: 'Introduce light tonal shading to give the portrait form and dimension in the shadow areas',
+    img: '/assets/generated/stage3-slight-shading.dim_600x600.png',
     fallbackImg: '/assets/generated/stage3-shading.dim_800x800.png',
   },
   {
     num: '04',
-    name: 'Light Detail',
-    desc: 'Refine facial features with light pencil shading, hair strand lines, and neck outline',
-    img: '/assets/generated/sketch-stage-4.dim_600x600.png',
+    name: 'Render and detail',
+    desc: 'Build up detailed rendering — refine features, add hair strand lines, and deepen shadow areas with hatching',
+    img: '/assets/generated/stage4-render-detail.dim_600x600.png',
     fallbackImg: '/assets/generated/stage4-render-detail.dim_800x800.png',
   },
   {
     num: '05',
-    name: 'Completed Portrait',
-    desc: 'Full pencil portrait with complete shading, rich hair detail, and necklace accessory',
-    img: '/assets/generated/sketch-stage-5.dim_600x600.png',
+    name: 'Polish',
+    desc: 'Smooth transitions, sharpen key edges, deepen dark values, and complete the full tonal range of the portrait',
+    img: '/assets/generated/stage5-polish.dim_600x600.png',
     fallbackImg: '/assets/generated/stage5-polish-final.dim_800x800.png',
   },
 ];
@@ -83,7 +83,7 @@ export default function Home() {
           </h1>
 
           <p className="font-cormorant text-xl md:text-2xl text-white/80 leading-relaxed mb-4 max-w-2xl mx-auto">
-            Watch your photograph evolve through five distinct artistic stages — from raw outline to polished masterpiece.
+            Watch your photograph evolve through five distinct portrait drawing stages — from traced outlines to a polished masterpiece.
           </p>
 
           {/* Stage Pills */}
@@ -130,7 +130,7 @@ export default function Home() {
             </h2>
             <div className="ink-divider w-24 mx-auto mb-4" />
             <p className="text-muted-foreground font-sans text-sm leading-relaxed max-w-md mx-auto">
-              Select any photograph and our pipeline will guide it through five progressive artistic stages, revealing the artwork within.
+              Select any photograph and our pipeline will guide it through five progressive portrait drawing stages, revealing the artwork within.
             </p>
           </div>
           <UploadInterface />
@@ -147,7 +147,7 @@ export default function Home() {
             </h2>
             <div className="ink-divider w-24 mx-auto mb-4" />
             <p className="text-muted-foreground font-sans text-sm max-w-lg mx-auto">
-              Every portrait passes through these five carefully crafted tutorial stages, each building more depth, detail, and artistic character.
+              Every portrait passes through these five carefully crafted stages, each building more depth, detail, and artistic character.
             </p>
           </div>
 

@@ -1,13 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Enhance the HILSA Art Guide app with a step-by-step drawing guide experience that shows clearly distinct progressive pencil sketch stages, instructional captions, and a dedicated walkthrough mode.
+**Goal:** Replace the five pencil sketch drawing stages with portrait-specific drawing stages across the entire app (frontend and backend), updating all labels, captions, image processing filters, and stage illustrations.
 
 **Planned changes:**
-- Update `pencilSketchUtils.ts` so each of the 5 stages produces a visually distinct, progressive canvas output: Stage 1 (construction lines), Stage 2 (contour outlines), Stage 3 (mid-tone shading), Stage 4 (refined details/darker values), Stage 5 (fully rendered portrait with paper grain)
-- Update `GalleryView` to show a numbered step label, descriptive title, and a short instructional caption beneath each stage image
-- Add a progress indicator (e.g. "2 of 5") visible when navigating stages in the lightbox
-- Add a "Drawing Guide" mode on the Results page showing one stage at a time with Previous/Next navigation buttons, a thumbnail strip of all 5 stages at the bottom, and an exit option to return to gallery view
-- Update the HowItWorks page timeline to include a small representative preview image alongside each of the five stage entries
+- Update all stage labels and captions throughout the UI (GalleryView, Drawing Guide walkthrough, HowItWorks timeline) to use the new five stage names: "Trace the outlines of the portrait", "Draw the basic elements", "Have a slight shading", "Render and detail", "Polish"
+- Remove all old pencil sketch stage names (Construction Lines, Contour Outline, Basic Shading, Detail Pass, Final Render, etc.) from every visible part of the UI
+- Update `pencilSketchUtils.ts` to apply per-stage visual treatments: faint outline trace (Stage 1), clean basic line work (Stage 2), light shading added (Stage 3), detailed rendering and texture (Stage 4), polished refined illustration (Stage 5)
+- Update backend stage identifiers and labels in `main.mo` to match the five new stage names without breaking existing CRUD or rate limiting logic
+- Replace stage illustration images with new portrait-specific artwork for all five stages
 
-**User-visible outcome:** Users can open a step-by-step Drawing Guide from the Results page, walk through each of the 5 progressive pencil sketch stages one at a time with instructional captions, jump to any stage via a thumbnail strip, and see illustrative preview images for each stage on the HowItWorks page.
+**User-visible outcome:** Users see portrait-drawing-specific stage names, descriptions, and progressively styled image previews throughout the app, with each stage visually reflecting the correct portrait drawing technique.

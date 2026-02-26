@@ -4,43 +4,43 @@ import { ArrowRight } from 'lucide-react';
 const stages = [
   {
     num: '01',
-    name: 'Skull Construction',
-    icon: '/assets/generated/stage-1-outline.dim_256x256.png',
+    name: 'Trace the outlines of the portrait',
+    icon: '/assets/generated/stage1-trace-outlines.dim_600x600.png',
     description:
-      'Begin with a simple circle to represent the skull. Add a vertical centre line and horizontal guide lines dividing the face into thirds — this is the foundation every portrait artist starts with.',
-    detail: 'The 1/3 proportion markers help you correctly place the eyes (at the halfway point), the nose (at the two-thirds mark), and the mouth (at the three-quarters mark) before any features are drawn.',
+      'Begin by lightly tracing the overall silhouette and major contours of the portrait. Use faint, confident strokes to map the outer edge of the head, shoulders, and any prominent shapes — this is your foundational roadmap.',
+    detail: 'Keep your pencil pressure very light at this stage. The goal is to capture the overall proportions and placement on the page, not to commit to any final lines. These traced outlines will guide every subsequent stage.',
   },
   {
     num: '02',
-    name: 'Head Structure',
-    icon: '/assets/generated/stage-2-sketch.dim_256x256.png',
+    name: 'Draw the basic elements',
+    icon: '/assets/generated/stage2-basic-elements.dim_600x600.png',
     description:
-      'Extend the circle into an oval egg shape, then add the jawline and chin. The lower half of the face narrows from the cheekbones down to the pointed chin, giving the head its characteristic form.',
-    detail: 'Rough placement guides for the eyes, nose, and mouth are sketched lightly at this stage. The ear is positioned between the eye line and the nose line on the side of the head.',
+      'With the outline in place, draw in the basic facial elements — the eyes, nose, mouth, ears, and hairline. Use clean, structural line work to establish the correct placement and size of each feature relative to the others.',
+    detail: 'Use the traced outlines from Stage 1 as anchor points. The eyes sit at the halfway point of the head, the nose at two-thirds, and the mouth at three-quarters. Keep lines clean and deliberate rather than sketchy.',
   },
   {
     num: '03',
-    name: 'Feature Blocking',
-    icon: '/assets/generated/stage-3-shading.dim_256x256.png',
+    name: 'Have a slight shading',
+    icon: '/assets/generated/stage3-slight-shading.dim_600x600.png',
     description:
-      'Block in the major facial features with loose, confident strokes — almond-shaped eyes, the triangular nose, the curved lips, and the ear. The hair mass silhouette is sketched as a single flowing shape.',
-    detail: 'At this stage accuracy matters more than neatness. Use the guide lines from Stage 1 to position each feature correctly. The hair is treated as one large dark mass rather than individual strands.',
+      'Introduce light tonal shading to begin giving the portrait form and dimension. Apply gentle hatching or blending to the shadow areas of the face — under the brow, beside the nose, beneath the lower lip, and in the hair mass.',
+    detail: 'Use the side of your pencil tip for soft, broad shading. Work in one direction first, then layer a second pass at a slight angle for smoother tones. Leave the lightest areas of the face completely untouched — bare paper is your brightest highlight.',
   },
   {
     num: '04',
-    name: 'Light Detail',
-    icon: '/assets/generated/stage-4-render.dim_256x256.png',
+    name: 'Render and detail',
+    icon: '/assets/generated/stage4-render-detail.dim_600x600.png',
     description:
-      'Refine each facial feature with lighter, more controlled pencil strokes. Begin adding directional hair strand lines flowing from the parting outward. Sketch the neck and shoulder outline to anchor the portrait.',
-    detail: 'Light hatching is applied to the shadow side of the face, under the nose, and beneath the lower lip. The eyes gain their irises and lashes. Hair strands follow the natural growth direction.',
+      'Build up the rendering with more detailed work — refine the eyes with irises and lashes, add individual hair strand lines flowing from the parting, define the lips and nostrils, and deepen the shadow areas with additional hatching layers.',
+    detail: 'Directional strokes are key at this stage. Hair strands should follow the natural growth direction. Facial shading should follow the contours of the planes of the face. Cross-hatching in the darkest areas creates rich, deep tones.',
   },
   {
     num: '05',
-    name: 'Completed Portrait',
-    icon: '/assets/generated/stage-5-polish.dim_256x256.png',
+    name: 'Polish',
+    icon: '/assets/generated/stage5-polish.dim_600x600.png',
     description:
-      'The final stage brings everything together — full tonal shading across the face, rich layered hair with individual strand detail, skin texture, and finishing touches like the necklace accessory.',
-    detail: 'Multiple layers of hatching and cross-hatching build up the dark values in the hair and shadow areas. The lightest areas of the face are left as bare paper, creating the full range of light to dark that defines a finished pencil portrait.',
+      'The final polishing stage brings everything together into a refined, finished portrait. Smooth out any rough transitions, sharpen key edges, deepen the darkest values, and ensure the full tonal range from bright highlight to rich shadow is present.',
+    detail: 'Use a blending stump or your fingertip to soften skin tones. Re-sharpen edges around the eyes, lips, and hair outline with a freshly pointed pencil. Step back and assess the overall balance — adjust any areas that feel too light or too dark to complete the portrait.',
   },
 ];
 
@@ -148,7 +148,7 @@ export default function HowItWorks() {
                     />
                   </div>
                   <p className="section-label text-xs mb-1">{stage.num}</p>
-                  <p className="font-serif text-xs font-semibold text-foreground">{stage.name}</p>
+                  <p className="font-serif text-xs font-semibold text-foreground leading-tight">{stage.name}</p>
                 </div>
                 {i < stages.length - 1 && (
                   <ArrowRight size={16} className="text-gold flex-shrink-0" />
@@ -200,7 +200,7 @@ export default function HowItWorks() {
           </h2>
           <div className="ink-divider w-24 mx-auto mb-6" />
           <p className="text-muted-foreground font-sans text-sm mb-8 leading-relaxed">
-            Upload any photograph and watch it evolve through all five stages of portrait drawing — from skull construction to completed artwork.
+            Upload any photograph and watch it evolve through all five stages of portrait drawing — from traced outlines to a polished finished artwork.
           </p>
           <Link to="/" className="btn-primary-art inline-flex items-center gap-2">
             Upload a Photo

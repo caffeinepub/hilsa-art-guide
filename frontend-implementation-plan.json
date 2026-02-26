@@ -1,83 +1,84 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Step-by-step processed image drawing guide with stage-by-stage progression",
+  "title": "Replace pencil sketch stages with portrait drawing stages and update style",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Enhance the five-stage pencil sketch pipeline so each stage produces clearly distinct, progressive visual output",
+      "id": "REQ-5",
+      "summary": "Update stage labels throughout the app to reflect the five new portrait drawing stages: Trace Outlines, Basic Elements, Slight Shading, Render and Detail, Polish",
       "acceptanceCriteria": [
-        "Each of the 5 stages produces a visually distinct canvas output that is clearly more complete than the previous stage",
-        "Stage 1 output is the most minimal/sparse, Stage 5 is the most detailed/complete",
-        "Transitions between stages are smooth and progressive, not abrupt",
-        "All stages still derive from the original uploaded image"
+        "Stage 1 is labelled 'Trace the outlines of the portrait' everywhere in the UI",
+        "Stage 2 is labelled 'Draw the basic elements' everywhere in the UI",
+        "Stage 3 is labelled 'Have a slight shading' everywhere in the UI",
+        "Stage 4 is labelled 'Render and detail' everywhere in the UI",
+        "Stage 5 is labelled 'Polish' everywhere in the UI",
+        "No old pencil sketch stage names (Construction Lines, Contour Outline, Basic Shading, Detail Pass, Final Render, etc.) remain visible anywhere in the UI",
+        "GalleryView step labels reflect the new stage names",
+        "HowItWorks page timeline reflects the new stage names",
+        "Drawing Guide walkthrough stage titles and captions reflect the new stage names"
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/lib/pencilSketchUtils.ts",
-          "operation": "modify",
-          "description": "Refactor the generateSketchStage function to produce five clearly distinct progressive outputs: Stage 1 (Construction Lines) should show only faint structural/proportion lines using very light edge detection and minimal processing; Stage 2 (Contour Outline) should add rough contour outlines with stronger edge detection but no shading; Stage 3 (Mid-tone Shading) should layer in grayscale mid-tones with moderate blur and initial paper grain; Stage 4 (Refined Details) should add darker values, increased contrast, and refined edge details; Stage 5 (Complete Portrait) should deliver the fully rendered result with complete tonal range, maximum contrast, and full paper grain texture. Adjust Sobel thresholds, blur radii, contrast factors, and grain opacity progressively across stages to ensure each stage is visibly more complete than the previous."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Update GalleryView to display each stage with step labels, instructional captions, and progress indicators",
-      "acceptanceCriteria": [
-        "Each stage panel shows a numbered step label and a descriptive title",
-        "A short instructional caption (1–2 sentences) is displayed beneath each stage image",
-        "A progress indicator (e.g. '2 of 5') is visible when navigating between stages in the lightbox",
-        "Step titles and captions match the actual visual content of that stage"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/lib/pencilSketchUtils.ts",
-          "operation": "modify",
-          "description": "Add an instructionalCaption field to each stage definition in the SKETCH_STAGES array. Stage 1 caption should guide the artist to focus on basic skull proportions and construction lines. Stage 2 should emphasize capturing the overall contour and main shapes. Stage 3 should explain mid-tone shading and form building. Stage 4 should focus on refining features and adding darker accents. Stage 5 should describe final polish, tonal range completion, and texture finishing."
-        },
         {
           "path": "frontend/src/components/GalleryView.tsx",
           "operation": "modify",
-          "description": "Update the gallery grid and lightbox to display step labels in the format 'Step X: [Stage Name]' above each image. Add the instructional caption text below each stage image in both grid and lightbox views. In the lightbox navigation, add a progress indicator showing 'Step X of 5' near the navigation controls. Ensure captions are styled for readability and positioned consistently beneath each stage preview."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Add a dedicated Drawing Guide view with sequential step-by-step walkthrough layout",
-      "acceptanceCriteria": [
-        "A 'Drawing Guide' button or tab is available on the Results page for completed jobs",
-        "The guide view shows one stage at a time with Previous/Next controls",
-        "A thumbnail strip with all 5 stages is visible at the bottom; clicking a thumbnail jumps to that step",
-        "The current step number and total step count are always visible",
-        "The guide view can be exited to return to the standard gallery view"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/DrawingGuideView.tsx",
-          "operation": "create",
-          "description": "Create a new DrawingGuideView component that accepts a Job prop and displays a sequential step-by-step walkthrough. The component should maintain current step state (1-5), show one large stage image at a time with its step label and instructional caption prominently displayed. Add Previous and Next navigation buttons (disable Previous on step 1, Next on step 5). Display a step counter (e.g. 'Step 2 of 5') at the top. Include a horizontal thumbnail strip at the bottom showing all 5 stage thumbnails; highlight the current step thumbnail and allow click-to-jump navigation. Add a Close/Exit button to return to standard gallery mode. Use the same stage data source logic as GalleryView (backend stages or fallback to client-side generation)."
+          "description": "Update the stage labels, captions, and all references to the five drawing stages. Replace any hardcoded or computed stage names with the new portrait drawing stage labels: 'Trace the outlines of the portrait', 'Draw the basic elements', 'Have a slight shading', 'Render and detail', 'Polish'. Update per-stage captions in the gallery display to match the new stage descriptions."
         },
-        {
-          "path": "frontend/src/pages/Results.tsx",
-          "operation": "modify",
-          "description": "Add a view mode state (gallery or guide) and a 'Drawing Guide' button that appears when a job is completed. When clicked, switch to guide mode and render the DrawingGuideView component instead of GalleryView. The DrawingGuideView should receive a callback to switch back to gallery mode. Position the mode toggle button prominently near the job title or action area."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Update HowItWorks timeline to include representative preview images for each stage",
-      "acceptanceCriteria": [
-        "Each of the five timeline entries on the HowItWorks page includes a small illustrative image or icon representing that drawing stage",
-        "The preview images are consistent in size and style across all five stages",
-        "The page layout remains clean and readable with the added visual elements"
-      ],
-      "file_operations": [
         {
           "path": "frontend/src/pages/HowItWorks.tsx",
           "operation": "modify",
-          "description": "Update each of the five timeline step entries to include a small preview image demonstrating that stage's visual output. Use the generated stage preview images at frontend/public/assets/generated/stage1-construction.dim_400x400.png, frontend/public/assets/generated/stage2-contour.dim_400x400.png, frontend/public/assets/generated/stage3-shading.dim_400x400.png, frontend/public/assets/generated/stage4-details.dim_400x400.png, and frontend/public/assets/generated/stage5-complete.dim_400x400.png. Position each image alongside or above its corresponding timeline entry. Size images consistently (e.g. 200x200px or 150x150px) and apply consistent styling (border, shadow, or rounded corners) to maintain visual harmony. Ensure the layout remains clean and the text descriptions are still easily readable."
+          "description": "Replace the timeline stage definitions with the five new portrait drawing stages. Update stage titles, descriptions, and technique notes to reflect: Stage 1 — Trace the outlines of the portrait, Stage 2 — Draw the basic elements, Stage 3 — Have a slight shading, Stage 4 — Render and detail, Stage 5 — Polish. Ensure all old pencil sketch terminology is removed."
+        },
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Update the hero section stage overview and any stage detail cards to use the new portrait drawing stage labels. Replace references to old pencil sketch stages with the five new stages. Update any stage-related copy or captions in the upload interface section."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Update client-side image processing pipeline to produce progressive portrait drawing stages with distinct visual styles",
+      "acceptanceCriteria": [
+        "Each of the 5 stages produces a visually distinct output that matches its stage description",
+        "Stage 1 output shows only faint traced outlines",
+        "Stage 2 output shows basic elements with clean line work",
+        "Stage 3 output shows visible light shading added over stage 2",
+        "Stage 4 output shows detailed rendering and texture",
+        "Stage 5 output looks polished and refined compared to stage 4",
+        "The pipeline processes a user-uploaded image and returns 5 progressive canvas data URLs"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/pencilSketchUtils.ts",
+          "operation": "modify",
+          "description": "Replace the uniform pencil-sketch filter approach with per-stage visual treatments that produce distinct outputs for each of the five portrait drawing stages. Stage 1 should apply minimal edge detection to create a faint outline/trace. Stage 2 should produce clean structural line work with basic facial elements visible. Stage 3 should layer light tonal shading over the stage 2 output. Stage 4 should add rendered detail, texture, and tonal depth. Stage 5 should apply polishing filters for a refined final illustration. Maintain the existing function signature that returns an array of canvas data URLs."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Update instructional captions for each stage to match new portrait drawing workflow",
+      "acceptanceCriteria": [
+        "Each stage has an updated instructional caption relevant to its new name and technique",
+        "HowItWorks page technique notes are updated to reflect the new five stages",
+        "GalleryView per-stage captions are updated",
+        "Drawing Guide walkthrough captions are updated"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/GalleryView.tsx",
+          "operation": "modify",
+          "description": "Update per-stage instructional captions to match the new portrait drawing stages. Ensure captions describe: Stage 1 — tracing outlines, Stage 2 — drawing basic elements, Stage 3 — applying slight shading, Stage 4 — rendering and detailing, Stage 5 — polishing the portrait. Remove any references to old pencil sketch techniques."
+        },
+        {
+          "path": "frontend/src/pages/HowItWorks.tsx",
+          "operation": "modify",
+          "description": "Update technique notes and descriptions in the timeline for each of the five portrait drawing stages. Ensure each stage description explains the portrait drawing technique relevant to that stage (tracing, basic elements, shading, rendering, polishing)."
+        },
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Update any walkthrough or instructional captions in the stage detail cards or process overview to reflect the new portrait drawing workflow and stage descriptions."
         }
       ]
     }

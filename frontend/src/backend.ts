@@ -180,7 +180,6 @@ export interface backendInterface {
     _caffeineStorageCreateCertificate(blobHash: string): Promise<_CaffeineStorageCreateCertificateResult>;
     _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
-    cancelJob(jobId: bigint): Promise<void>;
     createJob(uploadedImage: ExternalBlob): Promise<CreateJobResponse>;
     getJob(jobId: bigint): Promise<Job | null>;
     getJobsByStatus(status: JobStatus, limit: bigint): Promise<Array<Job>>;
@@ -273,20 +272,6 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor._caffeineStorageUpdateGatewayPrincipals();
-            return result;
-        }
-    }
-    async cancelJob(arg0: bigint): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.cancelJob(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.cancelJob(arg0);
             return result;
         }
     }

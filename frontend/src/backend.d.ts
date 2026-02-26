@@ -88,7 +88,6 @@ export enum JobStatus {
     failed = "failed"
 }
 export interface backendInterface {
-    cancelJob(jobId: bigint): Promise<void>;
     createJob(uploadedImage: ExternalBlob): Promise<CreateJobResponse>;
     getJob(jobId: bigint): Promise<Job | null>;
     getJobsByStatus(status: JobStatus, limit: bigint): Promise<Array<Job>>;

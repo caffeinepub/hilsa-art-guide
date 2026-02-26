@@ -138,20 +138,3 @@ export function useRetryFailedJob() {
     },
   });
 }
-
-// Hook to cancel a job
-export function useCancelJob() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation<void, Error, bigint>({
-    mutationFn: async (jobId: bigint) => {
-      if (!actor) throw new Error("Actor not initialized");
-      return actor.cancelJob(jobId);
-    },
-    onSuccess: (_data, jobId) => {
-      queryClient.invalidateQueries({ queryKey: ["job", jobId.toString()] });
-      queryClient.invalidateQueries({ queryKey: ["myJobs"] });
-    },
-  });
-}

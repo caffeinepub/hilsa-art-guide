@@ -1,50 +1,40 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T20:52:52.449Z",
-  "summary": "The diff only modifies project_state.json, which is a planning/state tracking file. None of the actual implementation requirements (REQ-1 through REQ-4) have been implemented. No source code files were added or modified — not pencilSketchUtils.ts, not GalleryView, not the Results page, not the HowItWorks page, and none of the required stage images were added.",
+  "generatedAt": "2026-02-26T21:13:41.819Z",
+  "summary": "The diff implements most requirements: REQ-5 (new stage labels throughout UI), REQ-6 (per-stage visual processing pipeline), REQ-7 (updated captions in GalleryView, HowItWorks, Home), and REQ-8 (backend stage names updated in main.mo). The Drawing Guide walkthrough component is not visible in the diff, creating uncertainty about REQ-5/REQ-7 coverage there. The five required image assets are referenced but not added to the diff.",
   "missing_requirements": [
     {
-      "id": "REQ-1",
-      "requirement": "Enhance the five-stage pencil sketch pipeline in pencilSketchUtils.ts so that each stage produces a clearly distinct, progressive visual output.",
-      "reason": "No changes to pencilSketchUtils.ts or any other source file were made. The diff only updates project_state.json with a pending status for this requirement.",
-      "evidence": [
-        "project_state.json"
-      ]
+      "id": "REQ-5",
+      "requirement": "Drawing Guide walkthrough stage titles and captions reflect the new stage names",
+      "reason": "The diff does not show a DrawingGuide component being modified. No DrawingGuide.tsx or equivalent component appears in the modified files list.",
+      "evidence": []
     },
     {
-      "id": "REQ-2",
-      "requirement": "Update the GalleryView component to display each stage with a step label, instructional caption, and a clear visual indicator showing which step the user is currently viewing.",
-      "reason": "No changes to GalleryView or any component file were made. The diff only updates project_state.json with a pending status for this requirement.",
-      "evidence": [
-        "project_state.json"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Add a dedicated 'Drawing Guide' view or mode on the Results page with step-by-step walkthrough layout, Previous/Next navigation, thumbnail strip, and exit functionality.",
-      "reason": "No changes to the Results page or any related component were made. The diff only updates project_state.json with a pending status for this requirement.",
-      "evidence": [
-        "project_state.json"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "requirement": "Update the HowItWorks page timeline to include a small representative preview image alongside each of the five stage entries.",
-      "reason": "No changes to the HowItWorks page were made. The diff only updates project_state.json with a pending status for this requirement.",
-      "evidence": [
-        "project_state.json"
-      ]
-    },
-    {
-      "requirement": "Add required stage images: stage1-construction.dim_400x400.png, stage2-contour.dim_400x400.png, stage3-shading.dim_400x400.png, stage4-details.dim_400x400.png, stage5-complete.dim_400x400.png",
-      "reason": "No image files were added in the diff. The diff summary explicitly states 'Added: 0' files.",
+      "id": "REQ-7",
+      "requirement": "Drawing Guide walkthrough captions are updated",
+      "reason": "No DrawingGuide component file appears in the modified files, so its captions cannot be confirmed updated.",
       "evidence": []
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.98,
+  "hallucinated_features": [
+    {
+      "description": "Fallback image paths (e.g., stage1-basic-outline.dim_800x800.png, stage2-reference-sketch.dim_800x800.png) referenced in Home.tsx stageDetails that were not requested in the build spec",
+      "reason": "The build request only specifies the five new 600x600 portrait drawing stage images. The fallback image paths pointing to 800x800 assets were not requested.",
+      "evidence": [
+        "frontend/src/pages/Home.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.72,
   "changed_files": [
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/GalleryView.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/lib/pencilSketchUtils.ts",
+    "frontend/src/pages/Home.tsx",
+    "frontend/src/pages/HowItWorks.tsx",
     "project_state.json"
   ]
 }

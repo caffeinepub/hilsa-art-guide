@@ -88,7 +88,6 @@ export const idlService = IDL.Service({
       [],
     ),
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
-  'cancelJob' : IDL.Func([IDL.Nat], [], []),
   'createJob' : IDL.Func([ExternalBlob], [CreateJobResponse], []),
   'getJob' : IDL.Func([IDL.Nat], [IDL.Opt(Job)], ['query']),
   'getJobsByStatus' : IDL.Func([JobStatus, IDL.Nat], [IDL.Vec(Job)], ['query']),
@@ -181,7 +180,6 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
-    'cancelJob' : IDL.Func([IDL.Nat], [], []),
     'createJob' : IDL.Func([ExternalBlob], [CreateJobResponse], []),
     'getJob' : IDL.Func([IDL.Nat], [IDL.Opt(Job)], ['query']),
     'getJobsByStatus' : IDL.Func(

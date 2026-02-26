@@ -1,4 +1,3 @@
-import Runtime "mo:core/Runtime";
 import Map "mo:core/Map";
 import Nat "mo:core/Nat";
 import Time "mo:core/Time";
@@ -135,9 +134,15 @@ actor {
         };
         jobs.add(jobId, updatedJob);
 
-        for (stageNumber in Nat.range(1, 6)) {
-          let stageName = "Stage " # stageNumber.toText();
+        let stageNames = [
+          "Trace Outlines",
+          "Basic Elements",
+          "Slight Shading",
+          "Render and Detail",
+          "Polish",
+        ];
 
+        for ((stageNumber, stageName) in Nat.range(1, 6).zip(stageNames.values())) {
           let newStage : StageResult.T = {
             stageNumber;
             stageName;
@@ -222,24 +227,6 @@ actor {
 
         ignore processJob(jobId);
         #success({ jobId });
-      };
-    };
-  };
-
-  public shared ({ caller }) func cancelJob(jobId : Nat) : async () {
-    switch (jobs.get(jobId)) {
-      case (null) { Runtime.trap("Job not found") };
-      case (?job) {
-        if (job.owner != caller) {
-          Runtime.trap("Caller not authorized to cancel this job.");
-        };
-
-        if (job.status != #inProgress) {
-          Runtime.trap("Cannot cancel a job that is not in progress.");
-        };
-
-        let cancelledJob = { job with status = #failed; errorMessage = ?"Job cancelled by user" };
-        jobs.add(jobId, cancelledJob);
       };
     };
   };

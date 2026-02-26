@@ -1,105 +1,111 @@
 {
   "kind": "build_request",
-  "title": "Step-by-step processed image drawing guide with stage-by-stage progression",
+  "title": "Replace pencil sketch stages with portrait drawing stages and update style",
   "projectName": "HILSA Art Guide",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Enhance the five-stage pencil sketch pipeline in pencilSketchUtils.ts so that each stage produces a clearly distinct, progressive visual output: Stage 1 shows only the basic skull/proportion construction lines (very faint, structural), Stage 2 adds rough contour outlines, Stage 3 layers in mid-tone shading, Stage 4 refines details and adds darker values, and Stage 5 delivers the fully rendered portrait with complete tonal range and paper grain texture.",
+      "id": "REQ-5",
+      "text": "Update the five drawing stage definitions throughout the app to: 1) Trace the outlines of the portrait, 2) Draw the basic elements, 3) Have a slight shading, 4) Render and detail, 5) Polish. Replace all references to the old pencil sketch stage names (Construction Lines, Contour Outline, etc.) with these new stage labels everywhere they appear — including stage labels, captions, progress indicators, the GalleryView, the Drawing Guide walkthrough, and the HowItWorks page timeline.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-latest"
         ],
         "quotes": [
-          "create step by step processed image which guides to draw stage by stage"
+          "stages : 1. Trace the outlines of the portrait 2. Draw the basic elements 3. Have a slight shading 4. Render and detail 5. Polish"
         ]
       },
       "acceptanceCriteria": [
-        "Each of the 5 stages produces a visually distinct canvas output that is clearly more complete than the previous stage",
-        "Stage 1 output is the most minimal/sparse, Stage 5 is the most detailed/complete",
-        "Transitions between stages are smooth and progressive, not abrupt",
-        "All stages still derive from the original uploaded image"
+        "Stage 1 is labelled 'Trace the outlines of the portrait' everywhere in the UI",
+        "Stage 2 is labelled 'Draw the basic elements' everywhere in the UI",
+        "Stage 3 is labelled 'Have a slight shading' everywhere in the UI",
+        "Stage 4 is labelled 'Render and detail' everywhere in the UI",
+        "Stage 5 is labelled 'Polish' everywhere in the UI",
+        "No old pencil sketch stage names (Construction Lines, Contour Outline, Basic Shading, Detail Pass, Final Render, etc.) remain visible anywhere in the UI",
+        "GalleryView step labels reflect the new stage names",
+        "HowItWorks page timeline reflects the new stage names",
+        "Drawing Guide walkthrough stage titles and captions reflect the new stage names"
       ]
     },
     {
-      "id": "REQ-2",
-      "text": "Update the GalleryView component to display each stage with a step label (e.g. 'Step 1: Construction Lines', 'Step 2: Contour Outline', etc.), an instructional caption below each image explaining what the artist should focus on or practice at that stage, and a clear visual indicator showing which step the user is currently viewing (e.g. a numbered progress indicator or breadcrumb).",
+      "id": "REQ-6",
+      "text": "Update the client-side image processing pipeline in pencilSketchUtils.ts to produce outputs that visually match each new stage style: Stage 1 produces a faint outline/trace style, Stage 2 produces basic structural elements with clean lines, Stage 3 adds light shading/tonal values, Stage 4 adds rendered detail and texture, Stage 5 produces a polished, refined final illustration. Replace the current uniform pencil-sketch filter approach with per-stage visual treatments that progressively build toward a finished portrait illustration.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-latest"
         ],
         "quotes": [
-          "create step by step processed image which guides to draw stage by stage"
+          "ue these styles insted of te pencil sketch"
         ]
       },
       "acceptanceCriteria": [
-        "Each stage panel shows a numbered step label and a descriptive title",
-        "A short instructional caption (1–2 sentences) is displayed beneath each stage image",
-        "A progress indicator (e.g. '2 of 5') is visible when navigating between stages in the lightbox",
-        "Step titles and captions match the actual visual content of that stage"
+        "Each of the 5 stages produces a visually distinct output that matches its stage description",
+        "Stage 1 output shows only faint traced outlines",
+        "Stage 2 output shows basic elements with clean line work",
+        "Stage 3 output shows visible light shading added over stage 2",
+        "Stage 4 output shows detailed rendering and texture",
+        "Stage 5 output looks polished and refined compared to stage 4",
+        "The pipeline processes a user-uploaded image and returns 5 progressive canvas data URLs"
       ]
     },
     {
-      "id": "REQ-3",
-      "text": "Add a dedicated 'Drawing Guide' view or mode on the Results page that presents stages sequentially in a step-by-step walkthrough layout: one stage visible at a time, with 'Previous Step' and 'Next Step' navigation buttons, the instructional caption, and a thumbnail strip at the bottom showing all 5 stages so the user can jump to any step directly.",
+      "id": "REQ-7",
+      "text": "Update the instructional captions for each stage throughout the app (GalleryView per-stage captions, Drawing Guide captions, HowItWorks descriptions) to match the new stage names and styles: Stage 1 — tracing outlines, Stage 2 — drawing basic elements, Stage 3 — applying slight shading, Stage 4 — rendering and detailing, Stage 5 — polishing the portrait.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-latest"
         ],
         "quotes": [
-          "guides to draw stage by stage"
+          "stages : 1. Trace the outlines of the portrait 2. Draw the basic elements 3. Have a slight shading 4. Render and detail 5. Polish"
         ]
       },
       "acceptanceCriteria": [
-        "A 'Drawing Guide' button or tab is available on the Results page for completed jobs",
-        "The guide view shows one stage at a time with Previous/Next controls",
-        "A thumbnail strip with all 5 stages is visible at the bottom; clicking a thumbnail jumps to that step",
-        "The current step number and total step count are always visible",
-        "The guide view can be exited to return to the standard gallery view"
+        "Each stage has an updated instructional caption relevant to its new name and technique",
+        "HowItWorks page technique notes are updated to reflect the new five stages",
+        "GalleryView per-stage captions are updated",
+        "Drawing Guide walkthrough captions are updated"
       ]
     },
     {
-      "id": "REQ-4",
-      "text": "Update the HowItWorks page timeline to include a small representative preview image alongside each of the five stage entries, visually demonstrating what the output looks like at that stage of the drawing process.",
-      "target": "frontend",
+      "id": "REQ-8",
+      "text": "Update the backend stage processing pipeline definitions in main.mo to reflect the five new stage names: Trace Outlines, Basic Elements, Slight Shading, Render and Detail, Polish — replacing any stored pencil sketch stage identifiers or labels used in job status tracking and stage results.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-latest"
         ],
         "quotes": [
-          "step by step processed image which guides to draw stage by stage"
+          "stages : 1. Trace the outlines of the portrait 2. Draw the basic elements 3. Have a slight shading 4. Render and detail 5. Polish"
         ]
       },
       "acceptanceCriteria": [
-        "Each of the five timeline entries on the HowItWorks page includes a small illustrative image or icon representing that drawing stage",
-        "The preview images are consistent in size and style across all five stages",
-        "The page layout remains clean and readable with the added visual elements"
+        "Backend stage identifiers or labels match the five new stage names",
+        "Job status and stage result records use the updated stage names",
+        "Existing CRUD operations and rate limiting logic are not broken"
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/ (useActor.ts, useInternetIdentity.ts) or frontend/src/main.tsx",
-    "Do not modify files under frontend/src/components/ui/",
-    "All Motoko logic must remain in backend/main.mo as a single actor",
-    "Stage processing must continue to be canvas-based and client-side via pencilSketchUtils.ts"
+    "Do not modify files listed in frontend.immutablePaths (useInternetIdentity, useActor, main.tsx, components/ui)",
+    "Preserve existing job management CRUD operations and rate limiting logic in the backend",
+    "The five stage count must remain exactly five"
   ],
   "nonGoals": [
-    "Adding new backend endpoints or changing the job data model",
-    "Supporting drawing media other than pencil sketch",
-    "Adding video or animation-based tutorials",
-    "Allowing users to edit or annotate the stage images"
+    "Adding new pages or routes beyond what already exists",
+    "Changing the overall app branding or color theme",
+    "Integrating external AI image generation APIs",
+    "Changing the upload or job creation flow"
   ],
   "imageRequirements": {
     "required": [
-      "Minimal pencil construction lines illustration showing skull proportions and basic head structure, white background (stage1-construction.dim_400x400.png)",
-      "Pencil contour outline illustration of a face with no shading, white background (stage2-contour.dim_400x400.png)",
-      "Pencil sketch with light mid-tone shading on a face, white background (stage3-shading.dim_400x400.png)",
-      "Detailed pencil portrait with refined features and darker values, white background (stage4-details.dim_400x400.png)",
-      "Fully rendered pencil portrait with complete tonal range and paper grain texture, white background (stage5-complete.dim_400x400.png)"
+      "Portrait drawing stage 1 illustration — faint outline trace of a face on white background, minimal marks (stage1-trace-outlines.dim_600x600.png)",
+      "Portrait drawing stage 2 illustration — clean line drawing of basic facial elements on white background (stage2-basic-elements.dim_600x600.png)",
+      "Portrait drawing stage 3 illustration — line drawing with light pencil shading over facial planes on white background (stage3-slight-shading.dim_600x600.png)",
+      "Portrait drawing stage 4 illustration — detailed rendered portrait with tonal depth and texture on white background (stage4-render-detail.dim_600x600.png)",
+      "Portrait drawing stage 5 illustration — polished, refined finished portrait drawing on white background (stage5-polish.dim_600x600.png)"
     ],
     "edits": []
   }

@@ -6,24 +6,24 @@ export interface SketchStage {
 
 const STAGE_DEFINITIONS = [
   {
-    label: "Stage 1 — Skull Construction",
-    description: "Basic circle with 1/3 proportion guide lines and center cross",
+    label: "Stage 1 — Trace the outlines of the portrait",
+    description: "Faint traced contour lines capturing the overall silhouette of the portrait",
   },
   {
-    label: "Stage 2 — Head Structure",
-    description: "Oval face shape with jaw, chin, and feature placement guides",
+    label: "Stage 2 — Draw the basic elements",
+    description: "Clean structural line work establishing the basic facial elements and proportions",
   },
   {
-    label: "Stage 3 — Feature Blocking",
-    description: "Rough eyes, nose, lips, ear, and hair mass silhouette",
+    label: "Stage 3 — Have a slight shading",
+    description: "Light tonal shading layered over the basic elements to add form and depth",
   },
   {
-    label: "Stage 4 — Light Detail",
-    description: "Refined features with light shading, hair strands, neck outline",
+    label: "Stage 4 — Render and detail",
+    description: "Detailed rendering with texture, tonal depth, and refined facial features",
   },
   {
-    label: "Stage 5 — Completed Portrait",
-    description: "Full pencil portrait with shading, hair detail, and necklace",
+    label: "Stage 5 — Polish",
+    description: "Polished and refined final illustration with full tonal range and crisp detail",
   },
 ];
 
@@ -175,11 +175,9 @@ function blendPencilStroke(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 1 — Skull Construction
-// Shows only the outermost head/skull contour (the big circle) plus a faint
-// horizontal centre-line and two 1/3 horizontal markers, matching the
-// reference image top-left panel.  Very light opacity (~10%) so it reads as
-// a barely-started construction sketch.
+// Stage 1 — Trace the outlines of the portrait
+// Shows only faint traced contour lines of the portrait silhouette.
+// Very light opacity (~10%) so it reads as barely-started outline tracing.
 // ─────────────────────────────────────────────────────────────────────────────
 function applyStage1(
   gray: Float32Array,
@@ -189,7 +187,7 @@ function applyStage1(
   const output = new ImageData(width, height);
   fillPaperBackground(output);
 
-  // Heavy blur to keep only the broadest skull silhouette
+  // Heavy blur to keep only the broadest silhouette contour
   const edges = sobelEdges(gray, width, height);
   const smoothEdges = gaussianBlur(edges, width, height, 4);
 
@@ -213,8 +211,7 @@ function applyStage1(
     }
   }
 
-  // Draw construction guide lines directly onto the canvas
-  // These simulate the 1/3 proportion markers seen in the reference image
+  // Draw faint guide lines to simulate tracing reference marks
   const guideOpacity = 0.08;
   const guideStroke = 0.6;
 
@@ -238,7 +235,7 @@ function applyStage1(
     output.data[i * 4 + 2] = b;
   }
 
-  // 1/3 horizontal markers (top third, middle third, bottom third)
+  // 1/3 horizontal markers
   for (let t = 1; t <= 3; t++) {
     const lineY = Math.round(height * (t / 3) * 0.8 + height * 0.1);
     for (let x = Math.round(width * 0.2); x < Math.round(width * 0.8); x++) {
@@ -254,10 +251,9 @@ function applyStage1(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 2 — Head Structure
-// Adds the oval/egg face shape, jawline, and chin over the skull circle.
-// Slightly more visible (~22% opacity) with a lower edge threshold so the
-// jaw and chin contours appear alongside the skull.
+// Stage 2 — Draw the basic elements
+// Clean structural line work with basic facial elements visible.
+// Slightly more visible (~22% opacity) with a lower edge threshold.
 // ─────────────────────────────────────────────────────────────────────────────
 function applyStage2(
   gray: Float32Array,
@@ -268,7 +264,7 @@ function applyStage2(
   fillPaperBackground(output);
 
   const edges = sobelEdges(gray, width, height);
-  // Moderate blur — skull + jaw contours visible, inner features still soft
+  // Moderate blur — structural contours visible, inner features still soft
   const smoothEdges = gaussianBlur(edges, width, height, 2);
 
   const threshold = 25;
@@ -314,9 +310,9 @@ function applyStage2(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 3 — Feature Blocking
-// Rough blocked-in eyes, nose, mouth, ear, and hair mass silhouette.
-// ~40% opacity with tonal shading for the hair mass and rough feature areas.
+// Stage 3 — Have a slight shading
+// Light tonal shading layered over the basic elements.
+// ~40% opacity with gentle tonal shading for hair mass and feature areas.
 // ─────────────────────────────────────────────────────────────────────────────
 function applyStage3(
   gray: Float32Array,
@@ -339,14 +335,14 @@ function applyStage3(
       const tonalDarkness = Math.max(0, (185 - g) / 185);
       const edgeDarkness = Math.min(1, Math.max(0, (e - 15) / 55));
 
-      // Hair region (very dark in original) gets rough blocked strokes
+      // Hair region (very dark in original) gets slight blocked strokes
       const isHairRegion = g < 85;
       const hairBlock =
         isHairRegion && (x + y * 2) % 5 < 2
           ? tonalDarkness * 0.38
           : 0;
 
-      // Rough feature blocking for mid-dark areas (eyes, nose, lips)
+      // Slight shading for mid-dark areas (eyes, nose, lips)
       const isFeatureRegion = g < 130 && g >= 85;
       const featureBlock =
         isFeatureRegion && (x + y) % 4 < 2
@@ -377,9 +373,9 @@ function applyStage3(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 4 — Light Detail
-// Refined facial features with light pencil shading, hair strand lines,
-// neck and shoulder outline.  ~60% opacity with directional hatching.
+// Stage 4 — Render and detail
+// Detailed rendering with texture, tonal depth, and refined facial features.
+// ~60% opacity with directional hatching and unsharp masking for detail.
 // ─────────────────────────────────────────────────────────────────────────────
 function applyStage4(
   gray: Float32Array,
@@ -441,9 +437,9 @@ function applyStage4(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 5 — Completed Portrait
-// Fully detailed pencil portrait with complete shading, rich hair detail,
-// skin texture, and necklace accessory.  ~90% opacity, full tonal range.
+// Stage 5 — Polish
+// Polished and refined final illustration with full tonal range and crisp detail.
+// ~90% opacity, full tonal range with S-curve contrast enhancement.
 // ─────────────────────────────────────────────────────────────────────────────
 function applyStage5(
   gray: Float32Array,
@@ -489,7 +485,7 @@ function applyStage5(
       const shadowHatch = isShadow && (x - y + width) % 5 < 2 ? tonalDarkness * 0.55 : 0;
       // Mid-tone fine strokes for skin texture
       const midToneStroke = isMidTone && (x + y * 2) % 8 < 2 ? tonalDarkness * 0.30 : 0;
-      // Fine detail strokes for facial features and necklace area
+      // Fine detail strokes for facial features
       const detailStroke = g < 150 && (x * 3 + y) % 11 < 2 ? tonalDarkness * 0.20 : 0;
 
       const combinedDarkness = Math.max(
@@ -532,8 +528,8 @@ export async function generatePencilSketchStages(
   jobId: string,
   onStageComplete?: (stageIndex: number, stage: SketchStage) => void
 ): Promise<SketchStage[]> {
-  // Check sessionStorage cache
-  const cacheKey = `sketch_stages_v3_${jobId}`;
+  // Check sessionStorage cache — bump key to v4 to invalidate old cached results
+  const cacheKey = `sketch_stages_v4_${jobId}`;
   const cached = sessionStorage.getItem(cacheKey);
   if (cached) {
     try {
@@ -556,51 +552,46 @@ export async function generatePencilSketchStages(
   let width = img.naturalWidth || img.width;
   let height = img.naturalHeight || img.height;
   if (width > maxDim || height > maxDim) {
-    if (width > height) {
-      height = Math.round((height / width) * maxDim);
-      width = maxDim;
-    } else {
-      width = Math.round((width / height) * maxDim);
-      height = maxDim;
-    }
+    const scale = maxDim / Math.max(width, height);
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
   }
 
   const imageData = getImageData(img, width, height);
   const gray = toGrayscale(imageData.data);
 
   const stageFunctions = [
-    () => applyStage1(gray, width, height),
-    () => applyStage2(gray, width, height),
-    () => applyStage3(gray, width, height),
-    () => applyStage4(gray, width, height),
-    () => applyStage5(gray, width, height),
+    applyStage1,
+    applyStage2,
+    applyStage3,
+    applyStage4,
+    applyStage5,
   ];
 
-  const stages: SketchStage[] = [];
+  const results: SketchStage[] = [];
 
   for (let i = 0; i < stageFunctions.length; i++) {
-    // Yield to browser between stages to keep UI responsive
-    await new Promise<void>((resolve) => setTimeout(resolve, 0));
-
-    const imageDataResult = stageFunctions[i]();
-    const dataUrl = imageDataToDataUrl(imageDataResult);
-
+    const stageImageData = stageFunctions[i](gray, width, height);
+    const dataUrl = imageDataToDataUrl(stageImageData);
     const stage: SketchStage = {
       label: STAGE_DEFINITIONS[i].label,
       description: STAGE_DEFINITIONS[i].description,
       dataUrl,
     };
-
-    stages.push(stage);
-    onStageComplete?.(i, stage);
+    results.push(stage);
+    if (onStageComplete) {
+      onStageComplete(i, stage);
+    }
+    // Yield to the browser between stages
+    await new Promise((resolve) => setTimeout(resolve, 0));
   }
 
   // Cache results
   try {
-    sessionStorage.setItem(cacheKey, JSON.stringify(stages));
+    sessionStorage.setItem(cacheKey, JSON.stringify(results));
   } catch {
-    // sessionStorage might be full
+    // ignore storage errors
   }
 
-  return stages;
+  return results;
 }
