@@ -1,40 +1,55 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Redesign Drawing Guide layout to match step-card style with stage image + description per card",
+  "title": "Replace HowItWorks stage images with 4-step pencil style renders of uploaded image",
   "requirements": [
     {
-      "id": "REQ-11",
-      "summary": "Redesign the Drawing Guide walkthrough view on the Results page so that each stage is presented as a distinct card block containing a bold step title, instructional body text, and a full-width rounded image showing the processed stage output",
+      "id": "REQ-1",
+      "summary": "Generate four new stage illustration images representing each step of the pencil drawing tutorial, depicting the same female portrait subject progressing from loose construction lines to a fully rendered graphite drawing",
       "acceptanceCriteria": [
-        "Each of the five drawing stages is rendered as its own card with a white background and rounded corners on a light grey/cream page background.",
-        "Each card contains a bold step heading (e.g. 'Step 1: Trace the Outlines'), a body paragraph with the existing instructional caption for that stage, and the processed stage image displayed in a full-width rounded image container below the text.",
-        "All five stage cards are displayed sequentially in a vertically scrollable layout — no pagination or hidden stages.",
-        "Stage image outputs (generated client-side) are displayed at appropriate resolution inside each card.",
-        "The typography uses a large, bold sans-serif for step titles and a regular-weight body font for descriptions, consistent with the reference screenshot style.",
-        "The layout is responsive and renders correctly on both desktop and mobile screen widths."
+        "Four PNG images are present in frontend/public/assets/generated/ with the specified filenames",
+        "Each image visually represents its stated pencil drawing stage",
+        "All four images depict the same portrait subject for visual continuity"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/GalleryView.tsx",
-          "operation": "modify",
-          "description": "Replace the current gallery layout with a vertical card-based layout where each of the five stages is rendered as a standalone card. Each card should have: (1) a white background with rounded corners, (2) a bold step title heading using the existing stage label (e.g., 'Step 1: Trace the Outlines'), (3) the existing instructional caption as body text below the title, and (4) the processed stage image displayed full-width within the card with rounded corners. Remove the lightbox viewer and download buttons. Ensure all five cards are visible in a scrollable vertical stack on a light grey/cream background. Use large bold sans-serif typography for titles (e.g., text-2xl font-bold) and regular body font for descriptions. Preserve all existing stage label strings and instructional caption copy from pencilSketchUtils.ts. Maintain responsive behavior for desktop and mobile."
+          "path": "frontend/public/assets/generated/stage1-basic-construction.dim_800x800.png",
+          "operation": "create",
+          "description": "Generate a female portrait image at the basic construction stage showing very light, loose graphite pencil lines forming an oval head shape with horizontal and vertical construction guidelines crossing at the face center, minimal detail, sketch-like appearance. This image will be used in the HowItWorks page tutorial section to represent Step I."
+        },
+        {
+          "path": "frontend/public/assets/generated/stage2-refined-lineart.dim_800x800.png",
+          "operation": "create",
+          "description": "Generate a female portrait image at the refined line art stage showing clean, darker pencil outlines defining eyes with irises and lashes, a defined nose bridge and tip, lips with cupid's bow, and the outer silhouette of flowing hair with no shading yet. This continues the progression from stage1 and will represent Step II in the tutorial."
+        },
+        {
+          "path": "frontend/public/assets/generated/stage3-hair-detail.dim_800x800.png",
+          "operation": "create",
+          "description": "Generate a female portrait image at the hair and detail development stage showing pencil-drawn hair strand direction lines with layered strokes, detailed eyebrows and eye shading, light contour shadow lines on cheekbones and jaw, and subtle crosshatching on the neck. This continues the progression from stage2 and will represent Step III in the tutorial."
+        },
+        {
+          "path": "frontend/public/assets/generated/stage4-final-shaded.dim_800x800.png",
+          "operation": "create",
+          "description": "Generate a female portrait image at the final shaded portrait stage showing a fully rendered graphite drawing with smooth blended tonal shading across the face and neck, rich dark hair with volume and highlight streaks, deep shadows under the chin, and polished professional pencil portrait quality. This completes the progression from stage3 and will represent Step IV in the tutorial."
         }
       ]
     },
     {
-      "id": "REQ-12",
-      "summary": "Update the HowItWorks page timeline to use the same card-per-step visual layout with step number, title, descriptive body text, and representative stage preview image",
+      "id": "REQ-2",
+      "summary": "Replace the current HowItWorks page tutorial section with a new layout using the four generated stage images, displaying Roman numeral indicators, numeric badges, stage titles, and descriptions for each step",
       "acceptanceCriteria": [
-        "Each of the five stages on the HowItWorks page is presented as a card matching the visual style of the reference screenshot.",
-        "Each card shows the stage title as a bold heading, the stage description as body text, and a placeholder or static representative sketch-style image.",
-        "Cards are arranged vertically and fully visible without toggling or expanding."
+        "The HowItWorks page displays exactly 4 stage cards in sequence",
+        "Each card renders its corresponding generated stage image (stage1 through stage4)",
+        "Roman numeral labels (Step I, Step II, Step III, Step IV) are visible per card",
+        "Numeric badges (01, 02, 03, 04) are displayed per card",
+        "Stage title and description text match the specification: Basic Construction, Refined Line Art, Hair & Detail Development, Final Shaded Portrait",
+        "Old/previous layout code for the tutorial section is removed"
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/HowItWorks.tsx",
           "operation": "modify",
-          "description": "Replace the current vertical timeline layout with a card-based layout matching the reference screenshot style. Each of the five stages should be rendered as a distinct card with: (1) a white background and rounded corners, (2) a bold step heading combining the stage number and name (e.g., 'Step 1: Trace the Outlines'), (3) the existing stage description as body text below the heading, and (4) a static representative stage preview image displayed full-width within the card with rounded corners. Use the generated stage preview images from frontend/public/assets/generated/ (stage1-trace-outlines.dim_600x600.png, stage2-hatching.dim_600x600.png, stage3-crosshatch.dim_600x600.png, stage4-render-detail.dim_600x600.png, stage5-polish.dim_600x600.png). Remove the timeline connector lines and icons. Arrange cards vertically in a scrollable stack on a light grey/cream background. Use large bold sans-serif typography for titles and regular body font for descriptions. Preserve all existing stage descriptions and technique tips. Ensure responsive layout for desktop and mobile."
+          "description": "Replace the existing 4-stage tutorial section with a new layout that uses the four generated stage images from frontend/public/assets/generated/ (stage1-basic-construction.dim_800x800.png through stage4-final-shaded.dim_800x800.png). Each stage card must display: Roman numeral step indicator (Step I–IV), numeric badge (01–04), stage title ('Basic Construction', 'Refined Line Art', 'Hair & Detail Development', 'Final Shaded Portrait'), and stage description. Remove the old layout code that conflicts with this new structure, ensuring the element at XPath /html[1]/body[1]/div[1]/div[1]/main[1]/section[3]/div[1]/div[2]/div[1]/div[2]/img[1] and its surrounding stage card are replaced to use the new images. Maintain the overall page structure with hero section and additional tutorial content sections intact."
         }
       ]
     }

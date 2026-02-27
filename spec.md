@@ -1,13 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Redesign the Drawing Guide on the Results page and the HowItWorks page to display each stage as a distinct card matching the reference screenshot style (white card, bold step title, description text, full-width rounded stage image).
+**Goal:** Replace the HowItWorks page tutorial section with four new pencil-style stage illustrations of a female portrait, updating both the images and the stage card layout.
 
 **Planned changes:**
-- Redesign the Results page Drawing Guide walkthrough so each of the five stages is rendered as its own white card with rounded corners on a light grey background, containing: a bold step title (e.g. "Step 1: Trace the Outlines"), an instructional body paragraph, and the processed stage image in a full-width rounded image container below the text.
-- All five stage cards are displayed sequentially in a vertically scrollable layout (no pagination or hidden stages).
-- Update the HowItWorks page timeline so each stage entry becomes a standalone card in the same style: bold step heading, descriptive body text, and a representative stage preview image below the text, arranged vertically.
-- Typography uses large bold sans-serif for step titles and regular-weight body font for descriptions.
-- Layout is responsive for both desktop and mobile.
+- Generate four new stage illustration images (stage1-basic-construction, stage2-refined-lineart, stage3-hair-detail, stage4-final-shaded) depicting a female portrait progressing through pencil drawing stages
+- Replace the existing tutorial section on the HowItWorks page (/how-it-works) with a new 4-card layout using these images
+- Each card displays a Roman numeral step label (Step I–IV), numeric badge (01–04), stage title, and description
+- Remove old/conflicting tutorial section code
 
-**User-visible outcome:** Users can scroll through all five drawing stage cards one after another on both the Results page and HowItWorks page, with each stage clearly presented as a white card showing the step title, instructions, and the stage image — matching the reference screenshot style.
+**User-visible outcome:** The HowItWorks page shows four visually consistent pencil-drawing stage cards — from basic construction lines to a fully shaded graphite portrait — replacing the previous layout.

@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T03:17:37.886Z",
+  "generatedAt": "2026-02-27T04:03:41.867Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,19 +11,25 @@
     "implemented": 2,
     "items": [
       {
-        "id": "REQ-11",
-        "summary": "Redesign the Drawing Guide walkthrough view on the Results page so that each stage is presented as a distinct card block containing: (1) a bold step title (e.g. 'Step 1: Trace the Outlines'), (2) a paragraph of instructional body text explaining what to do at that stage, and (3) a full-width rounded image showing the processed stage output — all stacked vertically, matching the card-per-step layout shown in the reference screenshot (white card on light grey background, title in large bold sans-serif, description text below it, then the stage image in a rounded rectangle container). All five stage cards should be visible on the page by scrolling, one after another.",
+        "id": "REQ-1",
+        "summary": "Generate four new stage illustration images representing each step of the pencil drawing tutorial: (1) Basic Construction — light sketch lines with face/head outline and construction guidelines (stage1-basic-construction.dim_800x800.png), (2) Refined Line Art — clean darker outlines with defined eyes, nose, lips, and hair shape (stage2-refined-lineart.dim_800x800.png), (3) Hair & Detail Development — hair strand direction lines, eyebrow/eye details, and light contour shading (stage3-hair-detail.dim_800x800.png), (4) Final Shaded Portrait — fully rendered graphite shading with smooth blending and hair volume (stage4-final-shaded.dim_800x800.png). All four images should depict the same female portrait subject progressing from loose construction lines to a fully rendered graphite drawing.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/GalleryView.tsx"
+          "frontend/public/assets/generated/stage1-basic-construction.dim_800x800.png",
+          "frontend/public/assets/generated/stage2-refined-lineart.dim_800x800.png",
+          "frontend/public/assets/generated/stage3-hair-detail.dim_800x800.png",
+          "frontend/public/assets/generated/stage4-final-shaded.dim_800x800.png"
         ],
         "matchedFiles": [
-          "frontend/src/components/GalleryView.tsx"
+          "frontend/public/assets/generated/stage1-basic-construction.dim_800x800.png",
+          "frontend/public/assets/generated/stage2-refined-lineart.dim_800x800.png",
+          "frontend/public/assets/generated/stage3-hair-detail.dim_800x800.png",
+          "frontend/public/assets/generated/stage4-final-shaded.dim_800x800.png"
         ]
       },
       {
-        "id": "REQ-12",
-        "summary": "Update the HowItWorks page timeline to use the same card-per-step visual layout: each stage entry becomes a standalone card with the step number and title as a bold heading, the descriptive body text beneath it, and a representative stage preview image below the text — mirroring the reference screenshot's structure.",
+        "id": "REQ-2",
+        "summary": "On the HowItWorks page (/how-it-works), replace the current content in the 4-stage tutorial section with a new layout that uses the four generated stage images. Each stage card must show: the Roman numeral step indicator (Step I–IV), the step number badge (01–04), the stage title (e.g. 'Basic Construction'), and the stage description. The element identified by XPath /html[1]/body[1]/div[1]/div[1]/main[1]/section[3]/div[1]/div[2]/div[1]/div[2]/img[1] and its surrounding stage card must be replaced to use the new stage images from frontend/public/assets/generated/. Remove any previous feature code that conflicts with this layout.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/HowItWorks.tsx"
@@ -39,7 +45,10 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/GalleryView.tsx",
+    "frontend/public/assets/generated/stage1-basic-construction.dim_800x800.png",
+    "frontend/public/assets/generated/stage2-refined-lineart.dim_800x800.png",
+    "frontend/public/assets/generated/stage3-hair-detail.dim_800x800.png",
+    "frontend/public/assets/generated/stage4-final-shaded.dim_800x800.png",
     "frontend/src/pages/HowItWorks.tsx",
     "project_state.json",
     "scratch/component-selection.json",

@@ -4,31 +4,31 @@ export interface SketchStage {
   dataUrl: string;
 }
 
+// ─── Stage metadata — 4-step pencil drawing tutorial ─────────────────────────
 export const STAGE_LABELS = [
-  "Trace the outlines",
-  "Draw the basic elements",
-  "Have a slight shading",
-  "Render and detail",
-  "Polish",
+  "Basic Construction",
+  "Refined Line Art",
+  "Hair & Detail Development",
+  "Final Shaded Portrait",
 ];
 
 export const STAGE_DESCRIPTIONS = [
-  "Lightly trace the overall silhouette and major contours of the portrait as your foundational roadmap",
-  "Draw in the basic facial elements with clean structural line work establishing correct placement and proportions",
-  "Introduce light tonal shading to give the portrait form and dimension in the shadow areas",
-  "Build up detailed rendering — refine features, add hair strand lines, and deepen shadow areas with hatching",
-  "Smooth transitions, sharpen key edges, deepen dark values, and complete the full tonal range of the portrait.",
+  "Light sketch lines with face/head outline and construction guidelines",
+  "Clean darker outlines with defined eyes, nose, lips, and hair shape",
+  "Hair strand direction lines, eyebrow/eye details, and light contour shading",
+  "Fully rendered graphite shading with smooth blending and hair volume",
 ];
 
-const STAGE_DEFINITIONS = STAGE_LABELS.map((label, i) => ({
-  label,
+export const STAGES = STAGE_LABELS.map((name, i) => ({
+  number: i + 1,
+  name,
   description: STAGE_DESCRIPTIONS[i],
 }));
 
 // Cream/parchment paper background color
-const PAPER_R = 240;
-const PAPER_G = 236;
-const PAPER_B = 224;
+const PAPER_R = 242;
+const PAPER_G = 238;
+const PAPER_B = 228;
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -134,37 +134,44 @@ function gaussianBlur(
   return result;
 }
 
-// Add subtle paper texture grain
-function paperGrain(seed: number): number {
+// Pseudo-random noise for pencil grain texture
+function pencilNoise(seed: number): number {
   const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
-  return (x - Math.floor(x) - 0.5) * 8;
+  return x - Math.floor(x);
+}
+
+// Simulate a wobbly freehand line by jittering pixel positions
+function freehandJitter(x: number, y: number, amplitude: number): [number, number] {
+  const jx = (pencilNoise(x * 0.3 + y * 0.7 + 1.1) - 0.5) * amplitude;
+  const jy = (pencilNoise(x * 0.7 + y * 0.3 + 2.3) - 0.5) * amplitude;
+  return [x + jx, y + jy];
 }
 
 function fillPaperBackground(output: ImageData): void {
   for (let i = 0; i < output.data.length / 4; i++) {
-    output.data[i * 4] = PAPER_R;
-    output.data[i * 4 + 1] = PAPER_G;
-    output.data[i * 4 + 2] = PAPER_B;
+    const grain = (pencilNoise(i * 0.01) - 0.5) * 4;
+    output.data[i * 4]     = Math.max(0, Math.min(255, PAPER_R + grain));
+    output.data[i * 4 + 1] = Math.max(0, Math.min(255, PAPER_G + grain * 0.9));
+    output.data[i * 4 + 2] = Math.max(0, Math.min(255, PAPER_B + grain * 0.8));
     output.data[i * 4 + 3] = 255;
   }
 }
 
-// Blend a dark pencil stroke onto the paper background
 function blendPencilStroke(
-  paperR: number,
-  paperG: number,
-  paperB: number,
+  pr: number,
+  pg: number,
+  pb: number,
   strokeDarkness: number,
   opacity: number
 ): [number, number, number] {
-  const graphiteR = 40;
-  const graphiteG = 38;
-  const graphiteB = 42;
+  const graphiteR = 38;
+  const graphiteG = 36;
+  const graphiteB = 44;
 
-  const blended = opacity * strokeDarkness;
-  const r = Math.round(paperR * (1 - blended) + graphiteR * blended);
-  const g = Math.round(paperG * (1 - blended) + graphiteG * blended);
-  const b = Math.round(paperB * (1 - blended) + graphiteB * blended);
+  const blended = Math.min(1, opacity * strokeDarkness);
+  const r = Math.round(pr * (1 - blended) + graphiteR * blended);
+  const g = Math.round(pg * (1 - blended) + graphiteG * blended);
+  const b = Math.round(pb * (1 - blended) + graphiteB * blended);
   return [
     Math.max(0, Math.min(255, r)),
     Math.max(0, Math.min(255, g)),
@@ -173,12 +180,11 @@ function blendPencilStroke(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 1 — Trace the outlines
-// Lightly trace the overall silhouette and major contours of the portrait
-// as your foundational roadmap. Very faint lines (~10% opacity), minimal
-// contrast, no shading — only the broadest outer contour survives.
+// Stage 1 — Basic Construction
+// Light sketch lines only. Face/head outline with vertical and horizontal
+// guidelines. Very faint pencil strokes. Minimal facial details.
 // ─────────────────────────────────────────────────────────────────────────────
-function applyStage1(
+function processStage1(
   gray: Float32Array,
   width: number,
   height: number
@@ -186,63 +192,87 @@ function applyStage1(
   const output = new ImageData(width, height);
   fillPaperBackground(output);
 
-  // Heavy blur to keep only the broadest silhouette contour
   const edges = sobelEdges(gray, width, height);
-  const smoothEdges = gaussianBlur(edges, width, height, 5);
+  const blurredEdges = gaussianBlur(edges, width, height, 7);
 
-  // Very high threshold — only the outermost contour survives
-  const threshold = 50;
-  const opacity = 0.09;
+  const threshold = 45;
+  const maxOpacity = 0.08;
 
-  for (let i = 0; i < gray.length; i++) {
-    const e = smoothEdges[i];
-    if (e > threshold) {
-      const strokeDarkness = Math.min(1, (e - threshold) / 120);
-      const grain = paperGrain(i) * 0.3;
-      const [r, g, b] = blendPencilStroke(
-        PAPER_R, PAPER_G, PAPER_B,
-        strokeDarkness,
-        opacity + grain * 0.01
-      );
-      output.data[i * 4]     = r;
-      output.data[i * 4 + 1] = g;
-      output.data[i * 4 + 2] = b;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = y * width + x;
+      const e = blurredEdges[i];
+
+      if (e > threshold) {
+        const [jx, jy] = freehandJitter(x, y, 2.5);
+        const ji = Math.round(jy) * width + Math.round(jx);
+        const safeIdx = Math.max(0, Math.min(gray.length - 1, ji));
+
+        const strokeDarkness = Math.min(1, (e - threshold) / 100);
+        const pressureVariation = 0.6 + pencilNoise(i * 0.05) * 0.4;
+        const opacity = maxOpacity * pressureVariation;
+
+        const pr = output.data[safeIdx * 4];
+        const pg = output.data[safeIdx * 4 + 1];
+        const pb = output.data[safeIdx * 4 + 2];
+        const [r, g, b] = blendPencilStroke(pr, pg, pb, strokeDarkness, opacity);
+        output.data[safeIdx * 4]     = r;
+        output.data[safeIdx * 4 + 1] = g;
+        output.data[safeIdx * 4 + 2] = b;
+      }
     }
   }
 
-  // Draw faint guide lines to simulate tracing reference marks
-  const guideOpacity = 0.07;
-  const guideStroke = 0.5;
+  // Draw faint construction guide lines
+  const guideOpacity = 0.06;
+  const guideStroke = 0.45;
 
   // Horizontal centre line
   const cy = Math.round(height * 0.5);
-  for (let x = Math.round(width * 0.15); x < Math.round(width * 0.85); x++) {
-    const i = cy * width + x;
-    const [r, g, b] = blendPencilStroke(PAPER_R, PAPER_G, PAPER_B, guideStroke, guideOpacity);
-    output.data[i * 4]     = r;
-    output.data[i * 4 + 1] = g;
-    output.data[i * 4 + 2] = b;
+  for (let x = Math.round(width * 0.12); x < Math.round(width * 0.88); x++) {
+    const wobble = Math.round((pencilNoise(x * 0.1) - 0.5) * 3);
+    const iy = Math.max(0, Math.min(height - 1, cy + wobble));
+    const idx = iy * width + x;
+    const pr = output.data[idx * 4];
+    const pg = output.data[idx * 4 + 1];
+    const pb = output.data[idx * 4 + 2];
+    const [r, g, b] = blendPencilStroke(pr, pg, pb, guideStroke, guideOpacity);
+    output.data[idx * 4]     = r;
+    output.data[idx * 4 + 1] = g;
+    output.data[idx * 4 + 2] = b;
   }
 
   // Vertical centre line
   const cx = Math.round(width * 0.5);
-  for (let y = Math.round(height * 0.1); y < Math.round(height * 0.9); y++) {
-    const i = y * width + cx;
-    const [r, g, b] = blendPencilStroke(PAPER_R, PAPER_G, PAPER_B, guideStroke, guideOpacity);
-    output.data[i * 4]     = r;
-    output.data[i * 4 + 1] = g;
-    output.data[i * 4 + 2] = b;
+  for (let y = Math.round(height * 0.08); y < Math.round(height * 0.92); y++) {
+    const wobble = Math.round((pencilNoise(y * 0.1 + 50) - 0.5) * 3);
+    const ix = Math.max(0, Math.min(width - 1, cx + wobble));
+    const idx = y * width + ix;
+    const pr = output.data[idx * 4];
+    const pg = output.data[idx * 4 + 1];
+    const pb = output.data[idx * 4 + 2];
+    const [r, g, b] = blendPencilStroke(pr, pg, pb, guideStroke, guideOpacity);
+    output.data[idx * 4]     = r;
+    output.data[idx * 4 + 1] = g;
+    output.data[idx * 4 + 2] = b;
   }
 
-  // 1/3 horizontal markers
-  for (let t = 1; t <= 3; t++) {
-    const lineY = Math.round(height * (t / 3) * 0.8 + height * 0.1);
-    for (let x = Math.round(width * 0.2); x < Math.round(width * 0.8); x++) {
-      const i = lineY * width + x;
-      const [r, g, b] = blendPencilStroke(PAPER_R, PAPER_G, PAPER_B, guideStroke * 0.6, guideOpacity * 0.7);
-      output.data[i * 4]     = r;
-      output.data[i * 4 + 1] = g;
-      output.data[i * 4 + 2] = b;
+  // Thirds horizontal markers (eye-line, nose-line)
+  for (let t = 1; t <= 2; t++) {
+    const lineY = Math.round(height * (0.15 + t * 0.25));
+    for (let x = Math.round(width * 0.18); x < Math.round(width * 0.82); x++) {
+      const wobble = Math.round((pencilNoise(x * 0.08 + t * 10) - 0.5) * 2);
+      const iy = Math.max(0, Math.min(height - 1, lineY + wobble));
+      const idx = iy * width + x;
+      if (pencilNoise(x * 0.2 + t) > 0.35) {
+        const pr = output.data[idx * 4];
+        const pg = output.data[idx * 4 + 1];
+        const pb = output.data[idx * 4 + 2];
+        const [r, g, b] = blendPencilStroke(pr, pg, pb, guideStroke * 0.5, guideOpacity * 0.6);
+        output.data[idx * 4]     = r;
+        output.data[idx * 4 + 1] = g;
+        output.data[idx * 4 + 2] = b;
+      }
     }
   }
 
@@ -250,12 +280,11 @@ function applyStage1(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 2 — Draw the basic elements
-// Draw in the basic facial elements with clean structural line work
-// establishing correct placement and proportions. Moderate contrast (~22%),
-// no fill or shading — only clean lines.
+// Stage 2 — Refined Line Art
+// Clean darker outlines. Defined eyes, nose, lips, hair shape.
+// Construction lines mostly removed. No heavy shading.
 // ─────────────────────────────────────────────────────────────────────────────
-function applyStage2(
+function processStage2(
   gray: Float32Array,
   width: number,
   height: number
@@ -264,58 +293,46 @@ function applyStage2(
   fillPaperBackground(output);
 
   const edges = sobelEdges(gray, width, height);
-  // Moderate blur — structural contours visible, inner features still soft
   const smoothEdges = gaussianBlur(edges, width, height, 2);
 
-  const threshold = 22;
-  const opacity = 0.24;
+  const threshold = 20;
+  const baseOpacity = 0.22;
 
-  for (let i = 0; i < gray.length; i++) {
-    const e = smoothEdges[i];
-    if (e > threshold) {
-      const strokeDarkness = Math.min(1, (e - threshold) / 70);
-      const grain = paperGrain(i + 1000);
-      const [r, g, b] = blendPencilStroke(
-        PAPER_R, PAPER_G, PAPER_B,
-        strokeDarkness,
-        opacity + grain * 0.005
-      );
-      output.data[i * 4]     = r;
-      output.data[i * 4 + 1] = g;
-      output.data[i * 4 + 2] = b;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = y * width + x;
+      const e = smoothEdges[i];
+
+      if (e > threshold) {
+        const [jx, jy] = freehandJitter(x, y, 1.2);
+        const ji = Math.round(jy) * width + Math.round(jx);
+        const safeIdx = Math.max(0, Math.min(gray.length - 1, ji));
+
+        const strokeDarkness = Math.min(1, (e - threshold) / 65);
+        const lineWeight = 0.7 + strokeDarkness * 0.3;
+        const pressure = 0.75 + pencilNoise(i * 0.03 + 500) * 0.25;
+        const opacity = baseOpacity * lineWeight * pressure;
+
+        const pr = output.data[safeIdx * 4];
+        const pg = output.data[safeIdx * 4 + 1];
+        const pb = output.data[safeIdx * 4 + 2];
+        const [r, g, b] = blendPencilStroke(pr, pg, pb, strokeDarkness, opacity);
+        output.data[safeIdx * 4]     = r;
+        output.data[safeIdx * 4 + 1] = g;
+        output.data[safeIdx * 4 + 2] = b;
+      }
     }
-  }
-
-  // Retain very faint guide lines from stage 1
-  const guideOpacity = 0.05;
-  const guideStroke = 0.4;
-  const cy = Math.round(height * 0.5);
-  for (let x = Math.round(width * 0.15); x < Math.round(width * 0.85); x++) {
-    const i = cy * width + x;
-    const [r, g, b] = blendPencilStroke(PAPER_R, PAPER_G, PAPER_B, guideStroke, guideOpacity);
-    output.data[i * 4]     = r;
-    output.data[i * 4 + 1] = g;
-    output.data[i * 4 + 2] = b;
-  }
-  const cx = Math.round(width * 0.5);
-  for (let y = Math.round(height * 0.1); y < Math.round(height * 0.9); y++) {
-    const i = y * width + cx;
-    const [r, g, b] = blendPencilStroke(PAPER_R, PAPER_G, PAPER_B, guideStroke, guideOpacity);
-    output.data[i * 4]     = r;
-    output.data[i * 4 + 1] = g;
-    output.data[i * 4 + 2] = b;
   }
 
   return output;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 3 — Have a slight shading
-// Introduce light tonal shading to give the portrait form and dimension
-// in the shadow areas. Light-grey tones appear in darker facial regions
-// on top of the structural lines (~40% opacity).
+// Stage 3 — Hair & Detail Development
+// Hair strand direction lines, eyebrow/eye details, light contour shading.
+// Maintains clean pencil texture.
 // ─────────────────────────────────────────────────────────────────────────────
-function applyStage3(
+function processStage3(
   gray: Float32Array,
   width: number,
   height: number
@@ -332,38 +349,43 @@ function applyStage3(
       const g = gray[i];
       const e = smoothEdges[i];
 
-      // Tonal shading: dark areas get light pencil tone
-      const tonalDarkness = Math.max(0, (185 - g) / 185);
-      const edgeDarkness = Math.min(1, Math.max(0, (e - 15) / 55));
+      const edgeDarkness = Math.min(1, Math.max(0, (e - 18) / 60));
 
-      // Hair region (very dark in original) gets slight blocked strokes
-      const isHairRegion = g < 85;
-      const hairBlock =
-        isHairRegion && (x + y * 2) % 5 < 2
-          ? tonalDarkness * 0.38
-          : 0;
+      const isShadow = g < 120;
+      const isDeepShadow = g < 70;
 
-      // Slight shading for mid-dark areas (eyes, nose, lips)
-      const isFeatureRegion = g < 130 && g >= 85;
-      const featureBlock =
-        isFeatureRegion && (x + y) % 4 < 2
-          ? tonalDarkness * 0.22
-          : 0;
+      const hatchSpacing = 4;
+      const hatchWidth = 2;
+      const hatchPhase = (x + y) % hatchSpacing;
+      const primaryHatch = isShadow && hatchPhase < hatchWidth
+        ? Math.max(0, (120 - g) / 120) * 0.42
+        : 0;
+
+      const crossHatchPhase = (x - y + width) % hatchSpacing;
+      const crossHatch = isDeepShadow && crossHatchPhase < hatchWidth
+        ? Math.max(0, (70 - g) / 70) * 0.35
+        : 0;
+
+      const isMidDark = g >= 70 && g < 140;
+      const tonalFill = isMidDark
+        ? Math.max(0, (140 - g) / 140) * 0.12
+        : 0;
 
       const combinedDarkness = Math.max(
-        edgeDarkness * 0.40,
-        tonalDarkness * 0.18,
-        hairBlock,
-        featureBlock
+        edgeDarkness * 0.38,
+        primaryHatch,
+        crossHatch,
+        tonalFill
       );
 
-      if (combinedDarkness > 0.02) {
-        const grain = paperGrain(i + 2000) * 0.008;
-        const [r, g2, b] = blendPencilStroke(
-          PAPER_R, PAPER_G, PAPER_B,
-          Math.min(1, combinedDarkness),
-          Math.min(1, combinedDarkness + grain)
-        );
+      if (combinedDarkness > 0.015) {
+        const grain = (pencilNoise(i * 0.07 + 2000) - 0.5) * 0.06;
+        const finalDarkness = Math.min(1, combinedDarkness + grain);
+
+        const pr = output.data[i * 4];
+        const pg = output.data[i * 4 + 1];
+        const pb = output.data[i * 4 + 2];
+        const [r, g2, b] = blendPencilStroke(pr, pg, pb, finalDarkness, Math.min(1, finalDarkness));
         output.data[i * 4]     = r;
         output.data[i * 4 + 1] = g2;
         output.data[i * 4 + 2] = b;
@@ -374,12 +396,12 @@ function applyStage3(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 4 — Render and detail
-// Build up detailed rendering — refine features, add hair strand lines,
-// and deepen shadow areas with hatching. ~60% opacity with directional
-// hatching and unsharp masking for refined edge detail.
+// Stage 4 — Final Shaded Portrait
+// Fully rendered graphite shading. Smooth skin blending.
+// Hair shaded with depth and volume. Soft shadow under chin and neck.
+// Professional pencil realism finish.
 // ─────────────────────────────────────────────────────────────────────────────
-function applyStage4(
+function processStage4(
   gray: Float32Array,
   width: number,
   height: number
@@ -398,116 +420,78 @@ function applyStage4(
       const bg = blurredGray[i];
       const e = smoothEdges[i];
 
-      // Unsharp mask for detail
-      const sharpened = Math.max(0, Math.min(255, g + (g - bg) * 1.2));
+      const sharpened = Math.max(0, Math.min(255, g + (g - bg) * 1.5));
 
-      const tonalDarkness = Math.max(0, (200 - sharpened) / 200);
-      const edgeDarkness = Math.min(1, Math.max(0, (e - 12) / 45));
-
-      const isDark = g < 100;
-      const isVeryDark = g < 55;
-
-      // Hair strand lines — diagonal direction
-      const hairStrand1 = isDark && (x + y) % 4 < 2 ? tonalDarkness * 0.52 : 0;
-      // Cross-hatching for very dark hair areas
-      const hairStrand2 = isVeryDark && (x - y + width) % 5 < 2 ? tonalDarkness * 0.42 : 0;
-      // Fine mid-tone strokes for facial shading
-      const midTone = g < 145 && g >= 80 && (x + y * 3) % 7 < 2 ? tonalDarkness * 0.22 : 0;
-
-      const combinedDarkness = Math.max(
-        edgeDarkness * 0.60,
-        tonalDarkness * 0.32,
-        hairStrand1,
-        hairStrand2,
-        midTone
-      );
-
-      if (combinedDarkness > 0.015) {
-        const grain = paperGrain(i + 3000) * 0.006;
-        const [r, g2, b] = blendPencilStroke(
-          PAPER_R, PAPER_G, PAPER_B,
-          Math.min(1, combinedDarkness),
-          Math.min(1, combinedDarkness + grain)
-        );
-        output.data[i * 4]     = r;
-        output.data[i * 4 + 1] = g2;
-        output.data[i * 4 + 2] = b;
-      }
-    }
-  }
-  return output;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Stage 5 — Polish
-// Smooth transitions, sharpen key edges, deepen dark values, and complete
-// the full tonal range of the portrait. ~90% opacity, full tonal range
-// with S-curve contrast enhancement from near-white to near-black.
-// ─────────────────────────────────────────────────────────────────────────────
-function applyStage5(
-  gray: Float32Array,
-  width: number,
-  height: number
-): ImageData {
-  const output = new ImageData(width, height);
-  fillPaperBackground(output);
-
-  const edges = sobelEdges(gray, width, height);
-  const smoothEdges = gaussianBlur(edges, width, height, 1);
-  const blurredGray = gaussianBlur(gray, width, height, 1);
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const i = y * width + x;
-      const g = gray[i];
-      const bg = blurredGray[i];
-      const e = smoothEdges[i];
-
-      // Strong unsharp mask for crisp detail
-      const sharpened = Math.max(0, Math.min(255, g + (g - bg) * 1.8));
-
-      // S-curve contrast enhancement for full tonal range
+      // S-curve contrast for richer tonal range
       const normalized = sharpened / 255;
-      const contrasted =
-        normalized < 0.5
-          ? 2 * normalized * normalized
-          : 1 - Math.pow(-2 * normalized + 2, 2) / 2;
-      const enhanced = contrasted * 255;
+      const sCurve = normalized < 0.5
+        ? 2 * normalized * normalized
+        : 1 - Math.pow(-2 * normalized + 2, 2) / 2;
+      const contrastGray = sCurve * 255;
 
-      const tonalDarkness = Math.max(0, (220 - enhanced) / 220);
-      const edgeDarkness = Math.min(1, Math.max(0, (e - 10) / 35));
+      const edgeDarkness = Math.min(1, Math.max(0, (e - 10) / 40));
+      const tonalDarkness = Math.max(0, (220 - contrastGray) / 220);
 
-      const isHair = g < 70;
+      // Smooth skin shading
+      const isMidTone = g >= 80 && g < 185;
+      const skinShading = isMidTone ? tonalDarkness * 0.45 : 0;
+
+      // Dense shadow hatching
       const isShadow = g < 110;
-      const isMidTone = g >= 110 && g < 170;
+      const isDeepShadow = g < 55;
 
-      // Rich multi-directional hair strokes
-      const hairStroke1 = isHair && (x + y) % 3 < 2 ? tonalDarkness * 0.85 : 0;
-      const hairStroke2 = isHair && (x * 2 + y) % 4 < 2 ? tonalDarkness * 0.75 : 0;
-      // Shadow hatching
-      const shadowHatch = isShadow && (x - y + width) % 5 < 2 ? tonalDarkness * 0.55 : 0;
-      // Mid-tone fine strokes for skin texture
-      const midToneStroke = isMidTone && (x + y * 2) % 8 < 2 ? tonalDarkness * 0.30 : 0;
-      // Fine detail strokes for facial features
-      const detailStroke = g < 150 && (x * 3 + y) % 11 < 2 ? tonalDarkness * 0.20 : 0;
+      const hatchSpacing = 3;
+      const hatchWidth = 2;
+      const primaryHatch = isShadow && (x + y) % hatchSpacing < hatchWidth
+        ? tonalDarkness * 0.62
+        : 0;
+
+      const crossHatch = isDeepShadow && (x - y + width) % hatchSpacing < hatchWidth
+        ? tonalDarkness * 0.55
+        : 0;
+
+      // Multi-directional hair strokes
+      const isHairRegion = g < 80;
+      const hairStroke1 = isHairRegion && (x * 3 + y) % 5 < 2
+        ? tonalDarkness * 0.7
+        : 0;
+      const hairStroke2 = isHairRegion && (x + y * 2) % 4 < 1
+        ? tonalDarkness * 0.5
+        : 0;
+
+      // Fine detail strokes
+      const isFeature = g < 150 && g >= 55;
+      const detailStroke = isFeature && (x * 2 + y * 3) % 9 < 2
+        ? tonalDarkness * 0.28
+        : 0;
+
+      // Soft shadow under chin (bottom quarter of image)
+      const chinShadow = y > height * 0.75
+        ? Math.max(0, (y - height * 0.75) / (height * 0.25)) * tonalDarkness * 0.3
+        : 0;
 
       const combinedDarkness = Math.max(
-        edgeDarkness * 0.90,
-        tonalDarkness * 0.55,
+        edgeDarkness * 0.72,
+        tonalDarkness * 0.38,
+        skinShading,
+        primaryHatch,
+        crossHatch,
         hairStroke1,
         hairStroke2,
-        shadowHatch,
-        midToneStroke,
-        detailStroke
+        detailStroke,
+        chinShadow
       );
 
       if (combinedDarkness > 0.01) {
-        const grain = paperGrain(i + 4000) * 0.004;
-        const [r, g2, b] = blendPencilStroke(
-          PAPER_R, PAPER_G, PAPER_B,
-          Math.min(1, combinedDarkness),
-          Math.min(1, combinedDarkness + grain)
-        );
+        // Pencil grain + paper fiber overlay
+        const grain = (pencilNoise(i * 0.05 + 4000) - 0.5) * 0.04;
+        const fiber = (pencilNoise(i * 0.003 + 7777) - 0.5) * 0.02;
+        const finalDarkness = Math.min(1, combinedDarkness + grain + fiber);
+
+        const pr = output.data[i * 4];
+        const pg = output.data[i * 4 + 1];
+        const pb = output.data[i * 4 + 2];
+        const [r, g2, b] = blendPencilStroke(pr, pg, pb, finalDarkness, Math.min(1, finalDarkness));
         output.data[i * 4]     = r;
         output.data[i * 4 + 1] = g2;
         output.data[i * 4 + 2] = b;
@@ -517,76 +501,115 @@ function applyStage5(
   return output;
 }
 
-function imageDataToDataUrl(imageData: ImageData): string {
-  const canvas = document.createElement("canvas");
-  canvas.width = imageData.width;
-  canvas.height = imageData.height;
-  const ctx = canvas.getContext("2d")!;
-  ctx.putImageData(imageData, 0, 0);
-  return canvas.toDataURL("image/png");
-}
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Main export — generate all 4 stages progressively
+// Cache key bumped to v7 to reflect 4-stage pipeline
+// ─────────────────────────────────────────────────────────────────────────────
 export async function generatePencilSketchStages(
   imageSrc: string,
   jobId: string,
-  onStageComplete?: (stageIndex: number, stage: SketchStage) => void
+  onStageComplete: (stageIndex: number, stage: SketchStage) => void
 ): Promise<SketchStage[]> {
-  // Check sessionStorage cache — bump key to v5 to invalidate old cached results
-  const cacheKey = `sketch_stages_v5_${jobId}`;
-  const cached = sessionStorage.getItem(cacheKey);
+  const CACHE_KEY = `sketch_stages_v7_${jobId}`;
+
+  // Check session cache
+  const cached = sessionStorage.getItem(CACHE_KEY);
   if (cached) {
     try {
       const parsed = JSON.parse(cached) as SketchStage[];
-      if (Array.isArray(parsed) && parsed.length === 5) {
-        if (onStageComplete) {
-          parsed.forEach((stage, idx) => onStageComplete(idx, stage));
-        }
+      if (Array.isArray(parsed) && parsed.length === 4) {
+        parsed.forEach((stage, i) => onStageComplete(i, stage));
         return parsed;
       }
     } catch {
-      // ignore parse errors
+      // ignore
     }
   }
 
   const img = await loadImage(imageSrc);
-
-  // Preserve aspect ratio, max 800px
-  const maxDim = 800;
-  let width = img.naturalWidth || img.width;
-  let height = img.naturalHeight || img.height;
-  if (width > maxDim || height > maxDim) {
-    const scale = Math.min(maxDim / width, maxDim / height);
-    width = Math.round(width * scale);
-    height = Math.round(height * scale);
-  }
-
-  const imageData = getImageData(img, width, height);
+  const SIZE = 600;
+  const imageData = getImageData(img, SIZE, SIZE);
   const gray = toGrayscale(imageData.data);
 
-  const stageFns = [applyStage1, applyStage2, applyStage3, applyStage4, applyStage5];
+  const stageFns = [processStage1, processStage2, processStage3, processStage4];
   const results: SketchStage[] = [];
 
   for (let i = 0; i < stageFns.length; i++) {
-    const stageImageData = stageFns[i](gray, width, height);
-    const dataUrl = imageDataToDataUrl(stageImageData);
+    const stageImageData = stageFns[i](gray, SIZE, SIZE);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = SIZE;
+    canvas.height = SIZE;
+    const ctx = canvas.getContext("2d")!;
+    ctx.putImageData(stageImageData, 0, 0);
+    const dataUrl = canvas.toDataURL("image/png");
+
     const stage: SketchStage = {
-      label: STAGE_DEFINITIONS[i].label,
-      description: STAGE_DEFINITIONS[i].description,
+      label: STAGE_LABELS[i],
+      description: STAGE_DESCRIPTIONS[i],
       dataUrl,
     };
+
     results.push(stage);
-    if (onStageComplete) {
-      onStageComplete(i, stage);
-    }
-    // Yield to the browser between stages
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    onStageComplete(i, stage);
+
+    // Yield to browser between stages
+    await new Promise((r) => setTimeout(r, 0));
   }
 
   try {
-    sessionStorage.setItem(cacheKey, JSON.stringify(results));
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify(results));
   } catch {
-    // ignore storage errors
+    // storage quota exceeded — ignore
   }
 
   return results;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Generate the 2x2 tutorial grid image from 4 stage data URLs
+// ─────────────────────────────────────────────────────────────────────────────
+export async function generateTutorialGrid(
+  stages: SketchStage[],
+  size = 600
+): Promise<string> {
+  const gridSize = size * 2;
+  const canvas = document.createElement("canvas");
+  canvas.width = gridSize;
+  canvas.height = gridSize;
+  const ctx = canvas.getContext("2d")!;
+
+  // Paper background
+  ctx.fillStyle = `rgb(${PAPER_R}, ${PAPER_G}, ${PAPER_B})`;
+  ctx.fillRect(0, 0, gridSize, gridSize);
+
+  const positions = [
+    [0, 0],
+    [size, 0],
+    [0, size],
+    [size, size],
+  ];
+
+  for (let i = 0; i < Math.min(stages.length, 4); i++) {
+    const [px, py] = positions[i];
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = stages[i].dataUrl;
+    });
+    ctx.drawImage(img, px, py, size, size);
+  }
+
+  // Draw grid divider lines
+  ctx.strokeStyle = `rgba(${PAPER_R - 30}, ${PAPER_G - 30}, ${PAPER_B - 30}, 0.5)`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(size, 0);
+  ctx.lineTo(size, gridSize);
+  ctx.moveTo(0, size);
+  ctx.lineTo(gridSize, size);
+  ctx.stroke();
+
+  return canvas.toDataURL("image/png");
 }

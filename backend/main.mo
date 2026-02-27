@@ -135,14 +135,13 @@ actor {
         jobs.add(jobId, updatedJob);
 
         let stageNames = [
-          "Trace Outlines",
-          "Basic Elements",
-          "Slight Shading",
-          "Render and Detail",
-          "Polish",
+          "Basic Construction",
+          "Refined Line Art",
+          "Hair & Detail Development",
+          "Final Shaded Portrait",
         ];
 
-        for ((stageNumber, stageName) in Nat.range(1, 6).zip(stageNames.values())) {
+        for ((stageNumber, stageName) in Nat.range(1, 5).zip(stageNames.values())) {
           let newStage : StageResult.T = {
             stageNumber;
             stageName;

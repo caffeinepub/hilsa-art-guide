@@ -1,64 +1,27 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 9,
-  "summary": "A drawing tutorial app that guides users through step-by-step processed images to learn how to draw stage by stage.",
-  "architectural_notes": [],
+  "projectStateVersion": 3,
+  "summary": "A 4-step pencil drawing tutorial app that displays progressive stages of a portrait drawing: Basic Construction, Refined Line Art, Hair & Detail Development, and Final Shaded Portrait. Each stage is rendered from an uploaded image in the corresponding pencil/graphite style.",
+  "architectural_notes": [
+    "Previous features/code replaced entirely with new 4-step tutorial layout as requested by user"
+  ],
   "known_issues": [],
   "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Female portrait at the basic construction stage: very light, loose graphite pencil lines forming an oval head shape, horizontal and vertical construction guidelines crossing at the face center, minimal detail, sketch-like (stage1-basic-construction.dim_800x800.png)\n- Female portrait at the refined line art stage: clean, darker pencil outlines defining eyes with irises and lashes, a defined nose bridge and tip, lips with cupid's bow, and the outer silhouette of flowing hair — no shading yet (stage2-refined-lineart.dim_800x800.png)\n- Female portrait at the hair and detail development stage: pencil-drawn hair strand direction lines with layered strokes, detailed eyebrows and eye shading, light contour shadow lines on cheekbones and jaw, subtle crosshatching on the neck (stage3-hair-detail.dim_800x800.png)\n- Female portrait at the final shaded portrait stage: fully rendered graphite drawing with smooth blended tonal shading across the face and neck, rich dark hair with volume and highlight streaks, deep shadows under the chin, polished professional pencil portrait quality (stage4-final-shaded.dim_800x800.png)",
   "existing_features": [
     {
-      "id": "feature-update-the-five-drawing-stage-definitions-throughout-the-app-to-1-trace-the-outlines-of-the-portrait-2-draw-the-basic-elements-3-have-a-slight-shading-4-render-and-detail-5-polish-replace-all-references-to-the-old-pencil-sketch-stage-names-construction-lines-contour-outline-etc-with-these-new-stage-labels-everywhere-they-appear-including-stage-labels-captions-progress-indicators-the-galleryview-the-drawing-guide-walkthrough-and-the-howitworks-page-timeline",
-      "title": "Update the five drawing stage definitions throughout the app to: 1) Trace the outlines of the portrait, 2) Draw the basic elements, 3) Have a slight shading, 4) Render and detail, 5) Polish. Replace all references to the old pencil sketch stage names (Construction Lines, Contour Outline, etc.) with these new stage labels everywhere they appear — including stage labels, captions, progress indicators, the GalleryView, the Drawing Guide walkthrough, and the HowItWorks page timeline.",
+      "id": "feature-generate-four-new-stage-illustration-images-representing-each-step-of-the-pencil-drawing-tutorial-1-basic-construction-light-sketch-lines-with-face-head-outline-and-construction-guidelines-stage1-basic-construction-dim-800x800-png-2-refined-line-art-clean-darker-outlines-with-defined-eyes-nose-lips-and-hair-shape-stage2-refined-lineart-dim-800x800-png-3-hair-detail-development-hair-strand-direction-lines-eyebrow-eye-details-and-light-contour-shading-stage3-hair-detail-dim-800x800-png-4-final-shaded-portrait-fully-rendered-graphite-shading-with-smooth-blending-and-hair-volume-stage4-final-shaded-dim-800x800-png-all-four-images-should-depict-the-same-female-portrait-subject-progressing-from-loose-construction-lines-to-a-fully-rendered-graphite-drawing",
+      "title": "Generate four new stage illustration images representing each step of the pencil drawing tutorial: (1) Basic Construction — light sketch lines with face/head outline and construction guidelines (stage1-basic-construction.dim_800x800.png), (2) Refined Line Art — clean darker outlines with defined eyes, nose, lips, and hair shape (stage2-refined-lineart.dim_800x800.png), (3) Hair & Detail Development — hair strand direction lines, eyebrow/eye details, and light contour shading (stage3-hair-detail.dim_800x800.png), (4) Final Shaded Portrait — fully rendered graphite shading with smooth blending and hair volume (stage4-final-shaded.dim_800x800.png). All four images should depict the same female portrait subject progressing from loose construction lines to a fully rendered graphite drawing.",
       "reqIds": [
-        "REQ-5"
+        "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-the-client-side-image-processing-pipeline-in-pencilsketchutils-ts-to-produce-outputs-that-visually-match-each-new-stage-style-stage-1-produces-a-faint-outline-trace-style-stage-2-produces-basic-structural-elements-with-clean-lines-stage-3-adds-light-shading-tonal-values-stage-4-adds-rendered-detail-and-texture-stage-5-produces-a-polished-refined-final-illustration-replace-the-current-uniform-pencil-sketch-filter-approach-with-per-stage-visual-treatments-that-progressively-build-toward-a-finished-portrait-illustration",
-      "title": "Update the client-side image processing pipeline in pencilSketchUtils.ts to produce outputs that visually match each new stage style: Stage 1 produces a faint outline/trace style, Stage 2 produces basic structural elements with clean lines, Stage 3 adds light shading/tonal values, Stage 4 adds rendered detail and texture, Stage 5 produces a polished, refined final illustration. Replace the current uniform pencil-sketch filter approach with per-stage visual treatments that progressively build toward a finished portrait illustration.",
+      "id": "feature-on-the-howitworks-page-how-it-works-replace-the-current-content-in-the-4-stage-tutorial-section-with-a-new-layout-that-uses-the-four-generated-stage-images-each-stage-card-must-show-the-roman-numeral-step-indicator-step-i-iv-the-step-number-badge-01-04-the-stage-title-e-g-basic-construction-and-the-stage-description-the-element-identified-by-xpath-html-1-body-1-div-1-div-1-main-1-section-3-div-1-div-2-div-1-div-2-img-1-and-its-surrounding-stage-card-must-be-replaced-to-use-the-new-stage-images-from-frontend-public-assets-generated-remove-any-previous-feature-code-that-conflicts-with-this-layout",
+      "title": "On the HowItWorks page (/how-it-works), replace the current content in the 4-stage tutorial section with a new layout that uses the four generated stage images. Each stage card must show: the Roman numeral step indicator (Step I–IV), the step number badge (01–04), the stage title (e.g. 'Basic Construction'), and the stage description. The element identified by XPath /html[1]/body[1]/div[1]/div[1]/main[1]/section[3]/div[1]/div[2]/div[1]/div[2]/img[1] and its surrounding stage card must be replaced to use the new stage images from frontend/public/assets/generated/. Remove any previous feature code that conflicts with this layout.",
       "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-instructional-captions-for-each-stage-throughout-the-app-galleryview-per-stage-captions-drawing-guide-captions-howitworks-descriptions-to-match-the-new-stage-names-and-styles-stage-1-tracing-outlines-stage-2-drawing-basic-elements-stage-3-applying-slight-shading-stage-4-rendering-and-detailing-stage-5-polishing-the-portrait",
-      "title": "Update the instructional captions for each stage throughout the app (GalleryView per-stage captions, Drawing Guide captions, HowItWorks descriptions) to match the new stage names and styles: Stage 1 — tracing outlines, Stage 2 — drawing basic elements, Stage 3 — applying slight shading, Stage 4 — rendering and detailing, Stage 5 — polishing the portrait.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-instructional-captions-and-descriptions-for-all-five-drawing-stages-throughout-the-app-to-exactly-match-the-user-provided-copy-stage-1-trace-the-outlines-with-caption-lightly-trace-the-overall-silhouette-and-major-contours-of-the-portrait-as-your-foundational-roadmap-stage-2-draw-the-basic-elements-with-caption-draw-in-the-basic-facial-elements-with-clean-structural-line-work-establishing-correct-placement-and-proportions-stage-3-have-a-slight-shading-with-caption-introduce-light-tonal-shading-to-give-the-portrait-form-and-dimension-in-the-shadow-areas-stage-4-render-and-detail-with-caption-build-up-detailed-rendering-refine-features-add-hair-strand-lines-and-deepen-shadow-areas-with-hatching-stage-5-polish-with-caption-smooth-transitions-sharpen-key-edges-deepen-dark-values-and-complete-the-full-tonal-range-of-the-portrait-apply-these-exact-strings-in-pencilsketchutils-ts-stage-definitions-galleryview-per-stage-captions-drawing-guide-walkthrough-captions-and-howitworks-page-stage-descriptions",
-      "title": "Update the instructional captions and descriptions for all five drawing stages throughout the app to exactly match the user-provided copy: Stage 1 — 'Trace the outlines' with caption 'Lightly trace the overall silhouette and major contours of the portrait as your foundational roadmap'; Stage 2 — 'Draw the basic elements' with caption 'Draw in the basic facial elements with clean structural line work establishing correct placement and proportions'; Stage 3 — 'Have a slight shading' with caption 'Introduce light tonal shading to give the portrait form and dimension in the shadow areas'; Stage 4 — 'Render and detail' with caption 'Build up detailed rendering — refine features, add hair strand lines, and deepen shadow areas with hatching'; Stage 5 — 'Polish' with caption 'Smooth transitions, sharpen key edges, deepen dark values, and complete the full tonal range of the portrait.' Apply these exact strings in pencilSketchUtils.ts stage definitions, GalleryView per-stage captions, Drawing Guide walkthrough captions, and HowItWorks page stage descriptions.",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-client-side-image-processing-in-pencilsketchutils-ts-so-that-each-stage-s-visual-output-matches-its-instructional-intent-as-described-in-the-user-provided-stage-definitions-stage-1-produces-a-faint-lightly-traced-silhouette-contour-outline-effect-stage-2-produces-clean-structural-line-work-showing-basic-facial-elements-with-clear-placement-stage-3-builds-on-stage-2-by-adding-light-tonal-shading-in-shadow-areas-stage-4-builds-on-stage-3-by-adding-detailed-rendering-including-hatching-hair-strand-detail-and-deeper-shadows-stage-5-produces-the-most-polished-output-with-smooth-tonal-transitions-sharp-key-edges-and-a-full-dark-to-light-tonal-range",
-      "title": "Update the client-side image processing in pencilSketchUtils.ts so that each stage's visual output matches its instructional intent as described in the user-provided stage definitions: Stage 1 produces a faint, lightly-traced silhouette/contour outline effect; Stage 2 produces clean structural line work showing basic facial elements with clear placement; Stage 3 builds on Stage 2 by adding light tonal shading in shadow areas; Stage 4 builds on Stage 3 by adding detailed rendering including hatching, hair strand detail, and deeper shadows; Stage 5 produces the most polished output with smooth tonal transitions, sharp key edges, and a full dark-to-light tonal range.",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-redesign-the-drawing-guide-walkthrough-view-on-the-results-page-so-that-each-stage-is-presented-as-a-distinct-card-block-containing-1-a-bold-step-title-e-g-step-1-trace-the-outlines-2-a-paragraph-of-instructional-body-text-explaining-what-to-do-at-that-stage-and-3-a-full-width-rounded-image-showing-the-processed-stage-output-all-stacked-vertically-matching-the-card-per-step-layout-shown-in-the-reference-screenshot-white-card-on-light-grey-background-title-in-large-bold-sans-serif-description-text-below-it-then-the-stage-image-in-a-rounded-rectangle-container-all-five-stage-cards-should-be-visible-on-the-page-by-scrolling-one-after-another",
-      "title": "Redesign the Drawing Guide walkthrough view on the Results page so that each stage is presented as a distinct card block containing: (1) a bold step title (e.g. 'Step 1: Trace the Outlines'), (2) a paragraph of instructional body text explaining what to do at that stage, and (3) a full-width rounded image showing the processed stage output — all stacked vertically, matching the card-per-step layout shown in the reference screenshot (white card on light grey background, title in large bold sans-serif, description text below it, then the stage image in a rounded rectangle container). All five stage cards should be visible on the page by scrolling, one after another.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-howitworks-page-timeline-to-use-the-same-card-per-step-visual-layout-each-stage-entry-becomes-a-standalone-card-with-the-step-number-and-title-as-a-bold-heading-the-descriptive-body-text-beneath-it-and-a-representative-stage-preview-image-below-the-text-mirroring-the-reference-screenshot-s-structure",
-      "title": "Update the HowItWorks page timeline to use the same card-per-step visual layout: each stage entry becomes a standalone card with the step number and title as a bold heading, the descriptive body text beneath it, and a representative stage preview image below the text — mirroring the reference screenshot's structure.",
-      "reqIds": [
-        "REQ-12"
+        "REQ-2"
       ],
       "version": 1
     }
@@ -66,46 +29,8 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Step-by-step processed image guide that shows how to draw something stage by stage",
+      "summary": "4-step pencil drawing tutorial layout with stages: (1) Basic Construction - light sketch lines with face/head outline and construction guidelines, (2) Refined Line Art - clean darker outlines with defined facial features, (3) Hair & Detail Development - hair strand lines, eyebrow/eye details, and light contour shading, (4) Final Shaded Portrait - fully rendered graphite shading with smooth blending and hair volume",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Update the GalleryView component to display each stage with a step label (e.g. 'Step 1: Construction Lines', 'Step 2: Contour Outline', etc.), an instructional caption below each image explaining what the artist should focus on or practice at that stage, and a clear visual indicator showing which step the user is currently viewing (e.g. a numbered progress indicator or breadcrumb).",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Add a dedicated 'Drawing Guide' view or mode on the Results page that presents stages sequentially in a step-by-step walkthrough layout: one stage visible at a time, with 'Previous Step' and 'Next Step' navigation buttons, the instructional caption, and a thumbnail strip at the bottom showing all 5 stages so the user can jump to any step directly.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Update the HowItWorks page timeline to include a small representative preview image alongside each of the five stage entries, visually demonstrating what the output looks like at that stage of the drawing process.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Update the five drawing stages to: 1) Trace the outlines of the portrait, 2) Draw the basic elements, 3) Have a slight shading, 4) Render and detail, 5) Polish — and update stage labels, captions, images, and pipeline accordingly instead of the pencil sketch stages.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Update the backend stage processing pipeline definitions in main.mo to reflect the five new stage names: Trace Outlines, Basic Elements, Slight Shading, Render and Detail, Polish — replacing any stored pencil sketch stage identifiers or labels used in job status tracking and stage results.",
-      "reqIds": [
-        "REQ-8"
-      ],
       "status": "pending"
     }
   ],

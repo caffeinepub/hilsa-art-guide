@@ -2,51 +2,77 @@ import { useRef } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowDown, Sparkles } from 'lucide-react';
 import UploadInterface from '../components/UploadInterface';
-import { STAGE_LABELS, STAGE_DESCRIPTIONS } from '../lib/pencilSketchUtils';
+import { STAGES } from '../lib/pencilSketchUtils';
 
-const stages = [
-  { num: '01', name: STAGE_LABELS[0] },
-  { num: '02', name: STAGE_LABELS[1] },
-  { num: '03', name: STAGE_LABELS[2] },
-  { num: '04', name: STAGE_LABELS[3] },
-  { num: '05', name: STAGE_LABELS[4] },
+// Per-stage visual identity for hero pills — unified graphite/sketch palette
+const STAGE_PILL_STYLES = [
+  // Stage 1: Basic Construction — barely-there, ghost light
+  'border border-dashed border-white/25 text-white/45 bg-white/5',
+  // Stage 2: Refined Line Art — clean structural, slightly more visible
+  'border border-white/35 text-white/60 bg-white/8',
+  // Stage 3: Hair & Detail Development — warm graphite mid-tone
+  'border border-stone-300/40 text-stone-100/70 bg-stone-50/8',
+  // Stage 4: Final Shaded Portrait — gold premium, finished masterpiece
+  'border border-gold/60 text-gold bg-gold/10',
 ];
 
-const stageDetails = [
+// Sketchbook card styles for the stage preview grid
+const STAGE_CARD_STYLES = [
   {
-    num: '01',
-    name: STAGE_LABELS[0],
-    desc: STAGE_DESCRIPTIONS[0],
-    img: '/assets/generated/stage1-trace-outlines.dim_600x600.png',
-    fallbackImg: '/assets/generated/stage1-basic-outline.dim_800x800.png',
+    card: 'bg-stone-50/60 border border-dashed border-stone-300/60',
+    imgWrapper: 'border border-dashed border-stone-300/70',
+    numBadge: 'bg-stone-400/70 text-white',
+    accent: 'text-stone-500',
+    label: 'text-stone-400/80 tracking-[0.22em]',
+    dot: 'bg-stone-300',
+    tag: 'Step I',
   },
   {
-    num: '02',
-    name: STAGE_LABELS[1],
-    desc: STAGE_DESCRIPTIONS[1],
-    img: '/assets/generated/stage2-basic-elements.dim_600x600.png',
-    fallbackImg: '/assets/generated/stage2-reference-sketch.dim_800x800.png',
+    card: 'bg-stone-50/70 border border-stone-300/70',
+    imgWrapper: 'border border-stone-300',
+    numBadge: 'bg-stone-500/80 text-white',
+    accent: 'text-stone-600',
+    label: 'text-stone-500/70 tracking-[0.2em]',
+    dot: 'bg-stone-400',
+    tag: 'Step II',
   },
   {
-    num: '03',
-    name: STAGE_LABELS[2],
-    desc: STAGE_DESCRIPTIONS[2],
-    img: '/assets/generated/stage3-slight-shading.dim_600x600.png',
-    fallbackImg: '/assets/generated/stage3-shading.dim_800x800.png',
+    card: 'bg-amber-50/50 border border-stone-300/60',
+    imgWrapper: 'border border-stone-400/50',
+    numBadge: 'bg-stone-600/70 text-amber-50',
+    accent: 'text-stone-700',
+    label: 'text-stone-600/65 tracking-[0.18em]',
+    dot: 'bg-stone-500/60',
+    tag: 'Step III',
   },
   {
-    num: '04',
-    name: STAGE_LABELS[3],
-    desc: STAGE_DESCRIPTIONS[3],
-    img: '/assets/generated/stage4-render-detail.dim_600x600.png',
-    fallbackImg: '/assets/generated/stage4-render-detail.dim_800x800.png',
+    card: 'bg-amber-50/70 border border-gold/40',
+    imgWrapper: 'border border-gold/50',
+    numBadge: 'bg-gold/80 text-ink',
+    accent: 'text-gold',
+    label: 'text-gold/80 tracking-[0.15em]',
+    dot: 'bg-gold',
+    tag: 'Step IV',
+  },
+];
+
+// Stage preview images — use the generated sketch stage assets
+const STAGE_IMAGES = [
+  {
+    img: '/assets/generated/sketch-stage-1.dim_600x600.png',
+    fallback: '/assets/generated/stage1-trace-outlines.dim_600x600.png',
   },
   {
-    num: '05',
-    name: STAGE_LABELS[4],
-    desc: STAGE_DESCRIPTIONS[4],
-    img: '/assets/generated/stage5-polish.dim_600x600.png',
-    fallbackImg: '/assets/generated/stage5-polish-final.dim_800x800.png',
+    img: '/assets/generated/sketch-stage-2.dim_600x600.png',
+    fallback: '/assets/generated/stage2-basic-elements.dim_600x600.png',
+  },
+  {
+    img: '/assets/generated/sketch-stage-3.dim_600x600.png',
+    fallback: '/assets/generated/stage3-slight-shading.dim_600x600.png',
+  },
+  {
+    img: '/assets/generated/sketch-stage-4.dim_600x600.png',
+    fallback: '/assets/generated/stage4-render-detail.dim_600x600.png',
   },
 ];
 
@@ -84,18 +110,21 @@ export default function Home() {
           </h1>
 
           <p className="font-cormorant text-xl md:text-2xl text-white/80 leading-relaxed mb-4 max-w-2xl mx-auto">
-            Watch your photograph evolve through five distinct portrait drawing stages — from traced outlines to a polished masterpiece.
+            Watch your photograph evolve through four progressive pencil drawing stages — from light construction lines to a fully shaded portrait masterpiece.
           </p>
 
-          {/* Stage Pills */}
+          {/* Stage Pills — graphite/sketch palette */}
           <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
-            {stages.map((s, i) => (
+            {STAGES.map((stage, i) => (
               <span
-                key={s.num}
-                className="text-xs font-sans font-medium tracking-widest uppercase text-white/60 px-3 py-1 border border-white/20"
+                key={stage.number}
+                className={`text-xs font-sans font-medium tracking-widest uppercase px-3 py-1 transition-all duration-200 ${STAGE_PILL_STYLES[i]}`}
               >
-                {s.num} {s.name}
-                {i < stages.length - 1 && <span className="ml-2 text-gold/60">→</span>}
+                <span className="opacity-55 mr-1">0{stage.number}</span>
+                <span>{stage.name}</span>
+                {i < STAGES.length - 1 && (
+                  <span className="ml-2 text-white/25">→</span>
+                )}
               </span>
             ))}
           </div>
@@ -131,7 +160,7 @@ export default function Home() {
             </h2>
             <div className="ink-divider w-24 mx-auto mb-4" />
             <p className="text-muted-foreground font-sans text-sm leading-relaxed max-w-md mx-auto">
-              Select any photograph and our pipeline will guide it through five progressive portrait drawing stages, revealing the artwork within.
+              Select any photograph and our pipeline will guide it through four progressive pencil drawing stages, revealing the artwork within.
             </p>
           </div>
           <UploadInterface />
@@ -140,64 +169,74 @@ export default function Home() {
 
       {/* Stage Preview Section */}
       <section className="py-20 px-6 bg-secondary/30">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <p className="section-label mb-3">The Process</p>
             <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-4">
-              Five Stages of Portrait Drawing
+              Four Stages of Pencil Drawing
             </h2>
             <div className="ink-divider w-24 mx-auto mb-4" />
             <p className="text-muted-foreground font-sans text-sm max-w-lg mx-auto">
-              Every portrait passes through these five carefully crafted stages, each building more depth, detail, and artistic character.
+              Every portrait passes through these four carefully crafted pencil drawing stages, each building more depth, detail, and artistic character.
             </p>
           </div>
 
-          {/* Stage preview grid — 5 cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
-            {stageDetails.map((stage, i) => (
-              <div
-                key={stage.num}
-                className="flex flex-col items-center group stage-card-hover"
-              >
-                {/* Preview image card */}
+          {/* Stage preview grid — 4 cards in 2x2 layout, sketchbook aesthetic */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+            {STAGES.map((stage, i) => {
+              const style = STAGE_CARD_STYLES[i];
+              const imgData = STAGE_IMAGES[i];
+              return (
                 <div
-                  className="relative w-full overflow-hidden rounded-lg border border-border shadow-art group-hover:border-gold transition-colors duration-300 mb-3"
-                  style={{ aspectRatio: '1 / 1', background: '#f0ece0' }}
+                  key={stage.number}
+                  className={`flex flex-col items-center group stage-card-hover rounded-sm p-3 transition-all duration-300 ${style.card}`}
                 >
-                  <img
-                    src={stage.img}
-                    alt={`Stage ${stage.num} — ${stage.name}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      // Try fallback image
-                      if (target.src !== stage.fallbackImg) {
-                        target.src = stage.fallbackImg;
-                      } else {
-                        target.style.display = 'none';
-                      }
-                    }}
-                  />
-                  {/* Stage number overlay */}
-                  <div className="absolute top-2 left-2 bg-ink/70 text-white text-xs font-mono px-1.5 py-0.5 rounded">
-                    {stage.num}
+                  {/* Stage tag */}
+                  <div className="w-full flex items-center justify-between mb-2">
+                    <span className={`text-[0.6rem] font-sans font-semibold tracking-[0.22em] uppercase ${style.label}`}>
+                      {style.tag}
+                    </span>
+                    <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
                   </div>
-                  {/* Connector line (desktop only) */}
-                  {i < stageDetails.length - 1 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-3 w-6 h-px bg-border -translate-y-1/2 z-10" />
-                  )}
-                </div>
 
-                {/* Stage label */}
-                <p className="section-label text-center mb-1">{stage.num}</p>
-                <h3 className="font-serif text-sm font-semibold text-foreground text-center mb-1">
-                  {stage.name}
-                </h3>
-                <p className="text-xs text-muted-foreground font-sans leading-relaxed text-center">
-                  {stage.desc}
-                </p>
-              </div>
-            ))}
+                  {/* Preview image card */}
+                  <div
+                    className={`relative w-full overflow-hidden rounded-sm shadow-art mb-3 transition-all duration-300 ${style.imgWrapper}`}
+                    style={{ aspectRatio: '1 / 1', background: '#f5f0e8' }}
+                  >
+                    <img
+                      src={imgData.img}
+                      alt={`Step ${stage.number} — ${stage.name}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (target.src !== imgData.fallback) {
+                          target.src = imgData.fallback;
+                        } else {
+                          target.style.display = 'none';
+                        }
+                      }}
+                    />
+                    {/* Stage number overlay */}
+                    <div className={`absolute top-2 left-2 text-xs font-mono px-1.5 py-0.5 rounded-sm ${style.numBadge}`}>
+                      0{stage.number}
+                    </div>
+                    {/* Connector line (desktop only) */}
+                    {i < STAGES.length - 1 && (
+                      <div className="hidden lg:block absolute top-1/2 -right-3 w-6 h-px bg-border -translate-y-1/2 z-10" />
+                    )}
+                  </div>
+
+                  {/* Stage label */}
+                  <h3 className={`font-serif text-sm font-semibold text-center mb-1 ${style.accent}`}>
+                    {stage.name}
+                  </h3>
+                  <p className="text-xs text-muted-foreground font-sans leading-relaxed text-center">
+                    {stage.description}
+                  </p>
+                </div>
+              );
+            })}
           </div>
 
           <div className="text-center mt-12">
