@@ -1,67 +1,93 @@
 {
   "kind": "build_request",
-  "title": "Replace HowItWorks stage images with 4-step pencil style renders of uploaded image",
-  "projectName": "HILSA Art Guide",
-  "priority": "normal",
+  "title": "Fix errors and redeploy Version 36",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Generate four new stage illustration images representing each step of the pencil drawing tutorial: (1) Basic Construction — light sketch lines with face/head outline and construction guidelines (stage1-basic-construction.dim_800x800.png), (2) Refined Line Art — clean darker outlines with defined eyes, nose, lips, and hair shape (stage2-refined-lineart.dim_800x800.png), (3) Hair & Detail Development — hair strand direction lines, eyebrow/eye details, and light contour shading (stage3-hair-detail.dim_800x800.png), (4) Final Shaded Portrait — fully rendered graphite shading with smooth blending and hair volume (stage4-final-shaded.dim_800x800.png). All four images should depict the same female portrait subject progressing from loose construction lines to a fully rendered graphite drawing.",
+      "text": "Audit and fix all TypeScript/React compilation errors and runtime errors in the frontend, including type mismatches, missing imports, undefined references, and any broken component logic across all pages and hooks.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "I need you to generate this exact styles for each stages of the uploaded image"
+          "Correct the errors and update the version 36"
         ]
       },
       "acceptanceCriteria": [
-        "Four PNG images are present in frontend/public/assets/generated/ with the specified filenames",
-        "Each image visually represents its stated pencil drawing stage",
-        "All four images depict the same portrait subject for visual continuity"
+        "The frontend builds without any TypeScript compilation errors.",
+        "No runtime console errors appear when navigating through all routes (Home, HowItWorks, Docs, Contact, Results).",
+        "All components render without crashing."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "On the HowItWorks page (/how-it-works), replace the current content in the 4-stage tutorial section with a new layout that uses the four generated stage images. Each stage card must show: the Roman numeral step indicator (Step I–IV), the step number badge (01–04), the stage title (e.g. 'Basic Construction'), and the stage description. The element identified by XPath /html[1]/body[1]/div[1]/div[1]/main[1]/section[3]/div[1]/div[2]/div[1]/div[2]/img[1] and its surrounding stage card must be replaced to use the new stage images from frontend/public/assets/generated/. Remove any previous feature code that conflicts with this layout.",
-      "target": "frontend",
+      "text": "Audit and fix all Motoko compilation errors and logic errors in the backend actor (backend/main.mo), including type errors, pattern match issues, and any API mismatches between the backend and frontend query/mutation hooks in useQueries.ts.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "Just remove the previous features and code it in this new way"
+          "Correct the errors and update the version 36"
         ]
       },
       "acceptanceCriteria": [
-        "The HowItWorks page displays exactly 4 stage cards in sequence",
-        "Each card renders its corresponding generated stage image (stage1 through stage4)",
-        "Roman numeral labels (Step I, Step II, Step III, Step IV) are visible per card",
-        "Numeric badges (01, 02, 03, 04) are displayed per card",
-        "Stage title and description text match the specification: Basic Construction, Refined Line Art, Hair & Detail Development, Final Shaded Portrait",
-        "Old/previous layout code for the tutorial section is removed"
+        "The Motoko actor compiles without errors.",
+        "All backend endpoints referenced in useQueries.ts (job creation, processing, listing, retry, cancellation) are correctly defined and callable.",
+        "No actor interface mismatches exist between the backend and frontend."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Ensure the GalleryView component correctly handles both client-side canvas-generated stage images and backend-provided stage images without errors, and that the download functionality works for all four sketch stages.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "Correct the errors and update the version 36"
+        ]
+      },
+      "acceptanceCriteria": [
+        "GalleryView renders all four sketch stages in both grid and card view modes without errors.",
+        "Download functionality successfully downloads the correct stage image.",
+        "No undefined or null reference errors occur when switching between client-side and backend image sources."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Ensure the HowItWorks page 2x2 grid correctly renders all four pencil sketch stage images with their Roman numeral overlays and descriptive labels, using the generated stage images from frontend/public/assets/generated.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "Correct the errors and update the version 36"
+        ]
+      },
+      "acceptanceCriteria": [
+        "All four stage cards render with correct stage images, Roman numeral overlays, and labels.",
+        "No broken image links or missing asset errors appear.",
+        "The 2x2 grid layout is responsive and consistent with the editorial cream/graphite theme."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/ or frontend/src/components/ui/",
-    "All generated images must be served as static assets from frontend/public/assets/generated/",
-    "Backend schema and Motoko logic must not be changed"
+    "Do not alter immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Preserve all existing features and visual styles from Version 36.",
+    "Do not change the backend actor's data model or job state machine unless required to fix a bug."
   ],
   "nonGoals": [
-    "Changing the canvas-based image processing pipeline in pencilSketchUtils.ts",
-    "Modifying the upload flow or Results page",
-    "Adding new backend endpoints",
-    "Altering the GalleryView component behavior"
+    "Adding new features beyond error correction.",
+    "Redesigning the UI or changing the visual theme.",
+    "Adding PDF export or any other new functionality."
   ],
   "imageRequirements": {
-    "required": [
-      "Female portrait at the basic construction stage: very light, loose graphite pencil lines forming an oval head shape, horizontal and vertical construction guidelines crossing at the face center, minimal detail, sketch-like (stage1-basic-construction.dim_800x800.png)",
-      "Female portrait at the refined line art stage: clean, darker pencil outlines defining eyes with irises and lashes, a defined nose bridge and tip, lips with cupid's bow, and the outer silhouette of flowing hair — no shading yet (stage2-refined-lineart.dim_800x800.png)",
-      "Female portrait at the hair and detail development stage: pencil-drawn hair strand direction lines with layered strokes, detailed eyebrows and eye shading, light contour shadow lines on cheekbones and jaw, subtle crosshatching on the neck (stage3-hair-detail.dim_800x800.png)",
-      "Female portrait at the final shaded portrait stage: fully rendered graphite drawing with smooth blended tonal shading across the face and neck, rich dark hair with volume and highlight streaks, deep shadows under the chin, polished professional pencil portrait quality (stage4-final-shaded.dim_800x800.png)"
-    ],
+    "required": [],
     "edits": []
   }
 }

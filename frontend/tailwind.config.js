@@ -63,6 +63,16 @@ export default {
                     DEFAULT: 'oklch(var(--ink))',
                     light: 'oklch(var(--ink-light))',
                 },
+                // Editorial paper palette
+                paper: {
+                    DEFAULT: 'oklch(var(--paper))',
+                    warm: 'oklch(var(--paper-warm))',
+                    rule: 'oklch(var(--paper-rule))',
+                },
+                graphite: {
+                    DEFAULT: 'oklch(var(--graphite))',
+                    light: 'oklch(var(--graphite-light))',
+                },
                 chart: {
                     1: 'oklch(var(--chart-1))',
                     2: 'oklch(var(--chart-2))',

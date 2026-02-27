@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import HowItWorks from './pages/HowItWorks';
 import Contact from './pages/Contact';
 import Results from './pages/Results';
+import Documentation from './pages/Documentation';
 
 // Root layout with Header + Footer
 function RootLayout() {
@@ -49,9 +50,16 @@ const resultsRoute = createRoute({
   component: Results,
 });
 
+const docsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/docs',
+  component: Documentation,
+});
+
 const routeTree = rootRoute.addChildren([
   homeRoute,
   howItWorksRoute,
+  docsRoute,
   contactRoute,
   resultsRoute,
 ]);

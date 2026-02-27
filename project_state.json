@@ -1,41 +1,46 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "A 4-step pencil drawing tutorial app that displays progressive stages of a portrait drawing: Basic Construction, Refined Line Art, Hair & Detail Development, and Final Shaded Portrait. Each stage is rendered from an uploaded image in the corresponding pencil/graphite style.",
-  "architectural_notes": [
-    "Previous features/code replaced entirely with new 4-step tutorial layout as requested by user"
-  ],
+  "summary": "New project",
+  "architectural_notes": [],
   "known_issues": [],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Female portrait at the basic construction stage: very light, loose graphite pencil lines forming an oval head shape, horizontal and vertical construction guidelines crossing at the face center, minimal detail, sketch-like (stage1-basic-construction.dim_800x800.png)\n- Female portrait at the refined line art stage: clean, darker pencil outlines defining eyes with irises and lashes, a defined nose bridge and tip, lips with cupid's bow, and the outer silhouette of flowing hair — no shading yet (stage2-refined-lineart.dim_800x800.png)\n- Female portrait at the hair and detail development stage: pencil-drawn hair strand direction lines with layered strokes, detailed eyebrows and eye shading, light contour shadow lines on cheekbones and jaw, subtle crosshatching on the neck (stage3-hair-detail.dim_800x800.png)\n- Female portrait at the final shaded portrait stage: fully rendered graphite drawing with smooth blended tonal shading across the face and neck, rich dark hair with volume and highlight streaks, deep shadows under the chin, polished professional pencil portrait quality (stage4-final-shaded.dim_800x800.png)",
-  "existing_features": [
-    {
-      "id": "feature-generate-four-new-stage-illustration-images-representing-each-step-of-the-pencil-drawing-tutorial-1-basic-construction-light-sketch-lines-with-face-head-outline-and-construction-guidelines-stage1-basic-construction-dim-800x800-png-2-refined-line-art-clean-darker-outlines-with-defined-eyes-nose-lips-and-hair-shape-stage2-refined-lineart-dim-800x800-png-3-hair-detail-development-hair-strand-direction-lines-eyebrow-eye-details-and-light-contour-shading-stage3-hair-detail-dim-800x800-png-4-final-shaded-portrait-fully-rendered-graphite-shading-with-smooth-blending-and-hair-volume-stage4-final-shaded-dim-800x800-png-all-four-images-should-depict-the-same-female-portrait-subject-progressing-from-loose-construction-lines-to-a-fully-rendered-graphite-drawing",
-      "title": "Generate four new stage illustration images representing each step of the pencil drawing tutorial: (1) Basic Construction — light sketch lines with face/head outline and construction guidelines (stage1-basic-construction.dim_800x800.png), (2) Refined Line Art — clean darker outlines with defined eyes, nose, lips, and hair shape (stage2-refined-lineart.dim_800x800.png), (3) Hair & Detail Development — hair strand direction lines, eyebrow/eye details, and light contour shading (stage3-hair-detail.dim_800x800.png), (4) Final Shaded Portrait — fully rendered graphite shading with smooth blending and hair volume (stage4-final-shaded.dim_800x800.png). All four images should depict the same female portrait subject progressing from loose construction lines to a fully rendered graphite drawing.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-on-the-howitworks-page-how-it-works-replace-the-current-content-in-the-4-stage-tutorial-section-with-a-new-layout-that-uses-the-four-generated-stage-images-each-stage-card-must-show-the-roman-numeral-step-indicator-step-i-iv-the-step-number-badge-01-04-the-stage-title-e-g-basic-construction-and-the-stage-description-the-element-identified-by-xpath-html-1-body-1-div-1-div-1-main-1-section-3-div-1-div-2-div-1-div-2-img-1-and-its-surrounding-stage-card-must-be-replaced-to-use-the-new-stage-images-from-frontend-public-assets-generated-remove-any-previous-feature-code-that-conflicts-with-this-layout",
-      "title": "On the HowItWorks page (/how-it-works), replace the current content in the 4-stage tutorial section with a new layout that uses the four generated stage images. Each stage card must show: the Roman numeral step indicator (Step I–IV), the step number badge (01–04), the stage title (e.g. 'Basic Construction'), and the stage description. The element identified by XPath /html[1]/body[1]/div[1]/div[1]/main[1]/section[3]/div[1]/div[2]/div[1]/div[2]/img[1] and its surrounding stage card must be replaced to use the new stage images from frontend/public/assets/generated/. Remove any previous feature code that conflicts with this layout.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    }
-  ],
+  "isFixRequest": true,
+  "existing_features": [],
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "4-step pencil drawing tutorial layout with stages: (1) Basic Construction - light sketch lines with face/head outline and construction guidelines, (2) Refined Line Art - clean darker outlines with defined facial features, (3) Hair & Detail Development - hair strand lines, eyebrow/eye details, and light contour shading, (4) Final Shaded Portrait - fully rendered graphite shading with smooth blending and hair volume",
-      "reqIds": [],
+      "summary": "Audit and fix all TypeScript/React compilation errors and runtime errors in the frontend, including type mismatches, missing imports, undefined references, and any broken component logic across all pages and hooks.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Audit and fix all Motoko compilation errors and logic errors in the backend actor (backend/main.mo), including type errors, pattern match issues, and any API mismatches between the backend and frontend query/mutation hooks in useQueries.ts.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Ensure the GalleryView component correctly handles both client-side canvas-generated stage images and backend-provided stage images without errors, and that the download functionality works for all four sketch stages.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Ensure the HowItWorks page 2x2 grid correctly renders all four pencil sketch stage images with their Roman numeral overlays and descriptive labels, using the generated stage images from frontend/public/assets/generated.",
+      "reqIds": [
+        "REQ-4"
+      ],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "HILSA Art Guide",
+  "projectName": "Fix errors and redeploy Version 36",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

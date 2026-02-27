@@ -1,55 +1,108 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Replace HowItWorks stage images with 4-step pencil style renders of uploaded image",
+  "title": "Fix Frontend Errors and Redeploy Version 36",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Generate four new stage illustration images representing each step of the pencil drawing tutorial, depicting the same female portrait subject progressing from loose construction lines to a fully rendered graphite drawing",
+      "summary": "Audit and fix all TypeScript/React compilation errors and runtime errors in the frontend, including type mismatches, missing imports, undefined references, and broken component logic across all pages and hooks",
       "acceptanceCriteria": [
-        "Four PNG images are present in frontend/public/assets/generated/ with the specified filenames",
-        "Each image visually represents its stated pencil drawing stage",
-        "All four images depict the same portrait subject for visual continuity"
+        "The frontend builds without any TypeScript compilation errors.",
+        "No runtime console errors appear when navigating through all routes (Home, HowItWorks, Docs, Contact, Results).",
+        "All components render without crashing."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/assets/generated/stage1-basic-construction.dim_800x800.png",
-          "operation": "create",
-          "description": "Generate a female portrait image at the basic construction stage showing very light, loose graphite pencil lines forming an oval head shape with horizontal and vertical construction guidelines crossing at the face center, minimal detail, sketch-like appearance. This image will be used in the HowItWorks page tutorial section to represent Step I."
+          "path": "frontend/src/components/GalleryView.tsx",
+          "operation": "modify",
+          "description": "Fix TypeScript errors related to ExternalBlob handling, ensure proper null/undefined checks for stage images, fix any type mismatches in download functionality, and ensure both client-side canvas-generated images and backend-provided ExternalBlob images are handled correctly without runtime errors."
         },
         {
-          "path": "frontend/public/assets/generated/stage2-refined-lineart.dim_800x800.png",
-          "operation": "create",
-          "description": "Generate a female portrait image at the refined line art stage showing clean, darker pencil outlines defining eyes with irises and lashes, a defined nose bridge and tip, lips with cupid's bow, and the outer silhouette of flowing hair with no shading yet. This continues the progression from stage1 and will represent Step II in the tutorial."
+          "path": "frontend/src/components/UploadInterface.tsx",
+          "operation": "modify",
+          "description": "Fix any TypeScript errors in the upload flow, ensure proper error handling for ExternalBlob.fromBytes() and upload progress tracking, verify the mutation hook integration is correctly typed, and fix any navigation errors when redirecting to results page."
         },
         {
-          "path": "frontend/public/assets/generated/stage3-hair-detail.dim_800x800.png",
-          "operation": "create",
-          "description": "Generate a female portrait image at the hair and detail development stage showing pencil-drawn hair strand direction lines with layered strokes, detailed eyebrows and eye shading, light contour shadow lines on cheekbones and jaw, and subtle crosshatching on the neck. This continues the progression from stage2 and will represent Step III in the tutorial."
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Fix any type mismatches between backend interface types and query hook return types, ensure proper handling of Option types (Some/None), verify JobStatus enum usage matches backend definitions, fix any errors in job creation/processing/retry mutations, and ensure polling logic for job status updates is error-free."
         },
         {
-          "path": "frontend/public/assets/generated/stage4-final-shaded.dim_800x800.png",
-          "operation": "create",
-          "description": "Generate a female portrait image at the final shaded portrait stage showing a fully rendered graphite drawing with smooth blended tonal shading across the face and neck, rich dark hair with volume and highlight streaks, deep shadows under the chin, and polished professional pencil portrait quality. This completes the progression from stage3 and will represent Step IV in the tutorial."
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Fix any component rendering errors, ensure proper integration of UploadInterface component, verify background image and stage preview grid images load correctly from frontend/public/assets/generated, and fix any TypeScript errors in the component structure."
+        },
+        {
+          "path": "frontend/src/pages/Results.tsx",
+          "operation": "modify",
+          "description": "Fix any errors in job data fetching via useQuery hook, ensure proper handling of loading/error/failed states, verify GalleryView component integration is error-free, fix any type mismatches with Job interface from backend, and ensure retry functionality works correctly."
+        },
+        {
+          "path": "frontend/src/pages/Contact.tsx",
+          "operation": "modify",
+          "description": "Fix any form validation errors, ensure toast notifications are properly imported and used, verify social media links and contact info render without errors, and fix any TypeScript errors in form submission handlers."
+        },
+        {
+          "path": "frontend/src/pages/Documentation.tsx",
+          "operation": "modify",
+          "description": "Fix any rendering errors in Section, CodeBlock, or ApiEndpoint sub-components, ensure proper TypeScript typing for component props, and verify all documentation content renders without console errors."
+        },
+        {
+          "path": "frontend/src/lib/pencilSketchUtils.ts",
+          "operation": "modify",
+          "description": "Fix any TypeScript errors in canvas-based image processing functions (grayscale, Sobel edge detection, Gaussian blur, pencil noise), ensure proper typing for all utility functions, and verify the four-stage pipeline metadata is correctly defined and exported."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Fix any router configuration errors, ensure all five routes (Home, HowItWorks, Docs, Contact, Results) are correctly defined and accessible, verify RootLayout integration with Header/Footer is error-free, and ensure ThemeProvider and Sonner toast setup works without errors."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Fix any navigation link errors using TanStack Router, ensure mobile menu toggle works without errors, verify CTA button functionality, and fix any TypeScript errors in component structure."
+        },
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Fix any rendering errors in brand logo, navigation links (including Docs link), and social media icons, ensure hover styling works correctly, and fix any TypeScript errors in component structure."
         }
       ]
     },
     {
-      "id": "REQ-2",
-      "summary": "Replace the current HowItWorks page tutorial section with a new layout using the four generated stage images, displaying Roman numeral indicators, numeric badges, stage titles, and descriptions for each step",
+      "id": "REQ-3",
+      "summary": "Ensure the GalleryView component correctly handles both client-side canvas-generated stage images and backend-provided stage images without errors, and that the download functionality works for all four sketch stages",
       "acceptanceCriteria": [
-        "The HowItWorks page displays exactly 4 stage cards in sequence",
-        "Each card renders its corresponding generated stage image (stage1 through stage4)",
-        "Roman numeral labels (Step I, Step II, Step III, Step IV) are visible per card",
-        "Numeric badges (01, 02, 03, 04) are displayed per card",
-        "Stage title and description text match the specification: Basic Construction, Refined Line Art, Hair & Detail Development, Final Shaded Portrait",
-        "Old/previous layout code for the tutorial section is removed"
+        "GalleryView renders all four sketch stages in both grid and card view modes without errors.",
+        "Download functionality successfully downloads the correct stage image.",
+        "No undefined or null reference errors occur when switching between client-side and backend image sources."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/GalleryView.tsx",
+          "operation": "modify",
+          "description": "Ensure robust handling of both canvas-generated Blob URLs and ExternalBlob.getDirectURL() for stage images, add proper null/undefined guards for optional resultImage fields, implement error boundaries for image loading failures, fix download functionality to handle both image source types correctly (canvas blobs and external blobs), ensure proper typing for stage image sources, and verify grid/card view mode switching works without errors. Verify the blob-storage component's usage instructions before implementing ExternalBlob handling."
+        },
+        {
+          "path": "frontend/src/lib/pencilSketchUtils.ts",
+          "operation": "modify",
+          "description": "Ensure canvas-based image generation functions return proper Blob URLs that can be used as image sources in GalleryView, add error handling for canvas operations, and verify the four-stage pipeline produces valid image data for all stages without errors."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Ensure the HowItWorks page 2x2 grid correctly renders all four pencil sketch stage images with their Roman numeral overlays and descriptive labels, using the generated stage images from frontend/public/assets/generated",
+      "acceptanceCriteria": [
+        "All four stage cards render with correct stage images, Roman numeral overlays, and labels.",
+        "No broken image links or missing asset errors appear.",
+        "The 2x2 grid layout is responsive and consistent with the editorial cream/graphite theme."
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/HowItWorks.tsx",
           "operation": "modify",
-          "description": "Replace the existing 4-stage tutorial section with a new layout that uses the four generated stage images from frontend/public/assets/generated/ (stage1-basic-construction.dim_800x800.png through stage4-final-shaded.dim_800x800.png). Each stage card must display: Roman numeral step indicator (Step I–IV), numeric badge (01–04), stage title ('Basic Construction', 'Refined Line Art', 'Hair & Detail Development', 'Final Shaded Portrait'), and stage description. Remove the old layout code that conflicts with this new structure, ensuring the element at XPath /html[1]/body[1]/div[1]/div[1]/main[1]/section[3]/div[1]/div[2]/div[1]/div[2]/img[1] and its surrounding stage card are replaced to use the new images. Maintain the overall page structure with hero section and additional tutorial content sections intact."
+          "description": "Fix any broken image references to the four pencil sketch stage images from frontend/public/assets/generated (using correct paths like frontend/public/assets/generated/stage1-outline.dim_600x600.png, frontend/public/assets/generated/stage2-sketch.dim_600x600.png, frontend/public/assets/generated/stage3-shading.dim_600x600.png, frontend/public/assets/generated/stage4-sketch.dim_600x600.png), ensure Roman numeral overlays render correctly on each stage card, verify descriptive labels match the four-stage pipeline, fix any CSS grid layout errors to ensure responsive 2x2 display, and ensure the editorial cream/graphite theme styling is applied consistently without errors."
         }
       ]
     }

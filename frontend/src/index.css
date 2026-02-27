@@ -8,21 +8,21 @@
   :root {
     --radius: 0.25rem;
 
-    /* Cream / off-white canvas */
-    --background: 0.965 0.012 85;
+    /* Warm cream paper canvas — matches reference image */
+    --background: 0.960 0.014 82;
     --foreground: 0.18 0.015 60;
 
     /* Card: slightly warmer cream */
-    --card: 0.975 0.010 80;
+    --card: 0.970 0.012 80;
     --card-foreground: 0.18 0.015 60;
 
     /* Popover */
-    --popover: 0.975 0.010 80;
+    --popover: 0.970 0.012 80;
     --popover-foreground: 0.18 0.015 60;
 
     /* Primary: deep charcoal ink */
     --primary: 0.20 0.015 55;
-    --primary-foreground: 0.965 0.012 85;
+    --primary-foreground: 0.960 0.014 82;
 
     /* Secondary: warm parchment */
     --secondary: 0.92 0.018 80;
@@ -38,7 +38,7 @@
 
     /* Destructive */
     --destructive: 0.577 0.245 27.325;
-    --destructive-foreground: 0.965 0.012 85;
+    --destructive-foreground: 0.960 0.014 82;
 
     /* Border: subtle warm line */
     --border: 0.82 0.018 75;
@@ -50,9 +50,16 @@
     --gold-light: 0.85 0.10 80;
     --gold-dark: 0.55 0.14 70;
 
-    /* Ink */
+    /* Ink / graphite */
     --ink: 0.15 0.015 55;
     --ink-light: 0.35 0.015 58;
+
+    /* Paper tokens — editorial cream palette */
+    --paper: 0.960 0.014 82;
+    --paper-warm: 0.950 0.016 80;
+    --paper-rule: 0.78 0.018 72;
+    --graphite: 0.22 0.012 52;
+    --graphite-light: 0.45 0.012 58;
 
     /* Charts */
     --chart-1: 0.72 0.12 75;
@@ -62,10 +69,10 @@
     --chart-5: 0.80 0.09 80;
 
     /* Sidebar */
-    --sidebar: 0.975 0.010 80;
+    --sidebar: 0.970 0.012 80;
     --sidebar-foreground: 0.18 0.015 60;
     --sidebar-primary: 0.20 0.015 55;
-    --sidebar-primary-foreground: 0.965 0.012 85;
+    --sidebar-primary-foreground: 0.960 0.014 82;
     --sidebar-accent: 0.92 0.018 80;
     --sidebar-accent-foreground: 0.25 0.015 55;
     --sidebar-border: 0.82 0.018 75;
@@ -114,6 +121,12 @@
     --ink: 0.92 0.012 80;
     --ink-light: 0.70 0.012 72;
 
+    --paper: 0.18 0.012 55;
+    --paper-warm: 0.20 0.012 55;
+    --paper-rule: 1 0 0 / 18%;
+    --graphite: 0.88 0.012 78;
+    --graphite-light: 0.65 0.012 68;
+
     --chart-1: 0.72 0.12 75;
     --chart-2: 0.60 0.08 65;
     --chart-3: 0.50 0.06 60;
@@ -155,6 +168,49 @@
   }
   .font-sans {
     font-family: 'Inter', sans-serif;
+  }
+
+  /* Paper / editorial tokens */
+  .bg-paper {
+    background-color: oklch(var(--paper));
+  }
+  .bg-paper-warm {
+    background-color: oklch(var(--paper-warm));
+  }
+  .border-paper-rule {
+    border-color: oklch(var(--paper-rule));
+  }
+  .text-graphite {
+    color: oklch(var(--graphite));
+  }
+  .text-graphite-light {
+    color: oklch(var(--graphite-light));
+  }
+  .bg-graphite {
+    background-color: oklch(var(--graphite));
+  }
+  .text-paper {
+    color: oklch(var(--paper));
+  }
+
+  /* Sketch editorial label — small-caps serif */
+  .sketch-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: oklch(var(--gold));
+  }
+
+  /* Stage label — small-caps Cormorant */
+  .sketch-stage-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: oklch(var(--graphite-light));
   }
 
   .text-gold {

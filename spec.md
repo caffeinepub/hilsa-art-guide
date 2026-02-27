@@ -1,12 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Replace the HowItWorks page tutorial section with four new pencil-style stage illustrations of a female portrait, updating both the images and the stage card layout.
+**Goal:** Fix all TypeScript/React and Motoko compilation errors in Version 36 so the application builds and runs without errors.
 
 **Planned changes:**
-- Generate four new stage illustration images (stage1-basic-construction, stage2-refined-lineart, stage3-hair-detail, stage4-final-shaded) depicting a female portrait progressing through pencil drawing stages
-- Replace the existing tutorial section on the HowItWorks page (/how-it-works) with a new 4-card layout using these images
-- Each card displays a Roman numeral step label (Step I–IV), numeric badge (01–04), stage title, and description
-- Remove old/conflicting tutorial section code
+- Fix all TypeScript/React compilation errors, type mismatches, missing imports, and undefined references across all frontend pages and hooks
+- Fix all Motoko compilation errors and logic errors in the backend actor (backend/main.mo)
+- Resolve any API mismatches between backend endpoints and frontend query/mutation hooks in useQueries.ts
+- Fix GalleryView component to correctly handle both client-side canvas-generated and backend-provided stage images without errors
+- Ensure download functionality works correctly for all four sketch stages in GalleryView
+- Fix the HowItWorks page 2x2 grid to correctly render all four pencil sketch stage images with Roman numeral overlays and descriptive labels
+- Bump version to 36
 
-**User-visible outcome:** The HowItWorks page shows four visually consistent pencil-drawing stage cards — from basic construction lines to a fully shaded graphite portrait — replacing the previous layout.
+**User-visible outcome:** The application builds and runs without compilation or runtime errors; all pages (Home, HowItWorks, Docs, Contact, Results) render correctly, the gallery displays all four sketch stages, and downloads work as expected.

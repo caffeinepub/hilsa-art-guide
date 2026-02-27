@@ -5,9 +5,11 @@ import Array "mo:core/Array";
 import Principal "mo:core/Principal";
 import Order "mo:core/Order";
 
-import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
+import MixinStorage "blob-storage/Mixin";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   include MixinStorage();
 

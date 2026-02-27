@@ -1,55 +1,68 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T04:03:41.867Z",
+  "generatedAt": "2026-02-27T07:22:40.647Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 4,
+    "implemented": 0,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Generate four new stage illustration images representing each step of the pencil drawing tutorial: (1) Basic Construction — light sketch lines with face/head outline and construction guidelines (stage1-basic-construction.dim_800x800.png), (2) Refined Line Art — clean darker outlines with defined eyes, nose, lips, and hair shape (stage2-refined-lineart.dim_800x800.png), (3) Hair & Detail Development — hair strand direction lines, eyebrow/eye details, and light contour shading (stage3-hair-detail.dim_800x800.png), (4) Final Shaded Portrait — fully rendered graphite shading with smooth blending and hair volume (stage4-final-shaded.dim_800x800.png). All four images should depict the same female portrait subject progressing from loose construction lines to a fully rendered graphite drawing.",
-        "status": "implemented",
+        "summary": "Audit and fix all TypeScript/React compilation errors and runtime errors in the frontend, including type mismatches, missing imports, undefined references, and any broken component logic across all pages and hooks.",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/public/assets/generated/stage1-basic-construction.dim_800x800.png",
-          "frontend/public/assets/generated/stage2-refined-lineart.dim_800x800.png",
-          "frontend/public/assets/generated/stage3-hair-detail.dim_800x800.png",
-          "frontend/public/assets/generated/stage4-final-shaded.dim_800x800.png"
+          "frontend/src/components/GalleryView.tsx",
+          "frontend/src/components/UploadInterface.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/pages/Results.tsx",
+          "frontend/src/pages/Contact.tsx",
+          "frontend/src/pages/Documentation.tsx",
+          "frontend/src/lib/pencilSketchUtils.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/components/Header.tsx",
+          "frontend/src/components/Footer.tsx"
         ],
-        "matchedFiles": [
-          "frontend/public/assets/generated/stage1-basic-construction.dim_800x800.png",
-          "frontend/public/assets/generated/stage2-refined-lineart.dim_800x800.png",
-          "frontend/public/assets/generated/stage3-hair-detail.dim_800x800.png",
-          "frontend/public/assets/generated/stage4-final-shaded.dim_800x800.png"
-        ]
+        "matchedFiles": []
       },
       {
         "id": "REQ-2",
-        "summary": "On the HowItWorks page (/how-it-works), replace the current content in the 4-stage tutorial section with a new layout that uses the four generated stage images. Each stage card must show: the Roman numeral step indicator (Step I–IV), the step number badge (01–04), the stage title (e.g. 'Basic Construction'), and the stage description. The element identified by XPath /html[1]/body[1]/div[1]/div[1]/main[1]/section[3]/div[1]/div[2]/div[1]/div[2]/img[1] and its surrounding stage card must be replaced to use the new stage images from frontend/public/assets/generated/. Remove any previous feature code that conflicts with this layout.",
-        "status": "implemented",
+        "summary": "Audit and fix all Motoko compilation errors and logic errors in the backend actor (backend/main.mo), including type errors, pattern match issues, and any API mismatches between the backend and frontend query/mutation hooks in useQueries.ts.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Ensure the GalleryView component correctly handles both client-side canvas-generated stage images and backend-provided stage images without errors, and that the download functionality works for all four sketch stages.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/components/GalleryView.tsx",
+          "frontend/src/lib/pencilSketchUtils.ts"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Ensure the HowItWorks page 2x2 grid correctly renders all four pencil sketch stage images with their Roman numeral overlays and descriptive labels, using the generated stage images from frontend/public/assets/generated.",
+        "status": "missing",
         "plannedFiles": [
           "frontend/src/pages/HowItWorks.tsx"
         ],
-        "matchedFiles": [
-          "frontend/src/pages/HowItWorks.tsx"
-        ]
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
-    "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/generated/stage1-basic-construction.dim_800x800.png",
-    "frontend/public/assets/generated/stage2-refined-lineart.dim_800x800.png",
-    "frontend/public/assets/generated/stage3-hair-detail.dim_800x800.png",
-    "frontend/public/assets/generated/stage4-final-shaded.dim_800x800.png",
-    "frontend/src/pages/HowItWorks.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
