@@ -2,48 +2,49 @@ import { useRef } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowDown, Sparkles } from 'lucide-react';
 import UploadInterface from '../components/UploadInterface';
+import { STAGE_LABELS, STAGE_DESCRIPTIONS } from '../lib/pencilSketchUtils';
 
 const stages = [
-  { num: '01', name: 'Trace Outlines' },
-  { num: '02', name: 'Basic Elements' },
-  { num: '03', name: 'Slight Shading' },
-  { num: '04', name: 'Render & Detail' },
-  { num: '05', name: 'Polish' },
+  { num: '01', name: STAGE_LABELS[0] },
+  { num: '02', name: STAGE_LABELS[1] },
+  { num: '03', name: STAGE_LABELS[2] },
+  { num: '04', name: STAGE_LABELS[3] },
+  { num: '05', name: STAGE_LABELS[4] },
 ];
 
 const stageDetails = [
   {
     num: '01',
-    name: 'Trace the outlines',
-    desc: 'Lightly trace the overall silhouette and major contours of the portrait as your foundational roadmap',
+    name: STAGE_LABELS[0],
+    desc: STAGE_DESCRIPTIONS[0],
     img: '/assets/generated/stage1-trace-outlines.dim_600x600.png',
     fallbackImg: '/assets/generated/stage1-basic-outline.dim_800x800.png',
   },
   {
     num: '02',
-    name: 'Draw the basic elements',
-    desc: 'Draw in the basic facial elements with clean structural line work establishing correct placement and proportions',
+    name: STAGE_LABELS[1],
+    desc: STAGE_DESCRIPTIONS[1],
     img: '/assets/generated/stage2-basic-elements.dim_600x600.png',
     fallbackImg: '/assets/generated/stage2-reference-sketch.dim_800x800.png',
   },
   {
     num: '03',
-    name: 'Have a slight shading',
-    desc: 'Introduce light tonal shading to give the portrait form and dimension in the shadow areas',
+    name: STAGE_LABELS[2],
+    desc: STAGE_DESCRIPTIONS[2],
     img: '/assets/generated/stage3-slight-shading.dim_600x600.png',
     fallbackImg: '/assets/generated/stage3-shading.dim_800x800.png',
   },
   {
     num: '04',
-    name: 'Render and detail',
-    desc: 'Build up detailed rendering — refine features, add hair strand lines, and deepen shadow areas with hatching',
+    name: STAGE_LABELS[3],
+    desc: STAGE_DESCRIPTIONS[3],
     img: '/assets/generated/stage4-render-detail.dim_600x600.png',
     fallbackImg: '/assets/generated/stage4-render-detail.dim_800x800.png',
   },
   {
     num: '05',
-    name: 'Polish',
-    desc: 'Smooth transitions, sharpen key edges, deepen dark values, and complete the full tonal range of the portrait',
+    name: STAGE_LABELS[4],
+    desc: STAGE_DESCRIPTIONS[4],
     img: '/assets/generated/stage5-polish.dim_600x600.png',
     fallbackImg: '/assets/generated/stage5-polish-final.dim_800x800.png',
   },

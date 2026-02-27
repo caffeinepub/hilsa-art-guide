@@ -1,13 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Replace the five pencil sketch drawing stages with portrait-specific drawing stages across the entire app (frontend and backend), updating all labels, captions, image processing filters, and stage illustrations.
+**Goal:** Redesign the Drawing Guide on the Results page and the HowItWorks page to display each stage as a distinct card matching the reference screenshot style (white card, bold step title, description text, full-width rounded stage image).
 
 **Planned changes:**
-- Update all stage labels and captions throughout the UI (GalleryView, Drawing Guide walkthrough, HowItWorks timeline) to use the new five stage names: "Trace the outlines of the portrait", "Draw the basic elements", "Have a slight shading", "Render and detail", "Polish"
-- Remove all old pencil sketch stage names (Construction Lines, Contour Outline, Basic Shading, Detail Pass, Final Render, etc.) from every visible part of the UI
-- Update `pencilSketchUtils.ts` to apply per-stage visual treatments: faint outline trace (Stage 1), clean basic line work (Stage 2), light shading added (Stage 3), detailed rendering and texture (Stage 4), polished refined illustration (Stage 5)
-- Update backend stage identifiers and labels in `main.mo` to match the five new stage names without breaking existing CRUD or rate limiting logic
-- Replace stage illustration images with new portrait-specific artwork for all five stages
+- Redesign the Results page Drawing Guide walkthrough so each of the five stages is rendered as its own white card with rounded corners on a light grey background, containing: a bold step title (e.g. "Step 1: Trace the Outlines"), an instructional body paragraph, and the processed stage image in a full-width rounded image container below the text.
+- All five stage cards are displayed sequentially in a vertically scrollable layout (no pagination or hidden stages).
+- Update the HowItWorks page timeline so each stage entry becomes a standalone card in the same style: bold step heading, descriptive body text, and a representative stage preview image below the text, arranged vertically.
+- Typography uses large bold sans-serif for step titles and regular-weight body font for descriptions.
+- Layout is responsive for both desktop and mobile.
 
-**User-visible outcome:** Users see portrait-drawing-specific stage names, descriptions, and progressively styled image previews throughout the app, with each stage visually reflecting the correct portrait drawing technique.
+**User-visible outcome:** Users can scroll through all five drawing stage cards one after another on both the Results page and HowItWorks page, with each stage clearly presented as a white card showing the step title, instructions, and the stage image — matching the reference screenshot style.

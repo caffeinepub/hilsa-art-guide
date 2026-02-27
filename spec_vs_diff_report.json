@@ -1,39 +1,22 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T21:13:41.819Z",
-  "summary": "The diff implements most requirements: REQ-5 (new stage labels throughout UI), REQ-6 (per-stage visual processing pipeline), REQ-7 (updated captions in GalleryView, HowItWorks, Home), and REQ-8 (backend stage names updated in main.mo). The Drawing Guide walkthrough component is not visible in the diff, creating uncertainty about REQ-5/REQ-7 coverage there. The five required image assets are referenced but not added to the diff.",
-  "missing_requirements": [
-    {
-      "id": "REQ-5",
-      "requirement": "Drawing Guide walkthrough stage titles and captions reflect the new stage names",
-      "reason": "The diff does not show a DrawingGuide component being modified. No DrawingGuide.tsx or equivalent component appears in the modified files list.",
-      "evidence": []
-    },
-    {
-      "id": "REQ-7",
-      "requirement": "Drawing Guide walkthrough captions are updated",
-      "reason": "No DrawingGuide component file appears in the modified files, so its captions cannot be confirmed updated.",
-      "evidence": []
-    }
-  ],
+  "generatedAt": "2026-02-27T03:17:37.883Z",
+  "summary": "The diff implements both REQ-11 and REQ-12. GalleryView.tsx is redesigned as a vertical stack of white rounded cards with bold step headings, description text, and full-width stage images. HowItWorks.tsx is redesigned with the same card-per-step layout on a light cream background. Both changes align with the acceptance criteria. No files under frontend/src/hooks/ or frontend/src/components/ui/ were modified.",
+  "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Fallback image paths (e.g., stage1-basic-outline.dim_800x800.png, stage2-reference-sketch.dim_800x800.png) referenced in Home.tsx stageDetails that were not requested in the build spec",
-      "reason": "The build request only specifies the five new 600x600 portrait drawing stage images. The fallback image paths pointing to 800x800 assets were not requested.",
+      "description": "HowItWorks cards include an extra 'detail' text field (technique detail paragraph) beyond what was requested — each card shows three text blocks: stage description, plus an additional technique detail paragraph not present in the original requirements.",
+      "reason": "REQ-12 specifies only a bold heading, body description text, and a representative image per card. The diff adds a third text block (stage.detail) with additional technique guidance not mentioned in the requirements or acceptance criteria.",
       "evidence": [
-        "frontend/src/pages/Home.tsx"
+        "frontend/src/pages/HowItWorks.tsx"
       ]
     }
   ],
-  "confidence": 0.72,
+  "confidence": 0.82,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
     "frontend/src/components/GalleryView.tsx",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/lib/pencilSketchUtils.ts",
-    "frontend/src/pages/Home.tsx",
     "frontend/src/pages/HowItWorks.tsx",
     "project_state.json"
   ]

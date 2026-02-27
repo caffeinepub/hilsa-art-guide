@@ -4,28 +4,26 @@ export interface SketchStage {
   dataUrl: string;
 }
 
-const STAGE_DEFINITIONS = [
-  {
-    label: "Stage 1 — Trace the outlines of the portrait",
-    description: "Faint traced contour lines capturing the overall silhouette of the portrait",
-  },
-  {
-    label: "Stage 2 — Draw the basic elements",
-    description: "Clean structural line work establishing the basic facial elements and proportions",
-  },
-  {
-    label: "Stage 3 — Have a slight shading",
-    description: "Light tonal shading layered over the basic elements to add form and depth",
-  },
-  {
-    label: "Stage 4 — Render and detail",
-    description: "Detailed rendering with texture, tonal depth, and refined facial features",
-  },
-  {
-    label: "Stage 5 — Polish",
-    description: "Polished and refined final illustration with full tonal range and crisp detail",
-  },
+export const STAGE_LABELS = [
+  "Trace the outlines",
+  "Draw the basic elements",
+  "Have a slight shading",
+  "Render and detail",
+  "Polish",
 ];
+
+export const STAGE_DESCRIPTIONS = [
+  "Lightly trace the overall silhouette and major contours of the portrait as your foundational roadmap",
+  "Draw in the basic facial elements with clean structural line work establishing correct placement and proportions",
+  "Introduce light tonal shading to give the portrait form and dimension in the shadow areas",
+  "Build up detailed rendering — refine features, add hair strand lines, and deepen shadow areas with hatching",
+  "Smooth transitions, sharpen key edges, deepen dark values, and complete the full tonal range of the portrait.",
+];
+
+const STAGE_DEFINITIONS = STAGE_LABELS.map((label, i) => ({
+  label,
+  description: STAGE_DESCRIPTIONS[i],
+}));
 
 // Cream/parchment paper background color
 const PAPER_R = 240;
@@ -175,9 +173,10 @@ function blendPencilStroke(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 1 — Trace the outlines of the portrait
-// Shows only faint traced contour lines of the portrait silhouette.
-// Very light opacity (~10%) so it reads as barely-started outline tracing.
+// Stage 1 — Trace the outlines
+// Lightly trace the overall silhouette and major contours of the portrait
+// as your foundational roadmap. Very faint lines (~10% opacity), minimal
+// contrast, no shading — only the broadest outer contour survives.
 // ─────────────────────────────────────────────────────────────────────────────
 function applyStage1(
   gray: Float32Array,
@@ -189,16 +188,16 @@ function applyStage1(
 
   // Heavy blur to keep only the broadest silhouette contour
   const edges = sobelEdges(gray, width, height);
-  const smoothEdges = gaussianBlur(edges, width, height, 4);
+  const smoothEdges = gaussianBlur(edges, width, height, 5);
 
   // Very high threshold — only the outermost contour survives
-  const threshold = 45;
-  const opacity = 0.10;
+  const threshold = 50;
+  const opacity = 0.09;
 
   for (let i = 0; i < gray.length; i++) {
     const e = smoothEdges[i];
     if (e > threshold) {
-      const strokeDarkness = Math.min(1, (e - threshold) / 100);
+      const strokeDarkness = Math.min(1, (e - threshold) / 120);
       const grain = paperGrain(i) * 0.3;
       const [r, g, b] = blendPencilStroke(
         PAPER_R, PAPER_G, PAPER_B,
@@ -212,8 +211,8 @@ function applyStage1(
   }
 
   // Draw faint guide lines to simulate tracing reference marks
-  const guideOpacity = 0.08;
-  const guideStroke = 0.6;
+  const guideOpacity = 0.07;
+  const guideStroke = 0.5;
 
   // Horizontal centre line
   const cy = Math.round(height * 0.5);
@@ -240,7 +239,7 @@ function applyStage1(
     const lineY = Math.round(height * (t / 3) * 0.8 + height * 0.1);
     for (let x = Math.round(width * 0.2); x < Math.round(width * 0.8); x++) {
       const i = lineY * width + x;
-      const [r, g, b] = blendPencilStroke(PAPER_R, PAPER_G, PAPER_B, guideStroke * 0.7, guideOpacity * 0.8);
+      const [r, g, b] = blendPencilStroke(PAPER_R, PAPER_G, PAPER_B, guideStroke * 0.6, guideOpacity * 0.7);
       output.data[i * 4]     = r;
       output.data[i * 4 + 1] = g;
       output.data[i * 4 + 2] = b;
@@ -252,8 +251,9 @@ function applyStage1(
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Stage 2 — Draw the basic elements
-// Clean structural line work with basic facial elements visible.
-// Slightly more visible (~22% opacity) with a lower edge threshold.
+// Draw in the basic facial elements with clean structural line work
+// establishing correct placement and proportions. Moderate contrast (~22%),
+// no fill or shading — only clean lines.
 // ─────────────────────────────────────────────────────────────────────────────
 function applyStage2(
   gray: Float32Array,
@@ -267,13 +267,13 @@ function applyStage2(
   // Moderate blur — structural contours visible, inner features still soft
   const smoothEdges = gaussianBlur(edges, width, height, 2);
 
-  const threshold = 25;
-  const opacity = 0.22;
+  const threshold = 22;
+  const opacity = 0.24;
 
   for (let i = 0; i < gray.length; i++) {
     const e = smoothEdges[i];
     if (e > threshold) {
-      const strokeDarkness = Math.min(1, (e - threshold) / 75);
+      const strokeDarkness = Math.min(1, (e - threshold) / 70);
       const grain = paperGrain(i + 1000);
       const [r, g, b] = blendPencilStroke(
         PAPER_R, PAPER_G, PAPER_B,
@@ -286,9 +286,9 @@ function applyStage2(
     }
   }
 
-  // Retain faint guide lines from stage 1 (even fainter now)
-  const guideOpacity = 0.06;
-  const guideStroke = 0.5;
+  // Retain very faint guide lines from stage 1
+  const guideOpacity = 0.05;
+  const guideStroke = 0.4;
   const cy = Math.round(height * 0.5);
   for (let x = Math.round(width * 0.15); x < Math.round(width * 0.85); x++) {
     const i = cy * width + x;
@@ -311,8 +311,9 @@ function applyStage2(
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Stage 3 — Have a slight shading
-// Light tonal shading layered over the basic elements.
-// ~40% opacity with gentle tonal shading for hair mass and feature areas.
+// Introduce light tonal shading to give the portrait form and dimension
+// in the shadow areas. Light-grey tones appear in darker facial regions
+// on top of the structural lines (~40% opacity).
 // ─────────────────────────────────────────────────────────────────────────────
 function applyStage3(
   gray: Float32Array,
@@ -374,8 +375,9 @@ function applyStage3(
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Stage 4 — Render and detail
-// Detailed rendering with texture, tonal depth, and refined facial features.
-// ~60% opacity with directional hatching and unsharp masking for detail.
+// Build up detailed rendering — refine features, add hair strand lines,
+// and deepen shadow areas with hatching. ~60% opacity with directional
+// hatching and unsharp masking for refined edge detail.
 // ─────────────────────────────────────────────────────────────────────────────
 function applyStage4(
   gray: Float32Array,
@@ -438,8 +440,9 @@ function applyStage4(
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Stage 5 — Polish
-// Polished and refined final illustration with full tonal range and crisp detail.
-// ~90% opacity, full tonal range with S-curve contrast enhancement.
+// Smooth transitions, sharpen key edges, deepen dark values, and complete
+// the full tonal range of the portrait. ~90% opacity, full tonal range
+// with S-curve contrast enhancement from near-white to near-black.
 // ─────────────────────────────────────────────────────────────────────────────
 function applyStage5(
   gray: Float32Array,
@@ -463,7 +466,7 @@ function applyStage5(
       // Strong unsharp mask for crisp detail
       const sharpened = Math.max(0, Math.min(255, g + (g - bg) * 1.8));
 
-      // S-curve contrast enhancement
+      // S-curve contrast enhancement for full tonal range
       const normalized = sharpened / 255;
       const contrasted =
         normalized < 0.5
@@ -528,8 +531,8 @@ export async function generatePencilSketchStages(
   jobId: string,
   onStageComplete?: (stageIndex: number, stage: SketchStage) => void
 ): Promise<SketchStage[]> {
-  // Check sessionStorage cache — bump key to v4 to invalidate old cached results
-  const cacheKey = `sketch_stages_v4_${jobId}`;
+  // Check sessionStorage cache — bump key to v5 to invalidate old cached results
+  const cacheKey = `sketch_stages_v5_${jobId}`;
   const cached = sessionStorage.getItem(cacheKey);
   if (cached) {
     try {
@@ -552,7 +555,7 @@ export async function generatePencilSketchStages(
   let width = img.naturalWidth || img.width;
   let height = img.naturalHeight || img.height;
   if (width > maxDim || height > maxDim) {
-    const scale = maxDim / Math.max(width, height);
+    const scale = Math.min(maxDim / width, maxDim / height);
     width = Math.round(width * scale);
     height = Math.round(height * scale);
   }
@@ -560,18 +563,11 @@ export async function generatePencilSketchStages(
   const imageData = getImageData(img, width, height);
   const gray = toGrayscale(imageData.data);
 
-  const stageFunctions = [
-    applyStage1,
-    applyStage2,
-    applyStage3,
-    applyStage4,
-    applyStage5,
-  ];
-
+  const stageFns = [applyStage1, applyStage2, applyStage3, applyStage4, applyStage5];
   const results: SketchStage[] = [];
 
-  for (let i = 0; i < stageFunctions.length; i++) {
-    const stageImageData = stageFunctions[i](gray, width, height);
+  for (let i = 0; i < stageFns.length; i++) {
+    const stageImageData = stageFns[i](gray, width, height);
     const dataUrl = imageDataToDataUrl(stageImageData);
     const stage: SketchStage = {
       label: STAGE_DEFINITIONS[i].label,
@@ -586,7 +582,6 @@ export async function generatePencilSketchStages(
     await new Promise((resolve) => setTimeout(resolve, 0));
   }
 
-  // Cache results
   try {
     sessionStorage.setItem(cacheKey, JSON.stringify(results));
   } catch {

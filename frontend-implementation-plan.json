@@ -1,84 +1,40 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Replace pencil sketch stages with portrait drawing stages and update style",
+  "title": "Redesign Drawing Guide layout to match step-card style with stage image + description per card",
   "requirements": [
     {
-      "id": "REQ-5",
-      "summary": "Update stage labels throughout the app to reflect the five new portrait drawing stages: Trace Outlines, Basic Elements, Slight Shading, Render and Detail, Polish",
+      "id": "REQ-11",
+      "summary": "Redesign the Drawing Guide walkthrough view on the Results page so that each stage is presented as a distinct card block containing a bold step title, instructional body text, and a full-width rounded image showing the processed stage output",
       "acceptanceCriteria": [
-        "Stage 1 is labelled 'Trace the outlines of the portrait' everywhere in the UI",
-        "Stage 2 is labelled 'Draw the basic elements' everywhere in the UI",
-        "Stage 3 is labelled 'Have a slight shading' everywhere in the UI",
-        "Stage 4 is labelled 'Render and detail' everywhere in the UI",
-        "Stage 5 is labelled 'Polish' everywhere in the UI",
-        "No old pencil sketch stage names (Construction Lines, Contour Outline, Basic Shading, Detail Pass, Final Render, etc.) remain visible anywhere in the UI",
-        "GalleryView step labels reflect the new stage names",
-        "HowItWorks page timeline reflects the new stage names",
-        "Drawing Guide walkthrough stage titles and captions reflect the new stage names"
+        "Each of the five drawing stages is rendered as its own card with a white background and rounded corners on a light grey/cream page background.",
+        "Each card contains a bold step heading (e.g. 'Step 1: Trace the Outlines'), a body paragraph with the existing instructional caption for that stage, and the processed stage image displayed in a full-width rounded image container below the text.",
+        "All five stage cards are displayed sequentially in a vertically scrollable layout — no pagination or hidden stages.",
+        "Stage image outputs (generated client-side) are displayed at appropriate resolution inside each card.",
+        "The typography uses a large, bold sans-serif for step titles and a regular-weight body font for descriptions, consistent with the reference screenshot style.",
+        "The layout is responsive and renders correctly on both desktop and mobile screen widths."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/GalleryView.tsx",
           "operation": "modify",
-          "description": "Update the stage labels, captions, and all references to the five drawing stages. Replace any hardcoded or computed stage names with the new portrait drawing stage labels: 'Trace the outlines of the portrait', 'Draw the basic elements', 'Have a slight shading', 'Render and detail', 'Polish'. Update per-stage captions in the gallery display to match the new stage descriptions."
-        },
-        {
-          "path": "frontend/src/pages/HowItWorks.tsx",
-          "operation": "modify",
-          "description": "Replace the timeline stage definitions with the five new portrait drawing stages. Update stage titles, descriptions, and technique notes to reflect: Stage 1 — Trace the outlines of the portrait, Stage 2 — Draw the basic elements, Stage 3 — Have a slight shading, Stage 4 — Render and detail, Stage 5 — Polish. Ensure all old pencil sketch terminology is removed."
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Update the hero section stage overview and any stage detail cards to use the new portrait drawing stage labels. Replace references to old pencil sketch stages with the five new stages. Update any stage-related copy or captions in the upload interface section."
+          "description": "Replace the current gallery layout with a vertical card-based layout where each of the five stages is rendered as a standalone card. Each card should have: (1) a white background with rounded corners, (2) a bold step title heading using the existing stage label (e.g., 'Step 1: Trace the Outlines'), (3) the existing instructional caption as body text below the title, and (4) the processed stage image displayed full-width within the card with rounded corners. Remove the lightbox viewer and download buttons. Ensure all five cards are visible in a scrollable vertical stack on a light grey/cream background. Use large bold sans-serif typography for titles (e.g., text-2xl font-bold) and regular body font for descriptions. Preserve all existing stage label strings and instructional caption copy from pencilSketchUtils.ts. Maintain responsive behavior for desktop and mobile."
         }
       ]
     },
     {
-      "id": "REQ-6",
-      "summary": "Update client-side image processing pipeline to produce progressive portrait drawing stages with distinct visual styles",
+      "id": "REQ-12",
+      "summary": "Update the HowItWorks page timeline to use the same card-per-step visual layout with step number, title, descriptive body text, and representative stage preview image",
       "acceptanceCriteria": [
-        "Each of the 5 stages produces a visually distinct output that matches its stage description",
-        "Stage 1 output shows only faint traced outlines",
-        "Stage 2 output shows basic elements with clean line work",
-        "Stage 3 output shows visible light shading added over stage 2",
-        "Stage 4 output shows detailed rendering and texture",
-        "Stage 5 output looks polished and refined compared to stage 4",
-        "The pipeline processes a user-uploaded image and returns 5 progressive canvas data URLs"
+        "Each of the five stages on the HowItWorks page is presented as a card matching the visual style of the reference screenshot.",
+        "Each card shows the stage title as a bold heading, the stage description as body text, and a placeholder or static representative sketch-style image.",
+        "Cards are arranged vertically and fully visible without toggling or expanding."
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/lib/pencilSketchUtils.ts",
-          "operation": "modify",
-          "description": "Replace the uniform pencil-sketch filter approach with per-stage visual treatments that produce distinct outputs for each of the five portrait drawing stages. Stage 1 should apply minimal edge detection to create a faint outline/trace. Stage 2 should produce clean structural line work with basic facial elements visible. Stage 3 should layer light tonal shading over the stage 2 output. Stage 4 should add rendered detail, texture, and tonal depth. Stage 5 should apply polishing filters for a refined final illustration. Maintain the existing function signature that returns an array of canvas data URLs."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Update instructional captions for each stage to match new portrait drawing workflow",
-      "acceptanceCriteria": [
-        "Each stage has an updated instructional caption relevant to its new name and technique",
-        "HowItWorks page technique notes are updated to reflect the new five stages",
-        "GalleryView per-stage captions are updated",
-        "Drawing Guide walkthrough captions are updated"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/GalleryView.tsx",
-          "operation": "modify",
-          "description": "Update per-stage instructional captions to match the new portrait drawing stages. Ensure captions describe: Stage 1 — tracing outlines, Stage 2 — drawing basic elements, Stage 3 — applying slight shading, Stage 4 — rendering and detailing, Stage 5 — polishing the portrait. Remove any references to old pencil sketch techniques."
-        },
         {
           "path": "frontend/src/pages/HowItWorks.tsx",
           "operation": "modify",
-          "description": "Update technique notes and descriptions in the timeline for each of the five portrait drawing stages. Ensure each stage description explains the portrait drawing technique relevant to that stage (tracing, basic elements, shading, rendering, polishing)."
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Update any walkthrough or instructional captions in the stage detail cards or process overview to reflect the new portrait drawing workflow and stage descriptions."
+          "description": "Replace the current vertical timeline layout with a card-based layout matching the reference screenshot style. Each of the five stages should be rendered as a distinct card with: (1) a white background and rounded corners, (2) a bold step heading combining the stage number and name (e.g., 'Step 1: Trace the Outlines'), (3) the existing stage description as body text below the heading, and (4) a static representative stage preview image displayed full-width within the card with rounded corners. Use the generated stage preview images from frontend/public/assets/generated/ (stage1-trace-outlines.dim_600x600.png, stage2-hatching.dim_600x600.png, stage3-crosshatch.dim_600x600.png, stage4-render-detail.dim_600x600.png, stage5-polish.dim_600x600.png). Remove the timeline connector lines and icons. Arrange cards vertically in a scrollable stack on a light grey/cream background. Use large bold sans-serif typography for titles and regular body font for descriptions. Preserve all existing stage descriptions and technique tips. Ensure responsive layout for desktop and mobile."
         }
       ]
     }
