@@ -1,108 +1,20 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix Frontend Errors and Redeploy Version 36",
+  "title": "Deploy Version 37",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Audit and fix all TypeScript/React compilation errors and runtime errors in the frontend, including type mismatches, missing imports, undefined references, and broken component logic across all pages and hooks",
+      "id": "REQ-5",
+      "summary": "Ensure frontend build artifacts are ready for Version 37 deployment",
       "acceptanceCriteria": [
-        "The frontend builds without any TypeScript compilation errors.",
-        "No runtime console errors appear when navigating through all routes (Home, HowItWorks, Docs, Contact, Results).",
-        "All components render without crashing."
+        "Version 37 is built and deployed to the Internet Computer network.",
+        "The deployed canister reflects the state of Version 37."
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/components/GalleryView.tsx",
-          "operation": "modify",
-          "description": "Fix TypeScript errors related to ExternalBlob handling, ensure proper null/undefined checks for stage images, fix any type mismatches in download functionality, and ensure both client-side canvas-generated images and backend-provided ExternalBlob images are handled correctly without runtime errors."
-        },
-        {
-          "path": "frontend/src/components/UploadInterface.tsx",
-          "operation": "modify",
-          "description": "Fix any TypeScript errors in the upload flow, ensure proper error handling for ExternalBlob.fromBytes() and upload progress tracking, verify the mutation hook integration is correctly typed, and fix any navigation errors when redirecting to results page."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Fix any type mismatches between backend interface types and query hook return types, ensure proper handling of Option types (Some/None), verify JobStatus enum usage matches backend definitions, fix any errors in job creation/processing/retry mutations, and ensure polling logic for job status updates is error-free."
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Fix any component rendering errors, ensure proper integration of UploadInterface component, verify background image and stage preview grid images load correctly from frontend/public/assets/generated, and fix any TypeScript errors in the component structure."
-        },
-        {
-          "path": "frontend/src/pages/Results.tsx",
-          "operation": "modify",
-          "description": "Fix any errors in job data fetching via useQuery hook, ensure proper handling of loading/error/failed states, verify GalleryView component integration is error-free, fix any type mismatches with Job interface from backend, and ensure retry functionality works correctly."
-        },
-        {
-          "path": "frontend/src/pages/Contact.tsx",
-          "operation": "modify",
-          "description": "Fix any form validation errors, ensure toast notifications are properly imported and used, verify social media links and contact info render without errors, and fix any TypeScript errors in form submission handlers."
-        },
-        {
-          "path": "frontend/src/pages/Documentation.tsx",
-          "operation": "modify",
-          "description": "Fix any rendering errors in Section, CodeBlock, or ApiEndpoint sub-components, ensure proper TypeScript typing for component props, and verify all documentation content renders without console errors."
-        },
-        {
-          "path": "frontend/src/lib/pencilSketchUtils.ts",
-          "operation": "modify",
-          "description": "Fix any TypeScript errors in canvas-based image processing functions (grayscale, Sobel edge detection, Gaussian blur, pencil noise), ensure proper typing for all utility functions, and verify the four-stage pipeline metadata is correctly defined and exported."
-        },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Fix any router configuration errors, ensure all five routes (Home, HowItWorks, Docs, Contact, Results) are correctly defined and accessible, verify RootLayout integration with Header/Footer is error-free, and ensure ThemeProvider and Sonner toast setup works without errors."
-        },
-        {
-          "path": "frontend/src/components/Header.tsx",
-          "operation": "modify",
-          "description": "Fix any navigation link errors using TanStack Router, ensure mobile menu toggle works without errors, verify CTA button functionality, and fix any TypeScript errors in component structure."
-        },
-        {
-          "path": "frontend/src/components/Footer.tsx",
-          "operation": "modify",
-          "description": "Fix any rendering errors in brand logo, navigation links (including Docs link), and social media icons, ensure hover styling works correctly, and fix any TypeScript errors in component structure."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Ensure the GalleryView component correctly handles both client-side canvas-generated stage images and backend-provided stage images without errors, and that the download functionality works for all four sketch stages",
-      "acceptanceCriteria": [
-        "GalleryView renders all four sketch stages in both grid and card view modes without errors.",
-        "Download functionality successfully downloads the correct stage image.",
-        "No undefined or null reference errors occur when switching between client-side and backend image sources."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/GalleryView.tsx",
-          "operation": "modify",
-          "description": "Ensure robust handling of both canvas-generated Blob URLs and ExternalBlob.getDirectURL() for stage images, add proper null/undefined guards for optional resultImage fields, implement error boundaries for image loading failures, fix download functionality to handle both image source types correctly (canvas blobs and external blobs), ensure proper typing for stage image sources, and verify grid/card view mode switching works without errors. Verify the blob-storage component's usage instructions before implementing ExternalBlob handling."
-        },
-        {
-          "path": "frontend/src/lib/pencilSketchUtils.ts",
-          "operation": "modify",
-          "description": "Ensure canvas-based image generation functions return proper Blob URLs that can be used as image sources in GalleryView, add error handling for canvas operations, and verify the four-stage pipeline produces valid image data for all stages without errors."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Ensure the HowItWorks page 2x2 grid correctly renders all four pencil sketch stage images with their Roman numeral overlays and descriptive labels, using the generated stage images from frontend/public/assets/generated",
-      "acceptanceCriteria": [
-        "All four stage cards render with correct stage images, Roman numeral overlays, and labels.",
-        "No broken image links or missing asset errors appear.",
-        "The 2x2 grid layout is responsive and consistent with the editorial cream/graphite theme."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/HowItWorks.tsx",
-          "operation": "modify",
-          "description": "Fix any broken image references to the four pencil sketch stage images from frontend/public/assets/generated (using correct paths like frontend/public/assets/generated/stage1-outline.dim_600x600.png, frontend/public/assets/generated/stage2-sketch.dim_600x600.png, frontend/public/assets/generated/stage3-shading.dim_600x600.png, frontend/public/assets/generated/stage4-sketch.dim_600x600.png), ensure Roman numeral overlays render correctly on each stage card, verify descriptive labels match the four-stage pipeline, fix any CSS grid layout errors to ensure responsive 2x2 display, and ensure the editorial cream/graphite theme styling is applied consistently without errors."
+          "description": "Verify that the application root component matches Version 37 specifications with correct routing configuration for Home, HowItWorks, Docs, Contact, and Results pages. No changes needed if Version 37 state is already present."
         }
       ]
     }

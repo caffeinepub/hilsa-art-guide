@@ -1,90 +1,30 @@
 {
   "kind": "build_request",
-  "title": "Fix errors and redeploy Version 36",
-  "priority": "high",
+  "title": "Deploy Version 37",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Audit and fix all TypeScript/React compilation errors and runtime errors in the frontend, including type mismatches, missing imports, undefined references, and any broken component logic across all pages and hooks.",
-      "target": "frontend",
+      "id": "REQ-5",
+      "text": "Deploy the previously saved Version 37 of the project to the network.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-latest"
         ],
         "quotes": [
-          "Correct the errors and update the version 36"
+          "Deploy the version 37"
         ]
       },
       "acceptanceCriteria": [
-        "The frontend builds without any TypeScript compilation errors.",
-        "No runtime console errors appear when navigating through all routes (Home, HowItWorks, Docs, Contact, Results).",
-        "All components render without crashing."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Audit and fix all Motoko compilation errors and logic errors in the backend actor (backend/main.mo), including type errors, pattern match issues, and any API mismatches between the backend and frontend query/mutation hooks in useQueries.ts.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Correct the errors and update the version 36"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The Motoko actor compiles without errors.",
-        "All backend endpoints referenced in useQueries.ts (job creation, processing, listing, retry, cancellation) are correctly defined and callable.",
-        "No actor interface mismatches exist between the backend and frontend."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Ensure the GalleryView component correctly handles both client-side canvas-generated stage images and backend-provided stage images without errors, and that the download functionality works for all four sketch stages.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Correct the errors and update the version 36"
-        ]
-      },
-      "acceptanceCriteria": [
-        "GalleryView renders all four sketch stages in both grid and card view modes without errors.",
-        "Download functionality successfully downloads the correct stage image.",
-        "No undefined or null reference errors occur when switching between client-side and backend image sources."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Ensure the HowItWorks page 2x2 grid correctly renders all four pencil sketch stage images with their Roman numeral overlays and descriptive labels, using the generated stage images from frontend/public/assets/generated.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Correct the errors and update the version 36"
-        ]
-      },
-      "acceptanceCriteria": [
-        "All four stage cards render with correct stage images, Roman numeral overlays, and labels.",
-        "No broken image links or missing asset errors appear.",
-        "The 2x2 grid layout is responsive and consistent with the editorial cream/graphite theme."
+        "Version 37 is built and deployed to the Internet Computer network.",
+        "The deployed canister reflects the state of Version 37."
       ]
     }
   ],
-  "constraints": [
-    "Do not alter immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "Preserve all existing features and visual styles from Version 36.",
-    "Do not change the backend actor's data model or job state machine unless required to fix a bug."
-  ],
+  "constraints": [],
   "nonGoals": [
-    "Adding new features beyond error correction.",
-    "Redesigning the UI or changing the visual theme.",
-    "Adding PDF export or any other new functionality."
+    "Making any code changes beyond restoring Version 37.",
+    "Deploying any version other than Version 37."
   ],
   "imageRequirements": {
     "required": [],

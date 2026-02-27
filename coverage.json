@@ -1,57 +1,21 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T07:22:40.647Z",
+  "generatedAt": "2026-02-27T07:59:56.198Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
+    "total": 1,
     "implemented": 0,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Audit and fix all TypeScript/React compilation errors and runtime errors in the frontend, including type mismatches, missing imports, undefined references, and any broken component logic across all pages and hooks.",
+        "id": "REQ-5",
+        "summary": "Deploy the previously saved Version 37 of the project to the network.",
         "status": "missing",
         "plannedFiles": [
-          "frontend/src/components/GalleryView.tsx",
-          "frontend/src/components/UploadInterface.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/pages/Results.tsx",
-          "frontend/src/pages/Contact.tsx",
-          "frontend/src/pages/Documentation.tsx",
-          "frontend/src/lib/pencilSketchUtils.ts",
-          "frontend/src/App.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/components/Footer.tsx"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-2",
-        "summary": "Audit and fix all Motoko compilation errors and logic errors in the backend actor (backend/main.mo), including type errors, pattern match issues, and any API mismatches between the backend and frontend query/mutation hooks in useQueries.ts.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Ensure the GalleryView component correctly handles both client-side canvas-generated stage images and backend-provided stage images without errors, and that the download functionality works for all four sketch stages.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/components/GalleryView.tsx",
-          "frontend/src/lib/pencilSketchUtils.ts"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Ensure the HowItWorks page 2x2 grid correctly renders all four pencil sketch stage images with their Roman numeral overlays and descriptive labels, using the generated stage images from frontend/public/assets/generated.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/pages/HowItWorks.tsx"
+          "frontend/src/App.tsx"
         ],
         "matchedFiles": []
       }
@@ -59,7 +23,6 @@
   },
   "changedFiles": [
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-implementation-plan.json",
